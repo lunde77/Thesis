@@ -1,8 +1,15 @@
-Procedure before push:
+##ssProcedure before push:
+
+
+### to pull
 
 git status # se stauts 
 
 git pull origin main # hvis ikke opdatet, så hent opdatering fra master
+
+
+
+### to push
 
 git add .  # add nye ting
 
