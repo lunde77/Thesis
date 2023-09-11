@@ -1,0 +1,14 @@
+Procedure before push:
+
+git status # se stauts 
+
+git pull origin main # hvis ikke opdatet, så hent opdatering fra master
+
+git add .  # add nye ting
+
+git commit -m "SKRIV DATO "
+
+git push -u origin main # push changes, derved er dine ændringer fuldført
+
+
+
