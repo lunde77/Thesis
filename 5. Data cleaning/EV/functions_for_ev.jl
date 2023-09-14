@@ -105,7 +105,7 @@ function get_power(filtered_df)
     println("The average resolution is $avg_resolution")
     println("with an maximum resolution of $max")
 
-    return POWER
+    return POWER, avg_resolution
 
 end
 
@@ -273,24 +273,24 @@ function make_data(target_cbid)
     # is the latest data pint was no recorded after day 300 of the year, we assume that the data is now full
     if time_since[size(filtered_df)[1]] <= 60*24*300
         println("dataset $target_cbid was not full")
-        return EV_DATA[1,:,:], false
+        return EV_DATA[1,:,:], false, 10
     end
 
     # if has run out of memory
     if size(EV_DATA)[2] <= 425600
         println("out of memory")
         println("out of memory")
-        return EV_DATA[1,:,:], true
+        return EV_DATA[1,:,:], true, 10
     end
 
 
-    EV_DATA[1, :, 3] =  get_power(filtered_df)
+    EV_DATA[1, :, 3], avg_resolution =  get_power(filtered_df)
     EV_DATA[1, :, 5] =  find_charger(filtered_df.power)
     # if has run out of memory
-    if size(EV_DATA)[2] <= 425600
-        println("out of memory")
-        println("out of memory")
-        return EV_DATA[1,:,:], true
+    if EV_DATA[1, 1, 3] >= 22.2
+        println("the mac charge was to high")
+        println("the mac charge was to high")
+        return EV_DATA[1,:,:], true, avg_resolution
     end
     EV_DATA[1, :, 3] =  filter_power(EV_DATA[1, :, 3], EV_DATA[1, 1, 5])
     EV_DATA[1, :, 1] =  get_resovior(EV_DATA[1, :, 3])
@@ -302,5 +302,5 @@ function make_data(target_cbid)
 #    plot!(EV_DATA[1,:,3], label = "conncted")
 #    plot!(EV_DATA[1,:,4], label = "Max charger power")
 
-    return EV_DATA[1,:,:], true
+    return EV_DATA[1,:,:], true, avg_resolution
 end
