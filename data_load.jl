@@ -1,6 +1,6 @@
 using CSV
 using DataFrames
-
+using XLSX
 
 ##### Output:
 
@@ -15,21 +15,13 @@ using DataFrames
         # max effect kW
         # minute of year (also the index)
 
+#Up_prices_d1:  Upregulation prices for d-1 per hour in DKK/kW
+#Up_prices_d2:  Upregulation prices for d-2 per hour in DKK/kW
+#Ned_prices_d1: Downregulation prices for d-1 per hour in DKK/kW
+#Ned_prices_d2: Downregulation prices for d-2 per hour in DKK/kW
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+####### Paths ########
 
 # Define the base folder path
 Emil = false
@@ -40,6 +32,31 @@ else
     base_path = "C:\\Users\\Gustav\\Documents\\Thesis\\data\\EV\\cleaned data"
 end
 
+
+
+####### Load FCR-D prices ########
+
+xf_FCR_D_Prices = XLSX.readxlsx("base_path"*"FCR_prices.xlsx")
+Ned_prices_d1 =  xf_FCR_D_Prices["Sheet1!A2:A8761"]  # in DKK/kW
+Ned_prices_d2 =  xf_FCR_D_Prices["Sheet1!B2:B8761"]  # in DKK/kW
+Up_prices_d1  =  xf_FCR_D_Prices["Sheet1!C2:C8761"]  # in DKK/kW
+Up_prices_d2  =  xf_FCR_D_Prices["Sheet1!D2:D8761"]  # in DKK/kW
+
+
+Up_prices_d1 = coalesce.(Up_prices_d1, 0)
+Up_prices_d2 = coalesce.(Up_prices_d2, 0)
+Ned_prices_d1 = coalesce.(Ned_prices_d1, 0)
+Ned_prices_d2 = coalesce.(Ned_prices_d2, 0)
+
+Mi = 24*365
+
+# convert to danish DKK
+for m=1:Mi
+        Up_prices_d1[m] = Up_prices_d1[i]/1000*7.8
+        Up_prices_d1[m] = Up_prices_d1[i]/1000*7.8
+        Ned_prices_d1[m] = Ned_prices_d1[i]/1000*7.8
+        Ned_prices_d2[m] = Up_prices_d2[i]/1000*7.8
+end
 
 
 

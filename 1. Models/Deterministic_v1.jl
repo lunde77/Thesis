@@ -18,11 +18,11 @@ include("$base_path"*"data_load.jl")
 Model  = Model(Cbc.Optimizer)
 
 # varibles
-@variable(Model, 0 <= Po[1:M])          # power delivered after activation
-@variable(Model, 0 <= C_up[1:M])       # Upwards bid
-@variable(Model, 0 <= C_down[1:M])     # Downwards bid
-@variable(Model, 0 <= Ma[1:M])         # Max power
-@variable(Model, 0 <= SoC[1:M+1])        # Energy resovior level
+@variable(Model, 0 <= Po[1:M])         # power delivered after activation - kW
+@variable(Model, 0 <= C_up[1:M])       # Upwards bid - kW
+@variable(Model, 0 <= C_down[1:M])     # Downwards bid - kW
+@variable(Model, 0 <= Ma[1:M])         # Max power - kW
+@variable(Model, 0 <= SoC[1:M+1])      # Energy resovior level - kWh
 
 # obejective
 @objective(Model, Max, sum( C_up[(t-1)*60+1]*La_up[t] + C_down[(t-1)*60+1]*La_down[t]  t=1:T))
@@ -36,7 +36,7 @@ Model  = Model(Cbc.Optimizer)
 @constraint(Model, [m=1:M], Ma[m] <= (kWh_cap[m]/po_cap[m]-kWh_cap[m] )*60           # the charging must not violaate the resovior max
 
 # power constraint
-@constraint(Model, [m=1:M], Po[m] = Power[m]+Ac_up[m]*C_up[m]-Ac_down[m]*C_down[m])  # The power is the baseline + the activation power
+@constraint(Model, [m=1:M], Po[m] == Power[m]+Ac_up[m]*C_up[m]-Ac_down[m]*C_down[m]) # The power is the baseline + the activation power
 
 # SoC/Resovior constraints
 @constraint(model, SoC[1] == 0)                                                      # The SoC must be zero at m=1, as it's before any operation
@@ -65,7 +65,6 @@ println("Termination status: $(termination_status(Model))")
 
 if termination_status(Model) == MOI.OPTIMAL
    println("Optimal objective value: $(objective_value(Model))")
-
 else
    println("No optimal solution available")
 end
