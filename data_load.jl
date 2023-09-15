@@ -17,8 +17,11 @@ using XLSX
 
 #Up_prices_d1:  Upregulation prices for d-1 per hour in DKK/kW
 #Up_prices_d2:  Upregulation prices for d-2 per hour in DKK/kW
-#Ned_prices_d1: Downregulation prices for d-1 per hour in DKK/kW
-#Ned_prices_d2: Downregulation prices for d-2 per hour in DKK/kW
+#Do_prices_d1: Downregulation prices for d-1 per hour in DKK/kW
+#Do_prices_d2: Downregulation prices for d-2 per hour in DKK/kW
+
+# Ac_up: activation rate per minue in % for up regulation
+# Ac_do: activation rate per minue in % for down regulation
 
 
 ####### Paths ########
@@ -27,53 +30,65 @@ using XLSX
 Emil = false
 
 if Emil
-    base_path = "C:\\Users\\ASUS\\Documents\\11. sem - kand\\EV data"
+    base_path = "C:\\Users\\ASUS\\Documents\\11. sem - kand\\data\\"
 else
-    base_path = "C:\\Users\\Gustav\\Documents\\Thesis\\data\\EV\\cleaned data"
+    base_path = "C:\\Users\\Gustav\\Documents\\Thesis\\data\\"
 end
+
+
+####### Load Activations rates ########
+
+Freq_data =  XLSX.readxlsx("$base_path"*"Frequency\\Activation.xlsx")
+global Ac_up =  Freq_data["Sheet1!A2:A525601"]  # in %
+global Ac_do =  Freq_data["Sheet1!B2:B525601"]  # in #
 
 
 
 ####### Load FCR-D prices ########
 
-xf_FCR_D_Prices = XLSX.readxlsx("base_path"*"FCR_prices.xlsx")
-Ned_prices_d1 =  xf_FCR_D_Prices["Sheet1!A2:A8761"]  # in DKK/kW
-Ned_prices_d2 =  xf_FCR_D_Prices["Sheet1!B2:B8761"]  # in DKK/kW
-Up_prices_d1  =  xf_FCR_D_Prices["Sheet1!C2:C8761"]  # in DKK/kW
-Up_prices_d2  =  xf_FCR_D_Prices["Sheet1!D2:D8761"]  # in DKK/kW
+xf_FCR_D_Prices = XLSX.readxlsx("$base_path"*"Price\\FCR_prices.xlsx")
+global Do_prices_d1 =  xf_FCR_D_Prices["Sheet1!A2:A8761"]  # in DKK/kW
+global Do_prices_d2 =  xf_FCR_D_Prices["Sheet1!B2:B8761"]  # in DKK/kW
+global Up_prices_d1  =  xf_FCR_D_Prices["Sheet1!C2:C8761"]  # in DKK/kW
+global Up_prices_d2  =  xf_FCR_D_Prices["Sheet1!D2:D8761"]  # in DKK/kW
 
-
+# file missing data with zeros
 Up_prices_d1 = coalesce.(Up_prices_d1, 0)
 Up_prices_d2 = coalesce.(Up_prices_d2, 0)
-Ned_prices_d1 = coalesce.(Ned_prices_d1, 0)
-Ned_prices_d2 = coalesce.(Ned_prices_d2, 0)
+Do_prices_d1 = coalesce.(Do_prices_d1, 0)
+Do_prices_d2 = coalesce.(Do_prices_d2, 0)
 
 Mi = 24*365
 
 # convert to danish DKK
 for m=1:Mi
-        Up_prices_d1[m] = Up_prices_d1[i]/1000*7.8
-        Up_prices_d1[m] = Up_prices_d1[i]/1000*7.8
-        Ned_prices_d1[m] = Ned_prices_d1[i]/1000*7.8
-        Ned_prices_d2[m] = Up_prices_d2[i]/1000*7.8
+        global Up_prices_d1[m] = Up_prices_d1[m]/1000*7.8
+        global Up_prices_d2[m] = Up_prices_d2[m]/1000*7.8
+        global Do_prices_d1[m] = Do_prices_d1[m]/1000*7.8
+        global Do_prices_d2[m] = Do_prices_d2[m]/1000*7.8
 end
-
-
 
 
 ####### LOAD DATA FOR EV CHARGE box ########
 
-
 # Get a list of all CSV files in the folder
-file_names = readdir(base_path, join=true)
+file_names = readdir("$base_path"*"EV\\cleaned data\\", join=true)
 dataframe_names = file_names
 # Create a dictionary to store the loaded DataFrames
 global EV_dataframes = Dict{String, DataFrame}()
+
+# Set the number of files to load - defount is all
+#num_files_to_load = size(dataframe_names)[1] # outcomment this (not delete), if other option than all is selceted
+num_files_to_load = 5
 
 # Load only CSV files and store them in the dictionary
 global i = 0
 for file_path in file_names
     global i = i + 1
+
+    if i > num_files_to_load
+        break
+    end
     if endswith(file_path, ".csv")
         #_, filename, _ = splitpath(file_path)  # Extract the file name without extension
         filename = file_path
