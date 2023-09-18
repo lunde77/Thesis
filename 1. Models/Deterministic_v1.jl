@@ -55,11 +55,7 @@ function deterministic_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    end
 
    # Power constraint
-   if SoC[m] == kWh_cap[m]/po_cap[m]
-      @constraint(Mo, [m=1:M_d], Po[m] == 0)                                          # The power realized must be zero, as we hit capacity
-   else 
-      @constraint(Mo, [m=1:M_d], Po[m] == Power[m]+Ac_up[m]*C_up[m]-Ac_do[m]*C_do[m]) # The power is the baseline + the activation power
-   end
+   @constraint(Mo, [m=1:M_d], Po[m] == Power[m]+Ac_up[m]*C_up[m]-Ac_do[m]*C_do[m])   # The power is the baseline + the activation power
 
    for m=1:M_d
       if Connected[m] == 0

@@ -39,8 +39,8 @@ end
 ####### Load Activations rates ########
 
 Freq_data =  XLSX.readxlsx("$base_path"*"Frequency\\Activation.xlsx")
-global Ac_up =  Freq_data["Sheet1!A2:A525601"]  # in %
-global Ac_do =  Freq_data["Sheet1!B2:B525601"]  # in #
+global Ac_upwards =  Freq_data["Sheet1!A2:A525601"]  # in %
+global Ac_dowards =  Freq_data["Sheet1!B2:B525601"]  # in #
 
 
 

@@ -1,25 +1,36 @@
 
+function test_main()
 
-for Day=1:365
 
-    # Inputs to determic model:
-    La_do = Do_prices_d1[(Day-1)*T+1:(Day)*T]                                                  # prices down for d-1
-    La_up = Up_prices_d1[(Day-1)*T+1:(Day)*T]                                                  # prices up for d-1
-    Ac_do = Ac_do[(Day-1)*M_d+1:(Day)*M_d]                                                     # activation % downwards
-    Ac_up = Ac_up[(Day-1)*M_d+1:(Day)*M_d]                                                     # activation % upwards
-    Max_Power =  EV_dataframes[dataframe_names[1]][(Day-1)*M_d+1:(Day)*M_d, 5]                 # max power of box
-    po_cap = EV_dataframes[dataframe_names[1]][(Day-1)*M_d+1:(Day)*M_d, 1]                     # % of resovior stored
-    kWh_cap = EV_dataframes[dataframe_names[1]][(Day-1)*M_d+1:(Day)*M_d, 2]                    # kWh of resovior charged
-    Power = EV_dataframes[dataframe_names[1]][(Day-1)*M_d+1:(Day)*M_d, 3]                      # baseline power
-    Connected = EV_dataframes[dataframe_names[1]][(Day-1)*M_d+1:(Day)*M_d, 4]                  # minutes where CB is connected
 
-    if Day == 1
-        SoC_start = kWh_cap[1]
-    else
-        SoC_start = SoC_end
+    for Day=1:365
+
+
+
+        # Static Parameters
+        T = 24 # hours on a day
+        M = 60 # minutes in an hour
+        M_d = T*M # minutes per model, i.e. per day
+
+        # Inputs to determic model:
+        global La_do = Do_prices_d1[(Day-1)*T+1:(Day)*T]                                                  # prices down for d-1
+        global La_up = Up_prices_d1[(Day-1)*T+1:(Day)*T]                                                  # prices up for d-1
+        global Ac_do = Ac_dowards[(Day-1)*M_d+1:(Day)*M_d]                                                # activation % downwards
+        global Ac_up = Ac_upwards[(Day-1)*M_d+1:(Day)*M_d]                                                # activation % upwards
+        global Max_Power =  EV_dataframes[dataframe_names[1]][(Day-1)*M_d+1:(Day)*M_d, 5]                 # max power of box
+        global po_cap = EV_dataframes[dataframe_names[1]][(Day-1)*M_d+1:(Day)*M_d, 1]                     # % of resovior stored
+        global kWh_cap = EV_dataframes[dataframe_names[1]][(Day-1)*M_d+1:(Day)*M_d, 2]                    # kWh of resovior charged
+        global Power = EV_dataframes[dataframe_names[1]][(Day-1)*M_d+1:(Day)*M_d, 3]                      # baseline power
+        global Connected = EV_dataframes[dataframe_names[1]][(Day-1)*M_d+1:(Day)*M_d, 4]                  # minutes where CB is connected
+
+        if Day == 1
+            global SoC_start = kWh_cap[1]
+        else
+            global SoC_start = SoC_end
+        end
+
+
+        Up_bid, down_bid, SoC_end = deterministic_model(La_do, La_up, Ac_do, Ac_up, Max_Power, po_cap, kWh_cap, Power, Connected, SoC_start)
+        global SoC_end
     end
-
-
-    Up_bid, down_bid, SoC_end = deterministic_model(La_do, La_up, Ac_do, Ac_up, Max_Power, po_cap, kWh_cap, Power, Connected, SoC_start)
-
 end
