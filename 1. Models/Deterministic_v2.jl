@@ -32,19 +32,32 @@ function deterministic_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    # Model
    Mo  = Model(Gurobi.Optimizer)
 
-   # varibles
-   @variable(Mo, 0 <= Po[1:M_d])       # Power delivered after activation - kW
-   @variable(Mo, 0 <= C_up[1:M_d])     # Upwards bid - kW
-   @variable(Mo, 0 <= C_do[1:M_d])     # Downwards bid - kW
-   @variable(Mo, 0 <= Ma[1:M_d])       # Max power - kW
-   @variable(Mo, 0 <= SoC[1:M_d])      # Energy resovior level - kWh
+   # varible per individual CB
+   @variable(Mo, 0 <= Po[1:M_d, 1:I])       # Power delivered after activation - kW
+   @variable(Mo, 0 <= Ma[1:M_d, 1:I])       # Max power - kW
+   @variable(Mo, 0 <= SoC[1:M_d, 1:I])      # Energy resovior level - kWh
+   @variable(Mo, 0 <= C_up_A[1:M_d, 1:I])   # Upwards bid placed on CB I - kW
+   @variable(Mo, 0 <= C_do_A[1:M_d, 1:I])   # Downwards bid  on CB I  - kW
+
+   # varible for aggregator
+   @variable(Mo, 0 <= Po_A[1:M_d])          # aggregator Power delivered after activation - kW
+   @variable(Mo, 0 <= Power_A[1:M_d])       # aggregator Power delivered before activation - kW
+   @variable(Mo, 0 <= C_up_A[1:M_d])        # aggregator Upwards bid - kW
+   @variable(Mo, 0 <= C_do_A[1:M_d])        # aggregator Downwards bid - kW
+   @variable(Mo, 0 <= Ma_A[1:M_d])          # aggregator Max power - kW
+
 
    # Obejective
-   @objective(Mo, Max, sum( C_up[(t-1)*60+1]*La_up[t] + C_do[(t-1)*60+1]*La_do[t] for t=1:T) )
+   @objective(Mo, Max, sum( C_up_A[(t-1)*60+1]*La_up[t] + C_do_A[(t-1)*60+1]*La_do[t] for t=1:T) )
+
+   # aggregator helper varibles
+   @constraint(Mo, [m=1:M_d], Ma_A[m] = sum(Ma[m,i] for i=1:I) )                     # The maximum charge is the sum of all max charging rates
+   @constraint(Mo, [m=1:M_d], Po_A[m] = sum(Po[m,i] for i=1:I) )                     # The power delivered for the aggregator is the sum of all
+   @constraint(Mo, [m=1:M_d], Power_A[m] = sum(Power[m,i] for i=1:I) )               # The power delivered for the aggregator is the sum of all
 
    # Bid constraiants
-   @constraint(Mo, [m=1:M_d], Ma[m]-Power[m] >= C_up[m]+C_do[m]*0.2 )                # The upwards flexibility has to be greater than the the the bids regulation
-   @constraint(Mo, [m=1:M_d], Power[m] >= C_up[m]*0.2+C_do[m] )                      # The downwards flexibility has to be greater than the the the bids regulation
+   @constraint(Mo, [m=1:M_d], Ma_A[m]-Power_A[m] >= C_up_A[m]+C_do_A[m]*0.2 )        # The upwards flexibility has to be greater than the the the bids regulation
+   @constraint(Mo, [m=1:M_d], Power_A[m] >= C_up_A[m]*0.2+C_do_A[m] )                # The downwards flexibility has to be greater than the the the bids regulation
 
    # Max power constraint
    @constraint(Mo, [m=1:M_d], Ma[m] <= Power_rate[m]  )                              # The charging power rate of the box must be higher than the Max power (Ma)
