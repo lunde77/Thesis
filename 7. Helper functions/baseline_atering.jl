@@ -28,8 +28,7 @@ function baseline_altering(Power, SoC_start, Connected, po_cap, kWh_cap)
                 end
 
                 if SoC_syn[m] > kWh_cap[m]/po_cap[m] # if the power put the SoC over it's limit, it mean we must alter the power baseline
-                        println("it was at m =  $m")
-                        println("it was at m =  $m")
+                        
                         if m==1
                                 Power[m] = 0
                         else
@@ -40,13 +39,9 @@ function baseline_altering(Power, SoC_start, Connected, po_cap, kWh_cap)
                                 Power[m] = 0
                                 m = m + 1
                                 if  M_d < m
-                                        println(m)
                                         return Power, false
                                 end
                         end
-                        println(m)
-                        print("her")
-                        println(SoC_syn[m] )
                         return Power, false
                 end
 

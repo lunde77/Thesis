@@ -75,5 +75,4 @@ function test_A(CB_Is)
     end
 
     println("The revenue in oracle mode would be $revenue")
-    return revenue
 end

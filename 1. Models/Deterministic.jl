@@ -15,9 +15,14 @@ using JuMP
 
 
 # return (varies per day):
-# value.(C_up)              # upwards bid in kW in m 1440x1
-# value.(C_do)              # downwards bid in kW in m 1440x1
-# value(SoC[M_d])           # the expected Energy resovior in kWh at the end of the day 1x1
+# value.(C_up_A)            # upwards bid for aggregator in kW in m 1440x1
+# value.(C_do_A)            # downwards bid for aggregator in kW in m 1440x1
+# value.(C_up)              # distributed of upwards bid in kW in m 1440xI
+# value.(C_do)              # distributed of downwards bid in kW in m 1440xI
+# value.(SoC[M_d,:])        # the expected Energy resovior in kWh at the end of the day 1xI
+# value.(SoC_A)             # the expected Energy resovior in kWh for all minutes for the aggregated resovior
+# value.(Ma_A)              # the expected Ma charging rate for the aggregator
+# objective_value(Mo)       # The profit of bids
 
 function deterministic_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh_cap, Power, Connected, SoC_start, SoC_A_cap, I)
 
@@ -62,14 +67,14 @@ function deterministic_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    # Aggregator Bid constraiants
    @constraint(Mo, [m=1:M_d], Ma_A[m]-Power_A[m] >= C_do_A[m] )                                          # The upwards flexibility has to be greater than the the the bids regulation
    @constraint(Mo, [m=1:M_d], Power_A[m] >= C_up_A[m]*0.2+C_do_A[m] )                                    # The downwards flexibility has to be greater than the the the bids regulation, hence there is delay factor added on
-   @constraint(Mo, [m=1:M_d], (SoC_A_cap[m]-SoC_A[m,1]) >= C_do_A[m]*(1/3) )                                        # There must at all times be enough resovior to be activated for 20 minutes of the - this is a
+   @constraint(Mo, [m=1:M_d], (SoC_A_cap[m]-SoC_A[m,1]) >= C_do_A[m]*(1/3) )                             # There must at all times be enough resovior to be activated for 20 minutes of the - this is a
 
    # Flexibility constraint
    @constraint(Mo, [m=1:M_d, i=1:I], Ma[m,i]-Power[m,i] >= C_do[m,i] )                                   # The upwards flexibility has to be greater than the the the bids regulation
-   @constraint(Mo, [m=1:M_d, i=1:I], Power[m,i] >= C_up[m,i] )                                          # The downwards flexibility has to be greater than the the the bids regulation
+   @constraint(Mo, [m=1:M_d, i=1:I], Power[m,i] >= C_up[m,i] )                                           # The downwards flexibility has to be greater than the the the bids regulation
 
    # Max power constraint
-   @constraint(Mo, [m=1:M_d, i=1:I], Ma[m,i] <= Power_rate[m,i]  )                                       # The charging power rate of the box must be higher than the Max power (Ma)
+   @constraint(Mo, [m=1:M_d, i=1:I], Ma[m,i] <= Power_rate[m,i]*Connected[m,i]  )                        # The charging power rate of the box must be higher than the Max power (Ma)
    for i=1:I
       for m=2:M_d
          if Connected[m,i] == 1 && Connected[m-1,i] != 0  # We need to look at m-1 for the resovior levels, as the power delivered at m, is what gives the SoC at the end
@@ -79,7 +84,7 @@ function deterministic_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    end
 
    # Power constraint
-   @constraint(Mo, [m=1:M_d, i=1:I], Po[m,i] == Power[m,i]-Ac_up[m]*C_up[m,i]+Ac_do[m]*C_do[m,i])    # The power is the baseline + the activation power
+   @constraint(Mo, [m=1:M_d, i=1:I], Po[m,i] == Power[m,i]- [m]*C_up[m,i]+Ac_do[m]*C_do[m,i])            # The power is the baseline + the activation power
 
    for i=1:I
       for m=1:M_d
@@ -118,5 +123,5 @@ function deterministic_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    end
    #************************************************************************
 
-   return value.(C_up_A), value.(C_do_A), value.(C_up), value.(C_do), value.(SoC[M_d,:]), objective_value(Mo)
+   return value.(C_up_A), value.(C_do_A), value.(C_up), value.(C_do), value.(Power_A), value.(Ma_A), value.(SoC_A), value.(SoC[M_d,:]), objective_value(Mo)
 end
