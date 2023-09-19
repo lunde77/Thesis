@@ -39,8 +39,8 @@ end
 ####### Load Activations rates ########
 
 Freq_data =  XLSX.readxlsx("$base_path"*"Frequency\\Activation.xlsx")
-global Ac_upwards =  Freq_data["Sheet1!A2:A525601"]  # in %
-global Ac_dowards =  Freq_data["Sheet1!B2:B525601"]  # in #
+global Ac_dowards =  Freq_data["Sheet1!A2:A525601"]  # in %
+global Ac_upwards =  Freq_data["Sheet1!B2:B525601"]  # in #
 
 
 
@@ -79,7 +79,7 @@ global EV_dataframes = Dict{String, DataFrame}()
 
 # Set the number of files to load - defount is all
 #num_files_to_load = size(dataframe_names)[1] # outcomment this (not delete), if other option than all is selceted
-num_files_to_load = 5
+num_files_to_load = 50
 
 # Load only CSV files and store them in the dictionary
 global i = 0
