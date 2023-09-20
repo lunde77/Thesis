@@ -24,6 +24,7 @@ else
 end
 
 include("$base_path"*"4. Tests\\Main.jl")
-include("$base_path"*"4. Tests\\Plots\\Deterministic d1\\plot_function.jl") 
+
 include("$base_path"*"7. Helper functions\\baseline_atering.jl")
-include("$base_path"*"1. Models\\Deterministic_v2.jl")
+include("$base_path"*"1. Models\\Deterministic.jl")
+include("$base_path"*"4. Tests\\Plots\\Deterministic d1\\plot_function.jl")

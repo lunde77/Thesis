@@ -1,3 +1,5 @@
+Up_bids_I[:,Day,:]
+
 using CSV
 using DataFrames
 
@@ -11,4 +13,3 @@ end
 
 results_df = DataFrame(results, :auto)
 CSV.write("$base_path"*"3. Simulations\\aggregated_1_50_10.csv", results_df)
-# Extracting the first column into a vector

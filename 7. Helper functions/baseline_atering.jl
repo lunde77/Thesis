@@ -28,13 +28,16 @@ function baseline_altering(Power, SoC_start, Connected, po_cap, kWh_cap)
                 end
 
                 if SoC_syn[m] > kWh_cap[m]/po_cap[m] # if the power put the SoC over it's limit, it mean we must alter the power baseline
-                        
+
                         if m==1
                                 Power[m] = 0
                         else
                                 Power[m] =  (kWh_cap[m]/po_cap[m] - SoC_syn[m-1])*60
                         end
                         m = m + 1
+                        if  M_d < m
+                                return Power, false
+                        end
                         while Connected[m] == 1
                                 Power[m] = 0
                                 m = m + 1

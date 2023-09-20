@@ -7,10 +7,10 @@ using JuMP
 #La_up                      # prices up for d-1 in h 24x1
 #Ac_do                      # activation % downwards in m 1440x1
 #Ac_up                      # activation % upwards in m 1440x1
-#Power_rate                 # charging power rate of box in m 1440x1
-#po_cap                     # % of resovior stored in m 1440x1
+#Power_rate                 # charging power rate of box in m 1440xI
+#po_cap                     # % of resovior stored in m 1440xI
 #kWh_cap                    # kWh of resovior charged in m 1440x1
-#Power                      # baseline power in m 1440x1
+#Power                      # baseline power in m 1440xI
 #Connected                  # minutes where CB is connected in m 1440x1
 
 
@@ -59,7 +59,7 @@ function deterministic_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    # aggregator helper varibles
    @constraint(Mo, [m=1:M_d], Ma_A[m] == sum(Ma[m,i] for i=1:I) )                                        # The maximum charge is the sum of all max charging rates
    @constraint(Mo, [m=1:M_d], Po_A[m] == sum(Po[m,i] for i=1:I) )                                        # The power delivered for the aggregator is the sum of all
-   @constraint(Mo, [m=1:M_d], Power_A[m] == sum(Power[m,i] for i=1:I) )                                  # The power delivered for the aggregator is the sum of all
+   @constraint(Mo, [m=1:M_d], Power_A[m] == sum(Power[m,i,s] for i=1:I) )                                  # The power delivered for the aggregator is the sum of all
    @constraint(Mo, [m=1:M_d], C_up_A[m] == sum(C_up[m,i] for i=1:I) )                                    # The upwards bid must be distributed over the charge boxses
    @constraint(Mo, [m=1:M_d], C_do_A[m] == sum(C_do[m,i] for i=1:I) )                                    # The downwards bid must be distributed over the charge boxses
    @constraint(Mo, [m=1:M_d], SoC_A[m,1] == sum(kWh_cap[m,i] for i=1:I))                                 # The aggregator SoC if no activation is realized
@@ -84,7 +84,7 @@ function deterministic_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    end
 
    # Power constraint
-   @constraint(Mo, [m=1:M_d, i=1:I], Po[m,i] == Power[m,i]- [m]*C_up[m,i]+Ac_do[m]*C_do[m,i])            # The power is the baseline + the activation power
+   @constraint(Mo, [m=1:M_d, i=1:I], Po[m,i] == Power[m,i]- Ac_up[m]*C_up[m,i]+Ac_do[m]*C_do[m,i])            # The power is the baseline + the activation power
 
    for i=1:I
       for m=1:M_d

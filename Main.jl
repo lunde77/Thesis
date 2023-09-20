@@ -40,6 +40,8 @@ function test_A(CB_Is)
         end
     end
 
+
+
     for Day=1:365
         print("day is $Day")
         global SoC_start = zeros(I)
@@ -48,12 +50,14 @@ function test_A(CB_Is)
         global Ac_do = Ac_dowards[(Day-1)*M_d+1:(Day)*M_d]                                                # activation % downwards
         global Ac_up = Ac_upwards[(Day-1)*M_d+1:(Day)*M_d]                                                # activation % upwards
 
-        global Max_Power =  Max_Power_all[(Day-1)*M_d+1:(Day)*M_d, :]                                         # max power of box
-        global po_cap = po_cap_all[(Day-1)*M_d+1:(Day)*M_d, :]                                                # % of resovior stored
-        global kWh_cap = kWh_cap_all[(Day-1)*M_d+1:(Day)*M_d, :]                                              # kWh of resovior charged
-        global Power = Power_all[(Day-1)*M_d+1:(Day)*M_d, :]                                                  # baseline power
-        global Connected = Connected_all[(Day-1)*M_d+1:(Day)*M_d, :]                                          # minutes where CB is connected
-        global SoC_A_cap = SoC_A_cap_all[(Day-1)*M_d+1:(Day)*M_d]                                          # The aggregated resovior capacity
+        global Max_Power =  Max_Power_all[(Day-1)*M_d+1:(Day)*M_d, :]                                     # max power of box
+        global po_cap = po_cap_all[(Day-1)*M_d+1:(Day)*M_d, :]                                            # % of resovior stored
+        global kWh_cap = kWh_cap_all[(Day-1)*M_d+1:(Day)*M_d, :]                                          # kWh of resovior charged
+        global Power = Power_all[(Day-1)*M_d+1:(Day)*M_d, :]                                              # baseline power
+        global Connected = Connected_all[(Day-1)*M_d+1:(Day)*M_d, :]                                      # minutes where CB is connected
+        global SoC_A_cap = SoC_A_cap_all[(Day-1)*M_d+1:(Day)*M_d]                                         # The aggregated resovior capacity
+
+
 
 
         for i=1:I
@@ -75,4 +79,5 @@ function test_A(CB_Is)
     end
 
     println("The revenue in oracle mode would be $revenue")
+    return revenue
 end
