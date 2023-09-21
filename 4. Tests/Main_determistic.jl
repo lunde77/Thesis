@@ -62,7 +62,7 @@ function Main_deterministic(CB_Is)
 
         for i=1:I
             if Day == 1
-                global SoC_start[i] = kWh_cap[1,i]
+                global SoC_start[i] = 0
             else
                 global SoC_start[i] = SoC_end[i]
             end
@@ -71,7 +71,7 @@ function Main_deterministic(CB_Is)
 
         Up_bids_A[:,Day], Do_bids_A[:,Day], Up_bids_I[:,Day,:], Do_bids_I[:,Day,:], Power_A[:,Day], MA_A[:,Day], SoC_A[:,Day], SoC_end, obj = deterministic_model(La_do, La_up, Ac_do, Ac_up, Max_Power, po_cap, kWh_cap, Power, Connected, SoC_start, SoC_A_cap, I)
 
-        
+
         revenue = revenue + obj
 
         global SoC_end

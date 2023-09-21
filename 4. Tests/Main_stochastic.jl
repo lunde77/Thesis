@@ -45,9 +45,9 @@ function Main_stochastic(CB_Is)
 
 
 
-    for Day=1:100
+    for Day=1:5
         print("day is $Day")
-        global SoC_start = zeros(I)
+        global SoC_start_r = zeros(I)
 
         ###### Initialize the realized data for the given day ######
         global La_do_r = Do_prices_d1[(Day-1)*T+1:(Day)*T]                                                  # prices down for d-1
@@ -71,22 +71,28 @@ function Main_stochastic(CB_Is)
         global Power_s  = scenario_generation_m(Power_all, Day)                                             # Scenarios for baseline power
         global Connected_s  = scenario_generation_m(Connected_all, Day)                                     # Scenarios for minutes where CB is connected
         global SoC_A_cap_s  = scenario_generation_m(SoC_A_cap_all, Day)                                     # Scenarios for The aggregated resovior capacity
+        global SoC_start_s = scenario_generation_d1(Dataset, Day)                                           # Scenarios for the start SoC
 
 
+        ###### Initialize the SoC for the begining of th day ######
         for i=1:I
             if Day == 1
-                global SoC_start[i] = kWh_cap[1,i]
+                global SoC_start_r[i] = 0
             else
-                global SoC_start[i] = SoC_end[i]
+                global SoC_start_r[i] = SoC_end[i]
             end
-            Power[:,i], altered = baseline_altering(Power[:,i], SoC_start[i], Connected[:,i], po_cap[:,i], kWh_cap[:,i])
+            # Alter the power if it's conflicting with the SoC limits
+            Power[:,i], altered = baseline_altering(Power_r[:,i], SoC_start_r[i], Connected_r[:,i], po_cap_r[:,i], kWh_cap_r[:,i])
         end
 
-        Up_bids_A[:,Day], Do_bids_A[:,Day], Up_bids_I[:,Day,:], Do_bids_I[:,Day,:], Power_A[:,Day], MA_A[:,Day], SoC_A[:,Day], SoC_end, obj = Stocchastic_d1_model(La_do, La_up, Ac_do, Ac_up, Max_Power, po_cap, kWh_cap, Power, Connected, SoC_start, SoC_A_cap, I)
+
+        ###### derrive bids based on stochastic model ######
+        Up_bids_A[:,Day], Do_bids_A[:,Day], Up_bids_I[:,Day,:], Do_bids_I[:,Day,:], Power_A[:,Day], MA_A[:,Day], SoC_A[:,Day], SoC_end, obj = Stocchastic_d1_model(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, I)
 
         println(SoC_end)
 
-        SoC_end, missing_del, A_E, missing_delivery_storer[:,Days,:] =  operation(kWh_cap, po_cap, Power, SoC_start, Max_Power, Ac_do, Ac_up, Do_bids_A[:,Day], Up_bids_A[:,Day])
+        ###### Simulate day of operation on realized data ######
+        SoC_end, missing_del, A_E, missing_delivery_storer[:,Days,:] =  operation(kWh_cap_r, po_cap_r, Power_r, SoC_start_r, Max_Power_r, Ac_do_r, Ac_up_r, Do_bids_A[:,Day], Up_bids_A[:,Day])
 
         println(SoC_end)
 
