@@ -26,6 +26,12 @@ using XLSX
 
 ####### Paths ########
 
+<<<<<<< HEAD:data_load.jl
+# Define the base folder path
+Emil = true
+
+=======
+>>>>>>> 9a75575bffdb57dddc81864c3cf45d299bd450ac:6. Data analyses/data_load.jl
 if Emil
     base_path = "C:\\Users\\ASUS\\Documents\\11. sem - kand\\data\\"
 else
