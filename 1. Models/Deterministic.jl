@@ -7,10 +7,10 @@ using JuMP
 #La_up                      # prices up for d-1 in h 24x1
 #Ac_do                      # activation % downwards in m 1440x1
 #Ac_up                      # activation % upwards in m 1440x1
-#Power_rate                 # charging power rate of box in m 1440x1
-#po_cap                     # % of resovior stored in m 1440x1
+#Power_rate                 # charging power rate of box in m 1440xI
+#po_cap                     # % of resovior stored in m 1440xI
 #kWh_cap                    # kWh of resovior charged in m 1440x1
-#Power                      # baseline power in m 1440x1
+#Power                      # baseline power in m 1440xI
 #Connected                  # minutes where CB is connected in m 1440x1
 
 
