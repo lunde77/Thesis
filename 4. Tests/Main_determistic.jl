@@ -1,4 +1,4 @@
-function test_A(CB_Is)
+function Main_deterministic(CB_Is)
     # Static Parameters
     global T = 24 # hours on a day
     global M = 60 # minutes in an hour

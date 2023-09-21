@@ -59,7 +59,7 @@ function deterministic_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    # aggregator helper varibles
    @constraint(Mo, [m=1:M_d], Ma_A[m] == sum(Ma[m,i] for i=1:I) )                                        # The maximum charge is the sum of all max charging rates
    @constraint(Mo, [m=1:M_d], Po_A[m] == sum(Po[m,i] for i=1:I) )                                        # The power delivered for the aggregator is the sum of all
-   @constraint(Mo, [m=1:M_d], Power_A[m] == sum(Power[m,i,s] for i=1:I) )                                  # The power delivered for the aggregator is the sum of all
+   @constraint(Mo, [m=1:M_d], Power_A[m] == sum(Power[m,i] for i=1:I) )                                  # The power delivered for the aggregator is the sum of all
    @constraint(Mo, [m=1:M_d], C_up_A[m] == sum(C_up[m,i] for i=1:I) )                                    # The upwards bid must be distributed over the charge boxses
    @constraint(Mo, [m=1:M_d], C_do_A[m] == sum(C_do[m,i] for i=1:I) )                                    # The downwards bid must be distributed over the charge boxses
    @constraint(Mo, [m=1:M_d], SoC_A[m,1] == sum(kWh_cap[m,i] for i=1:I))                                 # The aggregator SoC if no activation is realized

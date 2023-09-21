@@ -1,4 +1,4 @@
-function test_A(CB_Is)
+function Main_stochastic(CB_Is)
     # Static Parameters
     global T = 24 # hours on a day
     global M = 60 # minutes in an hour
@@ -8,6 +8,7 @@ function test_A(CB_Is)
 
 
     global revenue =  0
+    global missing_delivery = 0
     global Up_bids_A = zeros(M_d,Days)
     global Do_bids_A = zeros(M_d,Days)
     global Up_bids_I = zeros(M_d,Days,I)
@@ -40,7 +41,9 @@ function test_A(CB_Is)
         end
     end
 
-    for Day=1:365
+
+
+    for Day=1:5
         print("day is $Day")
         global SoC_start = zeros(I)
         global La_do = Do_prices_d1[(Day-1)*T+1:(Day)*T]                                                  # prices down for d-1
@@ -48,12 +51,14 @@ function test_A(CB_Is)
         global Ac_do = Ac_dowards[(Day-1)*M_d+1:(Day)*M_d]                                                # activation % downwards
         global Ac_up = Ac_upwards[(Day-1)*M_d+1:(Day)*M_d]                                                # activation % upwards
 
-        global Max_Power =  Max_Power_all[(Day-1)*M_d+1:(Day)*M_d, :]                                         # max power of box
-        global po_cap = po_cap_all[(Day-1)*M_d+1:(Day)*M_d, :]                                                # % of resovior stored
-        global kWh_cap = kWh_cap_all[(Day-1)*M_d+1:(Day)*M_d, :]                                              # kWh of resovior charged
-        global Power = Power_all[(Day-1)*M_d+1:(Day)*M_d, :]                                                  # baseline power
-        global Connected = Connected_all[(Day-1)*M_d+1:(Day)*M_d, :]                                          # minutes where CB is connected
-        global SoC_A_cap = SoC_A_cap_all[(Day-1)*M_d+1:(Day)*M_d]                                          # The aggregated resovior capacity
+        global Max_Power =  Max_Power_all[(Day-1)*M_d+1:(Day)*M_d, :]                                     # max power of box
+        global po_cap = po_cap_all[(Day-1)*M_d+1:(Day)*M_d, :]                                            # % of resovior stored
+        global kWh_cap = kWh_cap_all[(Day-1)*M_d+1:(Day)*M_d, :]                                          # kWh of resovior charged
+        global Power = Power_all[(Day-1)*M_d+1:(Day)*M_d, :]                                              # baseline power
+        global Connected = Connected_all[(Day-1)*M_d+1:(Day)*M_d, :]                                      # minutes where CB is connected
+        global SoC_A_cap = SoC_A_cap_all[(Day-1)*M_d+1:(Day)*M_d]                                         # The aggregated resovior capacity
+
+
 
 
         for i=1:I
@@ -69,11 +74,17 @@ function test_A(CB_Is)
 
         println(SoC_end)
 
+        SoC_end, missing_del =  operation(kWh_cap, po_cap, Power, SoC_start, Max_Power, Ac_up, Ac_do, Do_bids_A, Up_bids_A)
+
+        println(SoC_end)
+
         revenue = revenue + obj
+        missing_delivery = missing_delivery + missing_del
 
         global SoC_end
     end
 
     println("The revenue in oracle mode would be $revenue")
-    return revenue
+    println("The missing delivery in oracle mode would be $missing_delivery")
+    return revenue, missing_delivery
 end
