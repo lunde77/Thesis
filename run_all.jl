@@ -14,6 +14,7 @@ end
 
 # load all functions:
 include("$base_path"*"1. Models\\Deterministic.jl")
+include("$base_path"*"2. Algorithms\\Day_simulater.jl")
 include("$base_path"*"3. Simulations\\Plots\\Deterministic\\plot_function.jl")
 include("$base_path"*"4. Tests\\Main_determistic.jl")
 include("$base_path"*"4. Tests\\Main_stochastic.jl")

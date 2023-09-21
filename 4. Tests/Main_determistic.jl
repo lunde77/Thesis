@@ -71,8 +71,7 @@ function Main_deterministic(CB_Is)
 
         Up_bids_A[:,Day], Do_bids_A[:,Day], Up_bids_I[:,Day,:], Do_bids_I[:,Day,:], Power_A[:,Day], MA_A[:,Day], SoC_A[:,Day], SoC_end, obj = deterministic_model(La_do, La_up, Ac_do, Ac_up, Max_Power, po_cap, kWh_cap, Power, Connected, SoC_start, SoC_A_cap, I)
 
-        println(SoC_end)
-
+        
         revenue = revenue + obj
 
         global SoC_end

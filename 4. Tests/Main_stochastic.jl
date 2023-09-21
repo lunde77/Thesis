@@ -6,13 +6,15 @@ function Main_stochastic(CB_Is)
     global Days = 365
     global I = size(CB_Is)[1]
 
-
+    # results to be stored
     global revenue =  0
     global missing_delivery = 0
     global Up_bids_A = zeros(M_d,Days)
     global Do_bids_A = zeros(M_d,Days)
     global Up_bids_I = zeros(M_d,Days,I)
     global Do_bids_I = zeros(M_d,Days,I)
+    global Activation_energy = zeros(M_d,Days,I)
+    global missing_delivery_storer = zeros(M_d,Days,2)
     global Power_A = zeros(M_d,Days)
     global SoC_A = zeros(M_d,Days)
     global MA_A = zeros(M_d,Days)
@@ -43,7 +45,7 @@ function Main_stochastic(CB_Is)
 
 
 
-    for Day=1:5
+    for Day=1:100
         print("day is $Day")
         global SoC_start = zeros(I)
         global La_do = Do_prices_d1[(Day-1)*T+1:(Day)*T]                                                  # prices down for d-1
@@ -59,8 +61,6 @@ function Main_stochastic(CB_Is)
         global SoC_A_cap = SoC_A_cap_all[(Day-1)*M_d+1:(Day)*M_d]                                         # The aggregated resovior capacity
 
 
-
-
         for i=1:I
             if Day == 1
                 global SoC_start[i] = kWh_cap[1,i]
@@ -74,10 +74,12 @@ function Main_stochastic(CB_Is)
 
         println(SoC_end)
 
-        SoC_end, missing_del =  operation(kWh_cap, po_cap, Power, SoC_start, Max_Power, Ac_up, Ac_do, Do_bids_A, Up_bids_A)
+        SoC_end, missing_del, A_E, missing_delivery_storer[:,Days,:] =  operation(kWh_cap, po_cap, Power, SoC_start, Max_Power, Ac_do, Ac_up, Do_bids_A[:,Day], Up_bids_A[:,Day])
 
         println(SoC_end)
 
+        # update results:
+        Activation_energy[:,Day,:] = A_E
         revenue = revenue + obj
         missing_delivery = missing_delivery + missing_del
 
