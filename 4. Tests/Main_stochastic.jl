@@ -48,17 +48,29 @@ function Main_stochastic(CB_Is)
     for Day=1:100
         print("day is $Day")
         global SoC_start = zeros(I)
-        global La_do = Do_prices_d1[(Day-1)*T+1:(Day)*T]                                                  # prices down for d-1
-        global La_up = Up_prices_d1[(Day-1)*T+1:(Day)*T]                                                  # prices up for d-1
-        global Ac_do = Ac_dowards[(Day-1)*M_d+1:(Day)*M_d]                                                # activation % downwards
-        global Ac_up = Ac_upwards[(Day-1)*M_d+1:(Day)*M_d]                                                # activation % upwards
 
-        global Max_Power =  Max_Power_all[(Day-1)*M_d+1:(Day)*M_d, :]                                     # max power of box
-        global po_cap = po_cap_all[(Day-1)*M_d+1:(Day)*M_d, :]                                            # % of resovior stored
-        global kWh_cap = kWh_cap_all[(Day-1)*M_d+1:(Day)*M_d, :]                                          # kWh of resovior charged
-        global Power = Power_all[(Day-1)*M_d+1:(Day)*M_d, :]                                              # baseline power
-        global Connected = Connected_all[(Day-1)*M_d+1:(Day)*M_d, :]                                      # minutes where CB is connected
-        global SoC_A_cap = SoC_A_cap_all[(Day-1)*M_d+1:(Day)*M_d]                                         # The aggregated resovior capacity
+        ###### Initialize the realized data for the given day ######
+        global La_do_r = Do_prices_d1[(Day-1)*T+1:(Day)*T]                                                  # prices down for d-1
+        global La_up_r = Up_prices_d1[(Day-1)*T+1:(Day)*T]                                                  # prices up for d-1
+        global Ac_do_r = Ac_dowards[(Day-1)*M_d+1:(Day)*M_d]                                                # activation % downwards
+        global Ac_up_r = Ac_upwards[(Day-1)*M_d+1:(Day)*M_d]                                                # activation % upwards
+
+        global Max_Power_r =  Max_Power_all[(Day-1)*M_d+1:(Day)*M_d, :]                                     # max power of box
+        global po_cap_r = po_cap_all[(Day-1)*M_d+1:(Day)*M_d, :]                                            # % of resovior stored
+        global kWh_cap_r  = kWh_cap_all[(Day-1)*M_d+1:(Day)*M_d, :]                                         # kWh of resovior charged
+        global Power_r  = Power_all[(Day-1)*M_d+1:(Day)*M_d, :]                                             # baseline power
+        global Connected_r  = Connected_all[(Day-1)*M_d+1:(Day)*M_d, :]                                     # minutes where CB is connected
+        global SoC_A_cap_r  = SoC_A_cap_all[(Day-1)*M_d+1:(Day)*M_d]                                        # The aggregated resovior capacity
+
+
+        ###### Initialize the scenarios for the given day ######
+
+        global Max_Power_s =  scenario_generation_m(Max_Power_all, Day)                                     # Scenarios for max power of box
+        global po_cap_s =  scenario_generation_m(po_cap_all, Day)                                           # Scenarios for % of resovior stored
+        global kWh_cap_s  = scenario_generation_m(kWh_cap_all, Day)                                         # Scenarios for kWh of resovior charged
+        global Power_s  = scenario_generation_m(Power_all, Day)                                             # Scenarios for baseline power
+        global Connected_s  = scenario_generation_m(Connected_all, Day)                                     # Scenarios for minutes where CB is connected
+        global SoC_A_cap_s  = scenario_generation_m(SoC_A_cap_all, Day)                                     # Scenarios for The aggregated resovior capacity
 
 
         for i=1:I
@@ -70,7 +82,7 @@ function Main_stochastic(CB_Is)
             Power[:,i], altered = baseline_altering(Power[:,i], SoC_start[i], Connected[:,i], po_cap[:,i], kWh_cap[:,i])
         end
 
-        Up_bids_A[:,Day], Do_bids_A[:,Day], Up_bids_I[:,Day,:], Do_bids_I[:,Day,:], Power_A[:,Day], MA_A[:,Day], SoC_A[:,Day], SoC_end, obj = deterministic_model(La_do, La_up, Ac_do, Ac_up, Max_Power, po_cap, kWh_cap, Power, Connected, SoC_start, SoC_A_cap, I)
+        Up_bids_A[:,Day], Do_bids_A[:,Day], Up_bids_I[:,Day,:], Do_bids_I[:,Day,:], Power_A[:,Day], MA_A[:,Day], SoC_A[:,Day], SoC_end, obj = Stocchastic_d1_model(La_do, La_up, Ac_do, Ac_up, Max_Power, po_cap, kWh_cap, Power, Connected, SoC_start, SoC_A_cap, I)
 
         println(SoC_end)
 
