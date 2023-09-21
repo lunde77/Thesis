@@ -84,7 +84,7 @@ function deterministic_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    end
 
    # Power constraint
-   @constraint(Mo, [m=1:M_d, i=1:I], Po[m,i] == Power[m,i]- [m]*C_up[m,i]+Ac_do[m]*C_do[m,i])            # The power is the baseline + the activation power
+   @constraint(Mo, [m=1:M_d, i=1:I], Po[m,i] == Power[m,i]- Ac_up[m]*C_up[m,i]+Ac_do[m]*C_do[m,i])            # The power is the baseline + the activation power
 
    for i=1:I
       for m=1:M_d

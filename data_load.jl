@@ -27,7 +27,7 @@ using XLSX
 ####### Paths ########
 
 # Define the base folder path
-Emil = false
+Emil = true
 
 if Emil
     base_path = "C:\\Users\\ASUS\\Documents\\11. sem - kand\\data\\"
