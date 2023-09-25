@@ -12,7 +12,7 @@
 # SoC[M,:]:         The SoC at end of the day for each CB - kWh - 1XI
 # missing_del:      The total amount of activation delivery missed - kWh
 
-function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_do, ac_up, C_do, C_up)
+function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_do, ac_up, C_do, C_up, La_do, La_up)
 
     missing_del = 0
     I = size(SoC_start)[1]
@@ -115,7 +115,15 @@ function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_
         # update missing_delivery - store results:
         missing_del = missing_del + sum(leftover)
     end
-    #println(" the end SoC was $(SoC[M,:]) ")
 
-    return SoC[M,:], missing_del, Act_E, Leftover_storer
+    # calculate the actual revenue
+    revenue = 0
+    for t=1:24
+        revenue = sum( (C_up[(t-1)*60+1]*La_up[t] + C_do[(t-1)*60+1]*La_do[t]) for t=1:T) + revenue
+    end
+
+
+
+
+    return revenue, SoC[M,:], missing_del, Act_E, Leftover_storer
 end

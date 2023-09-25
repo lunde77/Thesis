@@ -14,6 +14,9 @@ function Main_stochastic(CB_Is)
     global Do_bids_A = zeros(M_d,Days)
     global Up_bids_I = zeros(M_d,Days,I,S)
     global Do_bids_I = zeros(M_d,Days,I,S)
+    global ex_p_do = zeros(M_d,Days,S)
+    global ex_p_up = zeros(M_d,Days,S)
+    global ex_p_total = zeros(Days)
     global Activation_energy = zeros(M_d,Days,I)
     global missing_delivery_storer = zeros(M_d,Days,2)
     global Power_A = zeros(M_d,Days,S)
@@ -46,8 +49,8 @@ function Main_stochastic(CB_Is)
 
 
 
-    for Day=1:12
-        print("day is $Day")
+    for Day=1:1
+        println("day is $Day")
         global SoC_start_r = zeros(I)
 
         ###### Initialize the realized data for the given day ######
@@ -94,10 +97,10 @@ function Main_stochastic(CB_Is)
 
 
         ###### derrive bids based on stochastic model ######
-        Up_bids_A[:,Day], Do_bids_A[:,Day], Up_bids_I[:,Day,:,:], Do_bids_I[:,Day,:,:], Power_A[:,Day,:], MA_A[:,Day,:], SoC_A[:,Day,:], obj = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, I)
+        Up_bids_A[:,Day], Do_bids_A[:,Day], Up_bids_I[:,Day,:,:], Do_bids_I[:,Day,:,:], Power_A[:,Day,:], MA_A[:,Day,:], SoC_A[:,Day,:], ex_p_up[:,Day,:], ex_p_do[:,Day,:], ex_p_total[Day] = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, I, S)
 
         ###### Simulate day of operation on realized data ######
-        SoC_end, missing_del, A_E, missing_delivery_storer[:,Days,:] =  operation(kWh_cap_r, po_cap_r, Power_r, SoC_start_r, Max_Power_r, Connected_r, Ac_do_r, Ac_up_r, Do_bids_A[:,Day], Up_bids_A[:,Day])
+        obj, SoC_end, missing_del, A_E, missing_delivery_storer[:,Days,:] = operation(kWh_cap_r, po_cap_r, Power_r, SoC_start_r, Max_Power_r, Connected_r, Ac_do_r, Ac_up_r, Do_bids_A[:,Day], Up_bids_A[:,Day], La_do_r, La_up_r)
 
         println(SoC_end)
 
@@ -109,7 +112,7 @@ function Main_stochastic(CB_Is)
         global SoC_end
     end
 
-    println("The revenue in oracle mode would be $revenue")
-    println("The missing delivery in oracle mode would be $missing_delivery")
+    println("The revenue  mode would be $revenue")
+    println("The missing delivery would be $missing_delivery")
     return revenue, missing_delivery
 end
