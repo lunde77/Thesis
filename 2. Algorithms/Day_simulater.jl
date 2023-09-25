@@ -12,7 +12,7 @@
 # SoC[M,:]:         The SoC at end of the day for each CB - kWh - 1XI
 # missing_del:      The total amount of activation delivery missed - kWh
 
-function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, ac_do, ac_up, C_do, C_up)
+function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_do, ac_up, C_do, C_up)
 
     missing_del = 0
     I = size(SoC_start)[1]
