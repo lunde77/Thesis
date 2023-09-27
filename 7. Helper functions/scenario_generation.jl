@@ -61,6 +61,7 @@ function scenario_generation_m(Dataset, Day, dim)
             if j <= 11
                 First_11_days = Dataset[end-1440*(12-j)+1:end-1440*(11-j), :]
                 New_matrix = First_11_days
+
             else
                 Last_354_days = Dataset[1440*(j-12)+1:1440*(j-11), :]
                 New_matrix = Last_354_days
