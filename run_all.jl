@@ -19,6 +19,6 @@ include("$base_path"*"4. Tests\\Main_stochastic.jl")
 include("$base_path"*"7. Helper functions\\baseline_atering.jl")
 include("$base_path"*"7. Helper functions\\scenario_generation.jl")
 include("$base_path"*"7. Helper functions\\scenario_generation_1d.jl")
-
+include("$base_path"*"7. Helper functions\\Power_90_scenario.jl")
 
 include("$base_path"*"6. Data analyses\\data_load.jl") # funciton for loading all data, needs to be last, as base_path is altered
