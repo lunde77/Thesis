@@ -32,7 +32,7 @@ function load_daily_data(Day)
     global SoC_A_cap_s  = scenario_generation_m(SoC_A_cap_all, Day, 1)                                     # Scenarios for The aggregated resovior capacity
     global SoC_start_s = scenario_generation_d1(kWh_cap_all, Day)                                          # Scenarios for the start SoC
 
-
+    println(sum(Power_s))
     global P90_Power = Power_scenario_90(Power_s)                                                          # The aggregated power in p90 scenario
     global P90_MP = Power_scenario_90(Max_Power_s)                                                         # The aggregated max power in p90 scenario
 end

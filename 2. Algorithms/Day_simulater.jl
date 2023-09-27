@@ -117,10 +117,8 @@ function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_
     end
 
     # calculate the actual revenue
-    revenue = 0
-    for t=1:24
-        revenue = sum( (C_up[(t-1)*60+1]*La_up[t] + C_do[(t-1)*60+1]*La_do[t]) for t=1:T) + revenue
-    end
+
+    revenue = sum( (C_up[(t-1)*60+1]*La_up[t] + C_do[(t-1)*60+1]*La_do[t]) for t=1:T) 
 
 
 
