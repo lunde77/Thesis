@@ -90,8 +90,11 @@ for file_path in file_names
     if endswith(file_path, ".csv")
         #_, filename, _ = splitpath(file_path)  # Extract the file name without extension
         filename = file_path
-
-        dataframe_name = filename[58:61]  # Remove the first 3 characters
+        if Emil
+            dataframe_name = filename[64:67]
+        else
+            dataframe_name = filename[58:61]  # Remove the first 3 characters
+        end
         dataframe_names[i] = dataframe_name
         println("File Path: $file_path")
         println("Dataframe Name: $dataframe_name")
