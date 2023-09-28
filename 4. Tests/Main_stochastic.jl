@@ -9,8 +9,8 @@ function Main_stochastic(CB_Is)
     global S = 10
 
     # test days
-    start_day = 2
-    end_day = 2
+    start_day = 1
+    end_day = 5
 
     # results data are intialized to be stored
     load_results_storer()
@@ -26,8 +26,8 @@ function Main_stochastic(CB_Is)
         load_daily_data(Day)
 
         ###### derrive bids based on stochastic model ######
-        Up_bids_A[:,Day], Do_bids_A[:,Day], Up_bids_I[:,Day,:,:], Do_bids_I[:,Day,:,:], Power_A[:,Day,:], MA_A[:,Day,:], SoC_A[:,Day,:], ex_p_up[:,Day,:], ex_p_do[:,Day,:],
-            ex_p_total[Day] = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, P90_Power, P90_MP, I, S)
+        Up_bids_A[:,Day], Do_bids_A[:,Day], Up_bids_I[:,Day,:,:], Do_bids_I[:,Day,:,:], ex_p_up[:,Day,:], ex_p_do[:,Day,:],
+            ex_p_total[Day], expected_over[:,Day,:] = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, P90_Power, P90_MP, I, S)
 
 
         ###### Initialize the SoC for the begining of th day ######
@@ -43,7 +43,7 @@ function Main_stochastic(CB_Is)
 
 
         ###### Simulate day of operation on realized data ######
-        obj, SoC_end, missing_del, A_E, missing_delivery_storer[:,Days,:] = operation(kWh_cap_r, po_cap_r, Power_r, SoC_start_r, Max_Power_r, Connected_r, Ac_do_r, Ac_up_r, Do_bids_A[:,Day], Up_bids_A[:,Day], La_do_r, La_up_r)
+        obj, SoC_end, missing_del, A_E, missing_delivery_storer[Day,:] = operation(kWh_cap_r, po_cap_r, Power_r, SoC_start_r, Max_Power_r, Connected_r, Ac_do_r, Ac_up_r, Do_bids_A[:,Day], Up_bids_A[:,Day], La_do_r, La_up_r)
 
         # update results:
         Activation_energy[:,Day,:] = A_E

@@ -71,14 +71,14 @@ function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_
         end
 
         # find potential flexibility issues, as wee need to have enough flexibility in both direction concerning the activátion level
-        if sum(flex[:,1]) <= C_do[m]
-            Leftover_storer[m,1] = 1
+        if sum(flex[:,1]) <= ac_do[m]*C_do[m]
+            leftover[1] =  ac_do[m]*C_do[m]-sum(flex[:,1])
+            Leftover_storer[m,1] = leftover[1]
         end
-        if sum(flex[:,2]) <= C_up[m]+C_do[m]*0.2
-            Leftover_storer[m,2] = 1
+        if sum(flex[:,2]) <= ac_up[m]*C_up[m]
+            leftover[2] =  ac_up[m]*C_up[m]-sum(flex[:,2])
+            Leftover_storer[m,2] = leftover[2]
         end
-
-
 
         # find % activation energy for each unit, used to update the SoC
         if ac > 0 && C_do[m] > 0
@@ -117,12 +117,11 @@ function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_
     end
 
     # calculate the actual revenue
+
     revenue = sum( (C_up[(t-1)*60+1]*La_up[t] + C_do[(t-1)*60+1]*La_do[t]) for t=1:T)
 
-    # calculate the % where the capacity where over bid
-    pr = zeros(2)
-    pr[2] = sum(Leftover_storer[:,2])/M                 # % of time missed down
-    pr[1] = sum(Leftover_storer[:,1])/M                 # % of time missed up
 
-    return revenue, SoC[M,:], missing_del, Act_E, pr
+
+
+    return revenue, SoC[M,:], missing_del, Act_E, Leftover_storer
 end
