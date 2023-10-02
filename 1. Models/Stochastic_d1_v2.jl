@@ -55,14 +55,10 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    @variable(Mo, 0 <= C_up_I[1:M_d, 1:I, 1:S])      # amount of upregulation distributed on CB on given scenario
    @variable(Mo, 0 <= dis_do[1:M_d, 1:S])              # give us the minute wise distributions of bid flexibility
    @variable(Mo, 0 <= dis_up[1:M_d, 1:S])              # give us the minute wise distributions of bid flexibility
-   @variable(Mo, 0 <= dis_do_after[1:M_d, 1:S])              # give us the minute wise distributions of bid flexibility, this is after the activation, i.e. we can meet bid with CB1, becouse activation has limited is capacity, we can distrubute in on other potential CBs
    @variable(Mo, 0 <= Ma_base[1:M_d, 1:I, 1:S])     # Max power baseline - kW
    @variable(Mo, 0 <= E_full[1:M_d, 1:I, 1:S])      # If bid for next 20 minutes where fulle activated how much energy would be charged
    @variable(Mo, 0 <= cap_mis_p[1:M_d, 1:I, 1:S])   # If bid for next 20 minutes where fulle activated many % of the energy would be missing on the resovior
 
-
-   # Aggregator varibles
-   #@variable(Mo, 0 <= Ma_A[1:M_d, s=1:S])             # aggregator Max power - kW
 
    # Bid Varibles
    @variable(Mo, 0 <= C_up[1:M_d])                    # Chosen upwards bid
@@ -73,6 +69,7 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    @variable(Mo, 0 <= Ap_do[1:M_d, 1:S])              # Total failed downwards activation
    @variable(Mo, 0 <= Ap_P_up[1:T, 1:S])              # The failed activation we need to par for up
    @variable(Mo, 0 <= Ap_P_do[1:T, 1:S])              # The failed activation we need to par for down
+   @variable(Mo, 0 <= dis_do_after[1:M_d, 1:S])              # give us the minute wise distributions of bid flexibility, this is after the activation, i.e. we can meet bid with CB1, becouse activation has limited is capacity, we can distrubute in on other potential CBs
    @variable(Mo, 0 <= per_dev_do[1:M_d, 1:S])           # The percentual over bid in respect to capacity for down bid
    @variable(Mo, 0 <= per_dev_up[1:M_d, 1:S])           # The percentual over bid in respect to capacity for up bid
    @variable(Mo, 0 <= mi_cap_up)                      # amount of bid capacity not available
@@ -179,5 +176,5 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    end
    #************************************************************************
 
-   return value.(C_up), value.(C_do), value.(C_up_I), value.(C_do_I), value.(Ap_up), value.(Ap_do), value(Penalty), value.(per_dev_do), value(Penalty)
+   return value.(C_up), value.(C_do), value.(C_up_I), value.(C_do_I), value.(Ap_up), value.(Ap_do), value(Penalty), value.(per_dev_do), value.(dis_do_after), value(Penalty)
 end

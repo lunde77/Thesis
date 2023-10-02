@@ -9,6 +9,7 @@ function load_results_storer()
     global ex_p_up = zeros(M_d,Days,S)                                                                      # expected penalty cost for up bid
     global ex_p_total = zeros(Days)                                                                         # total expected pentalty
     global Activation_energy = zeros(M_d,Days,I)                                                            # sum of activated energy for each day to each minute for each charger
+    global after_Activation = zeros(M_d,Days)                                                            # sum of activated energy for each day to each minute for each charger
     global missing_delivery_storer = zeros(Days,2)                                                          # missed energy for both up and down
     global Power_A = zeros(M_d,Days,S)                                                                      # The aggregated power for each scenario without activation
     global SoC_A = zeros(M_d,Days,S)                                                                        # The aggregated SoC for each scenario without activation
