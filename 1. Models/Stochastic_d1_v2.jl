@@ -79,11 +79,11 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    @variable(Mo, 0 <= Penalty)                        # Total penalty based on missied activation
 
    ### Obejective ###
-   @objective(Mo, Max,  Income-Penalty)
+   @objective(Mo, Max,  Income-Penalty) ###
 
    # summerizing constraints
-   @constraint(Mo, Income == sum( (C_up[(t-1)*60+1]*La_up[t,s] + C_do[(t-1)*60+1]*La_do[t,s])*Pi for t=1:T, s=1:S) )
-   @constraint(Mo, Penalty == sum(  (Ap_P_up[t,s]*Pen_up[t,s]+Ap_P_do[t,s]*Pen_do[t,s])*Pi for s=1:S, t=1:T) )
+   @constraint(Mo, Income == sum( (C_up[(t-1)*60+1]*La_up[t,s] + C_do[(t-1)*60+1]*La_do[t,s])*Pi for t=1:T, s=1:S) ) ###
+   @constraint(Mo, Penalty == sum(  (Ap_P_up[t,s]*Pen_up[t,s]+Ap_P_do[t,s]*Pen_do[t,s])*Pi for s=1:S, t=1:T) ) ###
 
    @constraint(Mo, Income-Penalty <= 1000000)
 
@@ -120,7 +120,13 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
 
    ### Operation constraints ###
    # energy related power constraint
+<<<<<<< HEAD
    @constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Po[m,i,s] == Power[m,i,s]-Ac_up[m,s]*(C_up_I[m,i,s]-Ap_up_I[m,i,s]) +Ac_do[m,s]*(C_do_I[m,i,s]-Ap_do_I[m,i,s]))   # The power is the baseline + the sum activation power
+=======
+   @constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Po[m,i,s] == Power[m,i,s]-Ac_up[m,s]*(C_up_I[m,i,s]-Ap_up_I[m,i,s])
+                                                                  +Ac_do[m,s]*(C_do_I[m,i,s]-Ap_do_I[m,i,s])  )   ### # The power is the baseline + the sum activation power
+   @constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Po[m,i,s] == Power[m,i,s]-Ac_up[m,s]*(C_up_I[m,i,s]-Ap_up_I[m,i,s]) +Ac_do[m,s]*(C_do_I[m,i,s]-Ap_do_I[m,i,s]+flex_do[m,i,s]*dis_do_after[m,s])  )   # The power is the baseline + the sum activation power
+>>>>>>> 9acfc7c921639da96f407df4f77566b28316cbf0
 
    @constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Po[m,i,s] <= Ma[m,i,s])                                               # The realized power must be smaller or equal to max power
 
@@ -142,6 +148,7 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    end
 
    # SoC constraint
+   
    for i=1:I
       for m=1:M_d
          for s=1:S
