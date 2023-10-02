@@ -22,12 +22,13 @@ function Main_stochastic(CB_Is)
     for Day=start_day:end_day
         println("day is $Day")
 
+
         ###### intialize all daily data, so it's loaded ######
         load_daily_data(Day)
 
         ###### derrive bids based on stochastic model ######
         Up_bids_A[:,Day], Do_bids_A[:,Day], Up_bids_I[:,Day,:,:], Do_bids_I[:,Day,:,:], ex_p_up[:,Day,:], ex_p_do[:,Day,:],
-            ex_p_total[Day], expected_over[:,Day,:] = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, P90_Power, P90_MP, I, S)
+            ex_p_total[Day], expected_over[:,Day,:] = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, flex_up_s, flex_do_s, total_flex_up_s, total_flex_do_s, I, S)
 
 
         ###### Initialize the SoC for the begining of th day ######

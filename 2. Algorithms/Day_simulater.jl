@@ -56,8 +56,8 @@ function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_
                         flex[i,1] = Power_rate[m,i]-Power[m,i]
                     end
                 else
-                    if (kWh_cap[m,i]/po_cap[m,i]-SoC[m-1,i])*60 < Power_rate[m,i]
-                        flex[i,1] = (kWh_cap[m,i]/po_cap[m,i]-SoC[m-1,i])*60-Power[m,i]
+                    if (kWh_cap[m-1,i]/po_cap[m-1,i]-SoC[m-1,i])*60 < Power_rate[m,i]
+                        flex[i,1] = (kWh_cap[m-1,i]/po_cap[m-1,i]-SoC[m-1,i])*60-Power[m,i]
                     else
                         flex[i,1] = Power_rate[m,i]-Power[m,i]
                     end

@@ -32,6 +32,16 @@ function load_daily_data(Day)
     global SoC_A_cap_s  = scenario_generation_m(SoC_A_cap_all, Day, 1)                                     # Scenarios for The aggregated resovior capacity
     global SoC_start_s = scenario_generation_d1(kWh_cap_all, Day)                                          # Scenarios for the start SoC
 
+
+    # flex[:,:,1]:              The individual downwards flexibility
+    # flex[:,:,2]:              The individual Upwards flexibility
+    # total_flex[:,:,1]:        The total downwards flexibility
+    # total_flex[:,:,2]:        The total Upwards flexibility
+
+
+
+    global flex_do_s, flex_up_s, total_flex_do_s, total_flex_up_s = baseline_flex(kWh_cap_s, po_cap_s, Power_s, Max_Power_s, Connected_s, SoC_start_s, S)                # Scenarios for the start SoC
+
     println(sum(Power_s))
     global P90_Power = Power_scenario_90(Power_s)                                                          # The aggregated power in p90 scenario
     global P90_MP = Power_scenario_90(Max_Power_s)                                                         # The aggregated max power in p90 scenario
