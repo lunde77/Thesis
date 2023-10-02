@@ -55,10 +55,8 @@ function Main_stochastic(CB_Is)
 
         global SoC_end
     end
-    total_cap_missed = zeros(2)
-    total_cap_missed[1] = sum(missing_delivery_storer[:,1])/365
-    total_cap_missed[2] = sum(missing_delivery_storer[:,2])/365
+
     println("The revenue  mode would be $(revenue[1])")
     println("The missing delivery would be $(missing_delivery[1])")
-    return revenue[1], missing_delivery[1], total_cap_missed
+    return revenue[1], missing_delivery[1]
 end
