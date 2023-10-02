@@ -25,7 +25,11 @@ include("$base_path"*"7. Helper functions\\scenario_generation.jl")
 include("$base_path"*"7. Helper functions\\scenario_generation_1d.jl")
 include("$base_path"*"7. Helper functions\\90_scenario_power.jl")
 include("$base_path"*"7. Helper functions\\90_scenario_reservoir.jl")
+<<<<<<< HEAD
 include("$base_path"*"7. Helper functions\\baseline_flexibility.jl")
+=======
+include("$base_path"*"7. Helper functions\\Max_power_rate_now.jl")
+>>>>>>> d7fbe623a6d951f7df9f1a62a4ec5fbb279de244
 include("$base_path"*"7. Helper functions\\Main_helpers\\Load_aggregated_data.jl")
 include("$base_path"*"7. Helper functions\\Main_helpers\\Load_daily_data.jl")
 include("$base_path"*"7. Helper functions\\Main_helpers\\load_results_storer.jl")
