@@ -19,24 +19,28 @@ using JuMP
 # return (varies per day):
 # value.(C_up)              # upwards bid for aggregator in kW in m 1440x1
 # value.(C_do)              # downwards bid for aggregator in kW in m 1440x1
-# value.(C_do_I)            # distributed of upwards bid in kW in m 1440xI
-# value.(C_do_I)         # distributed of downwards bid in kW in m 1440xI
+# value.(C_up_I)            # distributed of upwards bid in kW in m 1440xI
+# value.(C_do_I)            # distributed of downwards bid in kW in m 1440xI
+# value.(Power_A)           # The aggregated power without activation for each scenario 1440xIxS
 # value.(SoC[M_d,:])        # the expected Energy resovior in kWh at the end of the day 1xI
 # value.(SoC_A)             # the expected Energy resovior in kWh for all minutes for the aggregated resovior
 # value.(Ma_A)              # the expected Ma charging rate for the aggregator
 # objective_value(Mo)       # The expected net ernings after pentalty
 
-function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh_cap, Power, Connected, SoC_start, SoC_A_cap, I)
+function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh_cap, Power, Connected, SoC_start, SoC_A_cap, Power_90, MP_90, I, S)
+
 
    #************************************************************************
    # Static Parameters
    T = 24 # hours on a day
    M = 60 # minutes in an hour
    M_d = T*M # minutes per model, i.e. per day
-   S = 10
    RM = 1 # %-end SoC assumed
-   pen = 1000 # penalty per kWh of missed activation
+   Pen_e_coef = -6 # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
+   Pen_do = deepcopy(La_do)*Pen_e_coef  # intialize penalty cost
+   Pen_up = deepcopy(La_up)*Pen_e_coef  # intialize penalty cost
    Pi = 1/S
+   epsilon = 0.000000001                 # helper, so demominator won't become zero
 
    #************************************************************************
    # Model
@@ -45,66 +49,85 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    # varible per individual CB
    @variable(Mo, 0 <= Po[1:M_d, 1:I, s=1:S])          # Power delivered after activation - kW
    @variable(Mo, 0 <= Ma[1:M_d, 1:I, s=1:S])          # Max power - kW
-   @variable(Mo, 0 <= SoC[1:M_d, 1:I, s=1:S])         # Simulated Energy resovior level after activation - kWh
-   @variable(Mo, 0 <= Ap_do_I[1:M_d, 1:I, s=1:S])     # failed activation per CB per S
-   @variable(Mo, 0 <= Ap_up_I[1:M_d, 1:I, s=1:S])     # failed activation per CB per S
-   @variable(MO, 0 <= C_do_I[1:M_d, 1:I, s=1:S])      # amount of downregulation distributed on CB on given scenario
-   @variable(MO, 0 <= C_uo_I[1:M_d, 1:I, s=1:S])      # amount of upregulation distributed on CB on given scenario
+   @variable(Mo, 0 <= SoC[1:M_d, 1:I, 1:S])         # Simulated Energy resovior level after activation - kWh
+   @variable(Mo, 0 <= Ap_do_I[1:M_d, 1:I, 1:S])     # failed activation per CB per S
+   @variable(Mo, 0 <= Ap_up_I[1:M_d, 1:I, 1:S])     # failed activation per CB per S
+   @variable(Mo, 0 <= C_do_I[1:M_d, 1:I, 1:S])      # amount of downregulation distributed on CB on given scenario
+   @variable(Mo, 0 <= C_up_I[1:M_d, 1:I, 1:S])      # amount of upregulation distributed on CB on given scenario
+   @variable(Mo, 0 <= Ma_base[1:M_d, 1:I, 1:S])     # Max power baseline - kW
+   @variable(Mo, 0 <= E_full[1:M_d, 1:I, 1:S])      # If bid for next 20 minutes where fulle activated how much energy would be charged
+   @variable(Mo, 0 <= cap_mis_p[1:M_d, 1:I, 1:S])   # If bid for next 20 minutes where fulle activated many % of the energy would be missing on the resovior
 
-   # varible for aggregator
-   @variable(Mo, 0 <= Po_A[1:M_d, s=1:S])             # aggregator Power delivered after activation - kW
-   @variable(Mo, 0 <= Power_A[1:M_d, s=1:S])          # aggregator Power delivered before activation - kW
-   @variable(Mo, 0 <= Flex_up[1:M_d, s=1:S])          # aggregator Upwards bid for scenario s - kW
-   @variable(Mo, 0 <= Flex_do[1:M_d, s=1:S])          # aggregator Downwards bid for scenario s  - kW
+
+   # Aggregator varibles
    @variable(Mo, 0 <= Ma_A[1:M_d, s=1:S])             # aggregator Max power - kW
-   @variable(Mo, 0 <= SoC_A[1:M_d, s=1:S])            # aggregator SoC for two scenarios in case of no activation
 
-   # Bid Varible
+   # Bid Varibles
    @variable(Mo, 0 <= C_up[1:M_d])                    # Chosen upwards bid
    @variable(Mo, 0 <= C_do[1:M_d])                    # Chosen downwards bid
+
+   # pentalty Varibles
    @variable(Mo, 0 <= Ap_up[1:M_d, 1:S])              # Total failed upwards activation
    @variable(Mo, 0 <= Ap_do[1:M_d, 1:S])              # Total failed downwards activation
+   @variable(Mo, 0 <= Ap_P_up[1:T, 1:S])              # The failed activation we need to par for up
+   @variable(Mo, 0 <= Ap_P_do[1:T, 1:S])              # The failed activation we need to par for down
+   @variable(Mo, 0 <= per_dev_do[1:M_d, 1:S])           # The percentual over bid in respect to capacity
+   @variable(Mo, 0 <= mi_cap_up)                      # amount of bid capacity not available
+   @variable(Mo, 0 <= mi_cap_do)                      # amount of bid capacity not available
 
    # Objetives
-   @variable(Mo, 0 <= Income)                         # Total income on capacity
-   @variable(Mo, 0 <= Penalty)                        # Total penalty based on missied activation
+   @variable(Mo, Income)                              # Total income on capacity
+   @variable(Mo, 0 <= Penalty)                      # Total penalty based on missied activation
 
    ### Obejective ###
    @objective(Mo, Max,  Income-Penalty)
 
    # summerizing constraints
-   @constraint(Mo, Income == sum( (C_up[(t-1)*60+1]*La_up[t,s] + C_do[(t-1)*60+1]*La_do[t,s])*Pi for t=1:T for s=1:S) )
-   @constraint(Mo, Penalty == sum( Ap_up[(t-1)*60+1,s]*pen+Ap_do[(t-1)*60+1,s]*pen )*Pi for t=1:T for s=1:S) )
+   @constraint(Mo, Income == sum( (C_up[(t-1)*60+1]*La_up[t,s] + C_do[(t-1)*60+1]*La_do[t,s])*Pi for t=1:T, s=1:S) )
+   @constraint(Mo, Penalty == sum(  (Ap_P_up[t,s]*Pen_up[t,s]+Ap_P_do[t,s]*Pen_do[t,s])*Pi for s=1:S, t=1:T) )
 
-   #@constraint(Mo, sum( C_up[(t-1)*60+1]*La_up[t] + C_do[(t-1)*60+1]*La_do[t] for t=1:T) <= 1000000)
+   @constraint(Mo, Income-Penalty <= 1000000)
 
    ### Bid constraints ###
    # Aggregator Bid constraiants
-   @constraint(Mo, [m=1:M_d, s=1:S], C_up[m] == sum(C_up_I[m,i,s] for i=1:I) )                                    # The upwards bid must be distributed over the charge boxses
-   @constraint(Mo, [m=1:M_d, s=1:S], C_do[m] == sum(C_do_I[m,i,s] for i=1:I) )                                    # The downwards bid must be distributed over the charge boxses
+   @constraint(Mo, [m=1:M_d, s=1:S], C_up[m] == sum(C_up_I[m,i,s] for i=1:I) )                                 # The upwards bid must be distributed over the charge boxses
+   @constraint(Mo, [m=1:M_d, s=1:S], C_do[m] == sum(C_do_I[m,i,s] for i=1:I) )                                 # The downwards bid must be distributed over the charge boxses
 
-   @constraint(Mo, [m=1:M_d, s=1:S], Ap_up[m,s] == sum(Ap_up_I[m,i,s] for i=1:I)/60 )                                # The pentalty for not meeeting potential activation energy
-   @constraint(Mo, [m=1:M_d, s=1:S], Ap_do[m,s] == sum(Ap_do_I[m,i,s] for i=1:I)/60 )                                # The pentalty for not meeeting potential activation energy
+   @constraint(Mo, [m=1:M_d, s=1:S], Ap_up[m,s] == sum(Ap_up_I[m,i,s] for i=1:I) )                             # The pentalty for not meeeting potential activation energy
+   @constraint(Mo, [m=1:M_d, s=1:S], Ap_do[m,s] == sum(Ap_do_I[m,i,s] for i=1:I) )                             # The pentalty for not meeeting potential activation energy
 
-   @constraint(Mo, [m=2:M, t=1:T], C_up[(t-1)*60+1] == C_up[(t-1)*60+m] )                                         # Bid must equal for all minutes in a hour
-   @constraint(Mo, [m=2:M, t=1:T], C_do[(t-1)*60+1] == C_do[(t-1)*60+m] )                                         # Bid must equal for all minutes in a hour
+   @constraint(Mo, [m=1:M, t=1:T, s=1:S], Ap_up[(t-1)*60+m] <= Ap_P_do[t,s] )                                  # Hourly activation penalty must be equal to minute where most energy is missed down
+   @constraint(Mo, [m=1:M, t=1:T, s=1:S], Ap_do[(t-1)*60+m] <= Ap_P_up[t,s] )                                  # Hourly activation penalty must be equal to minute where most energy is missed up
 
-   @constraint(Mo, [m=1:M_d, s=1:S], Ma_A[m,s]-Power_A[m,s] >= C_do[m] )                                          # The upwards flexibility has to be greater than the the the bids regulation
-   @constraint(Mo, [m=1:M_d, s=1:S], Power_A[m,s] >= C_do[m]*0.2+C_up[m,s] )                                      # The downwards flexibility has to be greater than the the the bids regulation, hence there is delay factor added on
-   @constraint(Mo, [m=1:M_d, s=1:S], SoC_A_cap[m,s]-SoC_A[m,s] >= C_do[m]*(1/3) )                                 # There must at all times be enough resovior to be activated for 20 minutes of the - this is a
+   @constraint(Mo, [m=2:M, t=1:T], C_up[(t-1)*60+1] == C_up[(t-1)*60+m] )                                      # Bid must equal for all minutes in a hour
+   @constraint(Mo, [m=2:M, t=1:T], C_do[(t-1)*60+1] == C_do[(t-1)*60+m] )                                      # Bid must equal for all minutes in a hour
 
-   # Individual bid constraints
-   #@constraint(Mo, [m=1:M_d, i=1:I, s=1:S],  C_do_I[m,i,s] <= Connected[m,i,s]*M+Ap_do_I[m,i,s] )                # Only bid when charger is Connected
-   #@constraint(Mo, [m=1:M_d, i=1:I, s=1:S],  C_up_I[m,i,s] <= Connected[m,i,s]*M+Ap_up_I[m,i,s] )                # Only bid when charger is Connected
+   #@constraint(Mo, [m=1:M_d], MP_90[m] >= C_do[m] )                                                           # The upwards flexibility has to be greater than the the the bids regulation
+   #@constraint(Mo, [m=1:M_d], 1000 >= C_do[m]*(1/3) )                                                         # There must at all times be enough resovior to be activated for 20 minutes of the - this is a
 
-   #@constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Ma[m,i,s]-Power[m,i,s]+Ap_do_I[m,i,s] >= C_do_I[m,i,s] )             # The upwards flexibility has to be greater than the the the bids regulation
-   #@constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Power[m,i,s]+Ap_up_I[m,i,s] >= C_do_I[m,i,s] )                       # The downwards flexibility has to be greater than the the the bids regulation
+   #### P90/bid available in 85% approximation constraints ###
+   for m=1:M_d
+      for s=1:S
+            @constraint(Mo, sum(Power[m,i,s]+epsilon for i=1:I)/(C_up[m]+C_do[m]*0.2+epsilon)+per_dev_up[m,s] >= 1  )         # The downwards flexibility has to be greater than the downwards bids plus to be 20% of the upwards bid, otherwise we'll have to enforce a capacity penalty
+
+            @constraint(Mo, sum(Ma_A[m,is])/(C_do[m]+epsilon)+per_dev_do[m,s] >= 1    )                                       # The upwards flexibility must be higher than the upwards bid, o.w, we don't have the capacity
+            @constraint(Mo, per_dev_do[m,s] >= sum(cap_mis_p)/I )                                                             # the overbid in upwards bid must be equal to at least the sverage charge box bid in avaible capacity in respect to full activation for 20 minutes 
+      end
+   end
+
+   @constraint(Mo, sum( per_dev_up[m,s] for m=1:M_d, s=1:S)/(S*M_d) <= 0.01 )                                     # the average over overbid must be less than 10%
+   @constraint(Mo, sum( per_dev_do[m,s] for m=1:M_d, s=1:S)/(S*M_d) <= 0.01 )                                     # the average over overbid must be less than 10%
+
 
    ### Operation constraints ###
-   # Power constraint
-   @constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Po[m,i,s] == Power[m,i,s]- Ac_up[m,s]*(C_do_I[m,i,s]-Ap_do_I[m,i,s])
-                                                                  +Ac_do[m,s]*(C_do_I[m,i,s]-Ap_up_I[m,i,s])  )   # The power is the baseline + the activation power
+   # energy related power constraint
+   @constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Po[m,i,s] == Power[m,i,s]-Ac_up[m,s]*(C_up_I[m,i,s]-Ap_up_I[m,i,s])
+                                                                  +Ac_do[m,s]*(C_do_I[m,i,s]-Ap_do_I[m,i,s])  )   # The power is the baseline + the sum activation power
    @constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Po[m,i,s] <= Ma[m,i,s])                                               # The realized power must be smaller or equal to max power
+
+   # Activation power constraint - these almost mimics the constraints above, however down and upwards activation within the same minute, can cancel out, and thus not mimic the actial flexibility needed to be delivered, hence the constraints below
+   @constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Ac_up[m,s]*(C_up_I[m,i,s]-Ap_up_I[m,i,s]) <= Power[m,i,s])            # The upwards regulation delivered must be smaller than the power had + the potential penalty
+   @constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Ac_do[m,s]*(C_do_I[m,i,s]-Ap_do_I[m,i,s]) <=  Ma[m,i,s])              # The downwards regulation delivered must smaller than the max effect + the potential penalty
 
    # Max power constraint
    @constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Ma[m,i,s] <= Power_rate[m,i,s]*Connected[m,i,s]  )                    # The charging power rate of the box must be higher than the Max power (Ma)
@@ -137,11 +160,24 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
       end
    end
 
-   # aggregator helper varibles
-   @constraint(Mo, [m=1:M_d, s=1:S], Ma_A[m,s] == sum(Ma[m,i,s] for i=1:I) )                                      # The maximum charge is the sum of all max charging rates
-   @constraint(Mo, [m=1:M_d, s=1:S], Po_A[m,s] == sum(Po[m,i,s] for i=1:I) )                                      # The power delivered for the aggregator is the sum of all
-   @constraint(Mo, [m=1:M_d, s=1:S], Power_A[m,s] == sum(Power[m,i,s] for i=1:I) )                                # The power delivered for the aggregator is the sum of all
-   @constraint(Mo, [m=1:M_d, s=1:S], SoC_A[m,s] == sum(kWh_cap[m,i,s] for i=1:I))                                 # The aggregator SoC if no activation is realized
+   ### aggregator helper varibles ###
+   for m=1:M_d
+      m_a_max = m+19
+      if m_a_max > M_d
+         m_a_max = M_d
+      end
+      duration = (m_a_max+1-m)/60 # how long we have to sustain the activation, will 1/3 if we're lower than 1440
+      if m ==  1
+         @constraint(Mo, [1:I, s=1:S],  (kWh_cap[m-1,i,s]/po_cap[m-1,i,s]-kWh_cap[m-1,i,s]/RM)/(sum( C_do_I[(t-1)*60+m_a ,i,s] for m_a=m:m_a_max)*duration)+cap_mis_p[i,m,s] >= 1 )            #  get ratio between abaible capacity and if we had full activation for 20 minutes
+      else
+         @constraint(Mo, [1:I, s=1:S],  (kWh_cap[m,i,s]/po_cap[1,i,s]-SoC_start[i,s]/RM)/(sum( C_do_I[(t-1)*60+m_a ,i,s] for m_a=m:m_a_max)*duration)+cap_mis_p[i,m,s] >= 1 )                  #  get ratio between abaible capacity and if we had full activation for 20 minutes
+      end
+   end
+
+
+   #@constraint(Mo, [1:M_d, 1:I, s=1:S], Ma_base[m,i,s]  <=  Power_rate[m,i,s]*Connected[m,i,s] )                                # The max charging rate is capped by it's individual power rate
+   #@constraint(Mo, [1:M_d, 1:I, s=1:S], Ma_base[m,i,s]  <= (kWh_cap[m-1,i,s]/po_cap[m-1,i,s]-kWh_cap[m-1,i,s]/RM )*60)          # The max charging rate is capped by energy in left in the resovior
+   #@constraint(Mo, [m=1:M_d, s=1:S], Ma_A[m,s] == sum(Ma_base[m,i,s] for i=1:I) )                                               # The maximum charge is the sum of all max charging rates
 
 
    #************************************************************************
@@ -157,5 +193,5 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    end
    #************************************************************************
 
-   return value.(C_up), value.(C_do), value.(C_do_I), value.(C_do_I), value.(Power_A), value.(Ma_A), value.(SoC_A), objective_value(Mo)
+   return value.(C_up), value.(C_do), value.(C_up_I), value.(C_do_I), value.(Ap_up), value.(Ap_do), value(Penalty), value.(per_dev_do)
 end

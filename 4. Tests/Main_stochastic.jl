@@ -12,26 +12,50 @@ function Main_stochastic(CB_Is)
     # test days
     start_day = 1
     end_day = 1
-
+    global clock = zeros(3)
+    global start = time_ns()
     # results data are intialized to be stored
     load_results_storer()
+    clock[1] = round((time_ns() - start) / 1e9, digits = 3)
 
+    println(clock[1])
+    println(clock[1])
+
+    global start = time_ns()
     # load all the aggregated data
     Load_aggregated(CB_Is)
+    clock[2] = round((time_ns() - start) / 1e9, digits = 3)
 
+    println(clock[2])
+    println(clock[2])
 
     for Day=start_day:end_day
         println("day is $Day")
 
 
         ###### intialize all daily data, so it's loaded ######
+        global start = time_ns()
+
         load_daily_data(Day)
 
+        clock[3] = round((time_ns() - start) / 1e9, digits = 3)
+        global start = time_ns()
+
+        println(clock[3])
+        println(clock[3])
         ###### derrive bids based on stochastic model ######
-        Up_bids_A[:,Day], Do_bids_A[:,Day], Up_bids_I[:,Day,:,:], Do_bids_I[:,Day,:,:], ex_p_up[:,Day,:], ex_p_do[:,Day,:],
-            ex_p_total[Day], expected_over_up[:,Day,:],  expected_over_do[:,Day,:] = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, flex_up_s, flex_do_s, total_flex_up_s, total_flex_do_s, I, S, RM)
+        t, t, t,t, t, t,
+            t, t, t = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, flex_up_s, flex_do_s, total_flex_up_s, total_flex_do_s, I, S, RM)
+
+        #Up_bids_A[:,Day], Do_bids_A[:,Day], Up_bids_I[:,Day,:,:], Do_bids_I[:,Day,:,:], ex_p_up[:,Day,:], ex_p_do[:,Day,:],
+        #    ex_p_total[Day], expected_over_up[:,Day,:],  expected_over_do[:,Day,:] = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, flex_up_s, flex_do_s, total_flex_up_s, total_flex_do_s, I, S, RM)
+
+        clock[4] = round((time_ns() - start) / 1e9, digits = 3)
 
 
+        println(clock[4])
+        println(clock[4])
+        global start = time_ns()
         ###### Initialize the SoC for the begining of th day ######
         for i=1:I
             if Day == start_day
@@ -54,6 +78,11 @@ function Main_stochastic(CB_Is)
         missing_delivery[1] = missing_delivery[1] + missing_del
 
         global SoC_end
+
+        clock[5] = round((time_ns() - start) / 1e9, digits = 3)
+
+        println(clock[5])
+        println(clock[5])
     end
     total_cap_missed = zeros(2)
     total_cap_missed[1] = sum(missing_delivery_storer[:,1])/365

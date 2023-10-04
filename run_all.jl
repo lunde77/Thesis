@@ -12,7 +12,7 @@ end
 
 # load all functions:
 include("$base_path"*"1. Models\\Deterministic.jl")
-include("$base_path"*"1. Models\\Stochastic_d1_v2.jl")
+include("$base_path"*"1. Models\\Stochastic_d1.jl")
 
 include("$base_path"*"2. Algorithms\\Day_simulater.jl")
 
