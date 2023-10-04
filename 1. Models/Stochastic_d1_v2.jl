@@ -120,13 +120,7 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
 
    ### Operation constraints ###
    # energy related power constraint
-<<<<<<< HEAD
    @constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Po[m,i,s] == Power[m,i,s]-Ac_up[m,s]*(C_up_I[m,i,s]-Ap_up_I[m,i,s]) +Ac_do[m,s]*(C_do_I[m,i,s]-Ap_do_I[m,i,s]))   # The power is the baseline + the sum activation power
-=======
-   @constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Po[m,i,s] == Power[m,i,s]-Ac_up[m,s]*(C_up_I[m,i,s]-Ap_up_I[m,i,s])
-                                                                  +Ac_do[m,s]*(C_do_I[m,i,s]-Ap_do_I[m,i,s])  )   ### # The power is the baseline + the sum activation power
-   @constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Po[m,i,s] == Power[m,i,s]-Ac_up[m,s]*(C_up_I[m,i,s]-Ap_up_I[m,i,s]) +Ac_do[m,s]*(C_do_I[m,i,s]-Ap_do_I[m,i,s]+flex_do[m,i,s]*dis_do_after[m,s])  )   # The power is the baseline + the sum activation power
->>>>>>> 9acfc7c921639da96f407df4f77566b28316cbf0
 
    @constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Po[m,i,s] <= Ma[m,i,s])                                               # The realized power must be smaller or equal to max power
 
