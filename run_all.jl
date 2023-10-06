@@ -12,7 +12,7 @@ end
 
 # load all functions:
 include("$base_path"*"1. Models\\Deterministic.jl")
-include("$base_path"*"1. Models\\Stochastic_d1.jl")
+include("$base_path"*"1. Models\\Stochastic_d1_t1.jl")
 
 include("$base_path"*"2. Algorithms\\Day_simulater.jl")
 
@@ -30,6 +30,5 @@ include("$base_path"*"7. Helper functions\\Max_power_rate_now.jl")
 include("$base_path"*"7. Helper functions\\Main_helpers\\Load_aggregated_data.jl")
 include("$base_path"*"7. Helper functions\\Main_helpers\\Load_daily_data.jl")
 include("$base_path"*"7. Helper functions\\Main_helpers\\load_results_storer.jl")
-
 
 include("$base_path"*"6. Data analyses\\data_load.jl") # funciton for loading all data, needs to be last, as base_path is altered
