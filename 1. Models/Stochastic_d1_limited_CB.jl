@@ -55,7 +55,7 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
 
    replace!(ratio_flex_do, NaN => 0.0)
    replace!(ratio_flex_up, NaN => 0.0)
-   
+
    df_ratio_do = Matrix{Float64}(undef, T, S)
    df_ratio_up = Matrix{Float64}(undef, T, S)
 
@@ -80,7 +80,7 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    @variable(Mo, 0 <= C_do_I[1:M_d, 1:I, 1:S])      # amount of downregulation distributed on CB on given scenario
    @variable(Mo, 0 <= C_up_I[1:M_d, 1:I, 1:S])      # amount of upregulation distributed on CB on given scenario
    @variable(Mo, 0 <= dis_do[1:M_d, 1:S])           # give us the minute wise distributions of bid flexibility
-   @variable(Mo, 0 <= dis_up[1:M_d, 1:S]) 
+   @variable(Mo, 0 <= dis_up[1:M_d, 1:S])
    # give us the minute wise distributions of bid flexibility
    @variable(Mo, 0 <= Ma_base[1:M_d, 1:I, 1:S])     # Max power baseline - kW
    @variable(Mo, 0 <= E_full[1:M_d, 1:I, 1:S])      # If bid for next 20 minutes where fulle activated how much energy would be charged
@@ -110,7 +110,7 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
 
    # summerizing constraints
    @constraint(Mo, Income == sum( (C_up[t]*La_up[t,s] + C_do[t]*La_do[t,s])*Pi for t=1:T, s=1:S) ) ###
-   @constraint(Mo, Penalty == sum(  (Ap_P_up[t,s]*Pen_up[t,s]*ratio_flex_up[t,s]+Ap_P_do[t,s]*Pen_do[t,s]*ratio_flex_do[t,s])*Pi for s=1:S, t=1:T) ) ###
+   @constraint(Mo, Penalty == sum(  (Ap_P_up[t,s]*Pen_up[t,s]*df_ratio_up[t,s]+Ap_P_do[t,s]*Pen_do[t,s]*df_ratio_do[t,s])*Pi for s=1:S, t=1:T) ) ###
 
    ### Bid constraints ###
    # Aggregator Bid constraiants

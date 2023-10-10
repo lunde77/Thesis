@@ -63,8 +63,8 @@ function Main_stochastic(CB_Is)
         lambda[1,1] = 0.14*I  # upwards gamma Penalty
         lambda[2,1] = I/3  # downwards gamma Penalty
         gamma = zeros(2)
-        gamma[1] = lambda[1,1]+0.15   # upwards gamma Penalty
-        gamma[2] = lambda[2,1]+0.15   # upwards gamma Penalty
+        gamma[1] = lambda[1,1]/5+1   # upwards gamma Penalty
+        gamma[2] = lambda[2,1]/5+1   # upwards gamma Penalty
         global change_lambda_up = 100
         global change_lambda_do = 100
         global counter =  1
@@ -91,9 +91,9 @@ function Main_stochastic(CB_Is)
             end
 
             per_dev_up_input, per_dev_do_input = deepcopy(per_dev_up_input_in_loop), deepcopy(per_dev_do_input_in_loop)
-            if counter < count_to*0.68
-                lambda[1,counter+1] = lambda[1,counter]+(gamma[1]-(counter*gamma[1]/count_to/0.75)   )*(sum(per_dev_up_input)/(S*M_d)-1)
-                lambda[2,counter+1] = lambda[2,counter]+(gamma[2]-(counter*gamma[2]/count_to/0.75)  )*(sum(per_dev_do_input)/(S*M_d)-1)
+            if counter < count_to*0.7
+                lambda[1,counter+1] = lambda[1,counter]+(gamma[1]-(counter*gamma[1]/count_to/0.9)   )*(sum(per_dev_up_input)/(S*M_d)-1)
+                lambda[2,counter+1] = lambda[2,counter]+(gamma[2]-(counter*gamma[2]/count_to/0.9)  )*(sum(per_dev_do_input)/(S*M_d)-1)
             else
                 lambda[1,counter+1] = lambda[1,counter]+(gamma[1]-(count_to*0.7*gamma[1]/count_to/0.75)  )*(sum(per_dev_up_input)/(S*M_d)-1)
                 lambda[2,counter+1] = lambda[2,counter]+(gamma[2]-(count_to*0.7*gamma[2]/count_to/0.75)  )*(sum(per_dev_do_input)/(S*M_d)-1)
