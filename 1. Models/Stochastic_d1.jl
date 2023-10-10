@@ -57,8 +57,8 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    @variable(Mo, 0 <= dis_do[1:M_d, 1:S])           # give us the minute wise distributions of bid flexibility
    @variable(Mo, 0 <= dis_up[1:M_d, 1:S])           # give us the minute wise distributions of bid flexibility
    @variable(Mo, 0 <= Ma_base[1:M_d, 1:I, 1:S])     # Max power baseline - kW
-   @variable(Mo, 0 <= E_full[1:M_d, 1:I, 1:S])      # If bid for next 20 minutes where fulle activated how much energy would be charged
-   @variable(Mo, 0 <= cap_mis_p[1:M_d, 1:I, 1:S])   # If bid for next 20 minutes where fulle activated many % of the energy would be missing on the resovior
+   #@variable(Mo, 0 <= E_full[1:M_d, 1:I, 1:S])      # If bid for next 20 minutes where fulle activated how much energy would be charged
+   #@variable(Mo, 0 <= cap_mis_p[1:M_d, 1:I, 1:S])   # If bid for next 20 minutes where fulle activated many % of the energy would be missing on the resovior
 
 
    # Bid Varibles
@@ -72,7 +72,7 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    @variable(Mo, 0 <= Ap_P_do[1:T, 1:S])              # The biggest total failed activation for a given  we need to par for down
    @variable(Mo, 0 <= per_dev_do[1:M_d, 1:S])         # The percentual over bid in respect to capacity for down bid
    @variable(Mo, 0 <= per_dev_up[1:M_d, 1:S])         # The percentual over bid in respect to capacity for up bid
-   @variable(Mo, 0 <= kWh_left[1:M_d, 1:20, 1:I, 1:S])                      # amount of bid capacity not available
+   #@variable(Mo, 0 <= kWh_left[1:M_d, 1:20, 1:I, 1:S])                      # amount of bid capacity not available
    @variable(Mo, 0 <= mi_cap_do)                      # amount of bid capacity not available
 
    # Objetives

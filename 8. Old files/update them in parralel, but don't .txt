@@ -1,0 +1,4 @@
+update them in parralel, but don't since we cannot solve the subporblems in parralel constraint to the machine.
+
+
+start with small gamma

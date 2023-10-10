@@ -37,7 +37,7 @@ function Stochastic_d1_model_hourly(La_do, La_up, Ac_do, Ac_up, Power_rate, po_c
    Pen_e_coef = 6 # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
    Pen_do = deepcopy(La_do)*Pen_e_coef  # intialize penalty cost
    Pen_up = deepcopy(La_up)*Pen_e_coef  # intialize penalty cost
-   S =10
+   S = 10
    Pi = 1/S
    epsilon = 0.1                 # helper, so demominator won't become zero
 
@@ -85,7 +85,7 @@ function Stochastic_d1_model_hourly(La_do, La_up, Ac_do, Ac_up, Power_rate, po_c
    @variable(Mo, Penalty)                        # Total penalty based on missied activation
 
    ### Obejective ###
-   @objective(Mo, Min,  -Income+Penalty+lambda[1]*(sum(per_dev_up[m,s] for m=1:M, s=1:S)/(M*S) +slack_up*1.01 )+lambda[2]*(sum(per_dev_do[m,s] for m=1:M, s=1:S )/(M*S) +slack_do*1.01 ) + gamma[1]/2*( (sum(per_dev_up[m,s] for m=1:M, s=1:S)+up_input)/(M_d*S)-1+slack_up)^2+gamma[2]/2*( (sum(per_dev_do[m,s] for m=1:M, s=1:S )+do_input)/(M_d*S)+slack_do-1)^2  )
+   @objective(Mo, Min,  -Income+Penalty+lambda[1]*(sum(per_dev_up[m,s] for m=1:M, s=1:S)/(M_d*S))+lambda[2]*(sum(per_dev_do[m,s] for m=1:M, s=1:S )/(M_d*S) ) + (1+gamma[1])*( (sum(per_dev_up[m,s] for m=1:M, s=1:S)+up_input)/(M_d*S)-1+slack_up)^2+(1+gamma[2])*( (sum(per_dev_do[m,s] for m=1:M, s=1:S )+do_input)/(M_d*S)+slack_do-1)^2  )
 
    # summerizing constraints
    @constraint(Mo, Income == sum( (C_up*La_up[t,s] + C_do*La_do[t,s])*Pi for s=1:S) ) ###
@@ -108,6 +108,8 @@ function Stochastic_d1_model_hourly(La_do, La_up, Ac_do, Ac_up, Power_rate, po_c
    @constraint(Mo, [m=1:M, s=1:S], Ap_up[m,s] <= Ap_P_up[s] )                                # Hourly activation penalty must be equal to minute where most energy is missed down
    @constraint(Mo, [m=1:M, s=1:S], Ap_do[m,s] <= Ap_P_do[s] )                                # Hourly activation penalty must be equal to minute where most energy is missed up
 
+   @constraint(Mo, 1 >= slack_up)
+   @constraint(Mo, 1 >= slack_do)
 
    #### P90/bid available in 85% approximation constraints ###
 
