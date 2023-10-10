@@ -29,7 +29,12 @@ function Main_stochastic(CB_Is)
     println(clock[2])
     println(clock[2])
 
-    for Day=start_day:end_day
+    ######
+    start_day = 1
+    day_list = [1,2,3,4,5,6,7,120,121,122,123,124,125,126,239,240,241,242,243,244,245]
+    ######
+    for Day in day_list
+    #for Day=start_day:end_day
         println("day is $Day")
 
 

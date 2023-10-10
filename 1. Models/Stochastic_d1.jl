@@ -39,10 +39,6 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    Pen_do = deepcopy(La_do)*Pen_e_coef  # intialize penalty cost
    Pen_up = deepcopy(La_up)*Pen_e_coef  # intialize penalty cost
    S = 10
-<<<<<<< HEAD
-   I = 10
-=======
->>>>>>> 758e196c94f787b890b0a1962fcab75ae088c56e
    Pi = 1/S
    epsilon = 0.1                 # helper, so demominator won't become zero
 
