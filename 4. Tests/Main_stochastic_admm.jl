@@ -48,7 +48,7 @@ function Main_stochastic(CB_Is)
 
 
 
-        global count_to = 20
+        global count_to = 15
         global per_dev_up_input = ones(M_d,S)*0.5
         global per_dev_do_input = ones(M_d,S)*0.5
         global slack_in_up = 1-sum(per_dev_up_input)/(M_d*S)
@@ -58,17 +58,19 @@ function Main_stochastic(CB_Is)
         global C_do = zeros(T)
         global slack_up = ones(T)*slack_in_up/24
         global slack_do = ones(T)*slack_in_do/24
-        gamma = zeros(2)
-        gamma[1] = 0.5  # upwards gamma Penalty
-        gamma[2] = 0.5 # downwards gamma Penalty
+
         lambda = zeros(2,count_to+1)
-        lambda[1,1] = 0.5  # upwards gamma Penalty
-        lambda[2,1] = 10 # downwards gamma Penalty
-        change_lambda = 100
+        lambda[1,1] = 0.14*I  # upwards gamma Penalty
+        lambda[2,1] = I/3  # downwards gamma Penalty
+        gamma = zeros(2)
+        gamma[1] = lambda[1,1]+0.15   # upwards gamma Penalty
+        gamma[2] = lambda[2,1]+0.15   # upwards gamma Penalty
+        global change_lambda_up = 100
+        global change_lambda_do = 100
         global counter =  1
 
 
-        while change_lambda >= 0.001 && counter <= count_to
+        while (change_lambda_up >= 0.01 || change_lambda_do >= 0.01) && counter <= count_to
             for t=1:T
                 do_input = (sum(per_dev_do_input)-sum(per_dev_do_input[(t-1)*60+m,s] for m=1:M, s=1:S))
                 up_input = (sum(per_dev_up_input)-sum(per_dev_up_input[(t-1)*60+m,s] for m=1:M, s=1:S))
@@ -76,9 +78,11 @@ function Main_stochastic(CB_Is)
                 #slack_in_up = sum(slack_in_do)-slack_do[t]
 
                 println(lambda[:,counter])
-                println(slack_do)
-                global C_up[t], C_do[t], per_dev_up_input_in_loop[(t-1)*60+1:t*60,:], per_dev_do_input_in_loop[(t-1)*60+1:t*60,:], slack_up[t], slack_do[t] = Stochastic_d1_model_hourly(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, flex_up_s, flex_do_s, total_flex_up_s, total_flex_do_s, I, S, t, RM, gamma, lambda[:,counter], up_input, do_input)
 
+                global C_up[t], C_do[t], per_dev_up_input_in_loop[(t-1)*60+1:t*60,:], per_dev_do_input_in_loop[(t-1)*60+1:t*60,:], slack_up[t], slack_do[t] = Stochastic_d1_model_hourly(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, flex_up_s, flex_do_s, total_flex_up_s, total_flex_do_s, I, S, t, RM, gamma, lambda[:,counter], up_input, do_input)
+                #per_dev_up_input, per_dev_do_input = deepcopy(per_dev_up_input_in_loop), deepcopy(per_dev_do_input_in_loop)
+                #lambda[1,counter] = lambda[1,counter]+(gamma[1])*(sum(per_dev_up_input)/(S*M_d)+sum(slack_up)/24-1)
+                #lambda[2,counter] = lambda[2,counter]+(gamma[2])*(sum(per_dev_do_input)/(S*M_d)+sum(slack_do)/24-1)
 
                 println("the bids were:")
                 println(C_do[t])
@@ -87,29 +91,23 @@ function Main_stochastic(CB_Is)
             end
 
             per_dev_up_input, per_dev_do_input = deepcopy(per_dev_up_input_in_loop), deepcopy(per_dev_do_input_in_loop)
-            lambda[1,counter+1] = lambda[1,counter]+(gamma[1])*(sum(per_dev_up_input)/(S*M_d)-1)
-            lambda[2,counter+1] = lambda[2,counter]+(gamma[2])*(sum(per_dev_do_input)/(S*M_d)-1)
-
+            if counter < count_to*0.68
+                lambda[1,counter+1] = lambda[1,counter]+(gamma[1]-(counter*gamma[1]/count_to/0.75)   )*(sum(per_dev_up_input)/(S*M_d)-1)
+                lambda[2,counter+1] = lambda[2,counter]+(gamma[2]-(counter*gamma[2]/count_to/0.75)  )*(sum(per_dev_do_input)/(S*M_d)-1)
+            else
+                lambda[1,counter+1] = lambda[1,counter]+(gamma[1]-(count_to*0.7*gamma[1]/count_to/0.75)  )*(sum(per_dev_up_input)/(S*M_d)-1)
+                lambda[2,counter+1] = lambda[2,counter]+(gamma[2]-(count_to*0.7*gamma[2]/count_to/0.75)  )*(sum(per_dev_do_input)/(S*M_d)-1)
+            end
             println("the bids were:")
             println(C_do)
             println(C_up)
 
-            change_lambda = abs(lambda[1,counter+1] -lambda[1,counter]) + abs(lambda[2,counter+1] -lambda[2,counter])
+            global change_lambda_up = abs(lambda[1,counter+1] -lambda[1,counter])
+            global change_lambda_do = abs(lambda[2,counter+1] -lambda[2,counter])
             println("lambda change is")
             println(abs(lambda[1,counter+1] -lambda[1,counter]) )
             println(abs(lambda[2,counter+1] -lambda[2,counter]) )
-            if lambda[1,counter+1] < 0
-                lambda[1,counter+1] = 0
-            end
-            if lambda[2,counter+1] < 0
-                lambda[2,counter+1] = 0
-            end
-            if lambda[1,counter+1] > 20
-                lambda[1,counter+1] = 20
-            end
-            if lambda[2,counter+1] > 20
-                lambda[2,counter+1] = 20
-            end
+
 
             global counter = counter + 1
 
