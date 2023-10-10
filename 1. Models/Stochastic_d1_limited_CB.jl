@@ -39,13 +39,13 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    Pen_do = deepcopy(La_do)*Pen_e_coef  # intialize penalty cost
    Pen_up = deepcopy(La_up)*Pen_e_coef  # intialize penalty cost
    S = 10
-   I = 2
+   ny_I = I/5
    Pi = 1/S
    epsilon = 0.1                 # helper, so demominator won't become zero
 
    ### parameters for limited CB ###
-   flex_lim_CB_do_2 = B = sum(flex_do[:,1:I,:], dims=2)
-   flex_lim_CB_up_2 = sum(flex_up[:,1:I,:], dims=2)
+   flex_lim_CB_do_2 = B = sum(flex_do[:,1:ny_I,:], dims=2)
+   flex_lim_CB_up_2 = sum(flex_up[:,1:ny_I,:], dims=2)
 
    flex_lim_CB_do = dropdims(flex_lim_CB_do_2, dims=2)
    flex_lim_CB_up = dropdims(flex_lim_CB_up_2, dims=2)
@@ -55,6 +55,16 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
 
    replace!(ratio_flex_do, NaN => 0.0)
    replace!(ratio_flex_up, NaN => 0.0)
+   
+   df_ratio_do = Matrix{Float64}(undef, T, S)
+   df_ratio_up = Matrix{Float64}(undef, T, S)
+
+   for t=1:T
+      for s=1:S
+         df_ratio_do[t,s] = mean(ratio_flex_do[(1+60*(t-1)):(60*t),s])
+         df_ratio_up[t,s] = mean(ratio_flex_up[(1+60*(t-1)):(60*t),s])
+      end
+   end
    ###
 
    #************************************************************************
