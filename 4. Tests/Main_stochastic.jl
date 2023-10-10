@@ -49,8 +49,8 @@ function Main_stochastic(CB_Is)
         println(clock[3])
         println(clock[3])
         ###### derrive bids based on stochastic model ######
-        t, t, t,t, t, t,
-            t, t, t = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, flex_up_s, flex_do_s, total_flex_up_s, total_flex_do_s, I, S, RM)
+        global t_c, t_do, t,t, t, t,
+            t, t, t, s_d, s_u = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, flex_up_s, flex_do_s, total_flex_up_s, total_flex_do_s, I, S, RM)
 
         #Up_bids_A[:,Day], Do_bids_A[:,Day], Up_bids_I[:,Day,:,:], Do_bids_I[:,Day,:,:], ex_p_up[:,Day,:], ex_p_do[:,Day,:],
         #    ex_p_total[Day], expected_over_up[:,Day,:],  expected_over_do[:,Day,:] = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, flex_up_s, flex_do_s, total_flex_up_s, total_flex_do_s, I, S, RM)

@@ -39,7 +39,10 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    Pen_do = deepcopy(La_do)*Pen_e_coef  # intialize penalty cost
    Pen_up = deepcopy(La_up)*Pen_e_coef  # intialize penalty cost
    S = 10
+<<<<<<< HEAD
    I = 10
+=======
+>>>>>>> 758e196c94f787b890b0a1962fcab75ae088c56e
    Pi = 1/S
    epsilon = 0.1                 # helper, so demominator won't become zero
 
@@ -78,7 +81,7 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
 
    # Objetives
    @variable(Mo, Income)                              # Total income on capacity
-   @variable(Mo, 0 <= Penalty)                        # Total penalty based on missied activation
+   @variable(Mo, Penalty)                        # Total penalty based on missied activation
 
    ### Obejective ###
    @objective(Mo, Max,  Income-Penalty) ###
@@ -87,8 +90,6 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    @constraint(Mo, Income == sum( (C_up[t]*La_up[t,s] + C_do[t]*La_do[t,s])*Pi for t=1:T, s=1:S) ) ###
    @constraint(Mo, Penalty == sum(  (Ap_P_up[t,s]*Pen_up[t,s]+Ap_P_do[t,s]*Pen_do[t,s])*Pi for s=1:S, t=1:T) ) ###
 
-
-
    ### Bid constraints ###
    # Aggregator Bid constraiants
    for t=1:T
@@ -96,9 +97,8 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
       @constraint(Mo, [m=1:M, s=1:S], C_do[t] == sum(C_do_I[(t-1)*60+m,i,s] for i=1:I) )                                 # The downwards bid must be distributed over the charge boxses
    end
 
-
-   @constraint(Mo, [m=1:M_d, s=1:S], total_flex_up[m,s]*dis_up[m,s]  == sum(C_up_I[m,i,s] for i=1:I ) )                          # Help
-   @constraint(Mo, [m=1:M_d, s=1:S], total_flex_do[m,s]*dis_do[m,s]  == sum(C_do_I[m,i,s] for i=1:I ) )                          # Help
+   #@constraint(Mo, [m=1:M_d, s=1:S], total_flex_up[m,s]*dis_up[m,s]  == sum(C_up_I[m,i,s] for i=1:I ) )                          # Help
+   #@constraint(Mo, [m=1:M_d, s=1:S], total_flex_do[m,s]*dis_do[m,s]  == sum(C_do_I[m,i,s] for i=1:I ) )                          # Help
 
    @constraint(Mo, [m=1:M_d, s=1:S, i=1:I], flex_up[m,i,s]*dis_up[m,s]  == C_up_I[m,i,s] )                                       # Help
    @constraint(Mo, [m=1:M_d, s=1:S, i=1:I], flex_do[m,i,s]*dis_do[m,s]  == C_do_I[m,i,s] )                                       # Help
@@ -112,12 +112,16 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
 
    #### P90/bid available in 85% approximation constraints ###
    for t=1:T
-      @constraint(Mo, [m=1:M, s=1:S], ( total_flex_up[(t-1)*60+m,s]-(C_up[t]+C_do[t]*0.2)+ epsilon)/( total_flex_up[(t-1)*60+m,s]+epsilon)+per_dev_up[(t-1)*60+m,s]  >= 0  )   # The Upwards flexibility has to be greater than the downwards bids plus to be 20% of the upwards bid, otherwise we'll have to enforce a capacity penalty
-      @constraint(Mo, [m=1:M, s=1:S], ( (total_flex_do[(t-1)*60+m,s]+epsilon)-C_do[t])/(total_flex_do[(t-1)*60+m,s]+epsilon)+per_dev_do[(t-1)*60+m,s] >= 0    )                  # The downwards flexibility must be higher than the upwards bid, o.w, we don't have the capacity
+      @constraint(Mo, [m=1:M, s=1:S], 100*( ( total_flex_up[(t-1)*60+m,s]-(C_up[t]+C_do[t]*0.2)+ epsilon)/( total_flex_up[(t-1)*60+m,s]+epsilon))+per_dev_up[(t-1)*60+m,s]  >= 0  )   # The Upwards flexibility has to be greater than the downwards bids plus to be 20% of the upwards bid, otherwise we'll have to enforce a capacity penalty
+      @constraint(Mo, [m=1:M, s=1:S], 100*( ( (total_flex_do[(t-1)*60+m,s]+epsilon)-C_do[t])/(total_flex_do[(t-1)*60+m,s]+epsilon))+per_dev_do[(t-1)*60+m,s] >= 0    )                  # The downwards flexibility must be higher than the upwards bid, o.w, we don't have the capacity
    end
 
-   @constraint(Mo, sum( per_dev_up[m,s] for m=1:M_d, s=1:S)/(S*M_d) <= 0.01 )                                     # the average over overbid must be less than 10%
-   @constraint(Mo, sum( per_dev_do[m,s] for m=1:M_d, s=1:S)/(S*M_d) <= 0.01 )                                     # the average over overbid must be less than 10%
+
+
+
+   @constraint(Mo, shadow_up, sum( per_dev_up[m,s] for m=1:M_d, s=1:S)/(S*M_d) <= 1 )                                     # the average over overbid must be less than 10%
+   @constraint(Mo, shadow_do, sum( per_dev_do[m,s] for m=1:M_d, s=1:S)/(S*M_d) <= 1 )                                     # the average over overbid must be less than 10%
+
 
 
    ### Operation constraints ###
@@ -132,6 +136,9 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
 
    # Max power constraint
    @constraint(Mo, [m=1:M_d, i=1:I, s=1:S], Ma[m,i,s] <= Power_rate[m,i,s]*Connected[m,i,s]  )                    # The charging power rate of the box must be higher than the Max power (Ma)
+
+
+
    for i=1:I
       for m=2:M_d
          for s=1:S
@@ -205,5 +212,5 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh
    end
    #************************************************************************
 
-   return value.(C_up), value.(C_do), value.(C_up_I), value.(C_do_I), value.(Ap_up), value.(Ap_do), value(Penalty), value.(per_dev_up), value.(per_dev_do)
+   return value.(C_up), value.(C_do), value.(C_up_I), value.(C_do_I), value.(Ap_up), value.(Ap_do), value(Penalty), value.(per_dev_up), value.(per_dev_do), shadow_price(shadow_up), shadow_price(shadow_do)
 end
