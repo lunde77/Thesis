@@ -10,7 +10,7 @@ else
 
 end
 
-results = zeros(3,8)
+results = zeros(2,8)
 
 # 1: objetive
 # 2: missed actation
@@ -21,8 +21,8 @@ results = zeros(3,8)
 # 7: itteation in last bid shcudle creation
 # 8: time taken
 
-for i=1:3
-    CB_Is = collect(1:i*50)
+for i=1:1
+    CB_Is = collect(1:150+i*50)
     global start = time_ns()
 
     results[i,1], results[i,2], results[i,3:4], results[i,5], results[i,6], results[i,7] = Main_stochastic_admm(CB_Is)

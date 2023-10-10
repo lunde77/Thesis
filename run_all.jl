@@ -12,13 +12,15 @@ end
 
 # load all functions:
 include("$base_path"*"1. Models\\Deterministic.jl")
-include("$base_path"*"1. Models\\Stochastic_d1_t1.jl")
+include("$base_path"*"1. Models\\Stochastic_admm.jl")
+include("$base_path"*"1. Models\\Stochastic_d1.jl")
 
 include("$base_path"*"2. Algorithms\\Day_simulater.jl")
 
 include("$base_path"*"3. Simulations\\Plots\\Deterministic\\plot_function.jl")
 include("$base_path"*"4. Tests\\Main_determistic.jl")
 include("$base_path"*"4. Tests\\Main_stochastic.jl")
+include("$base_path"*"4. Tests\\Main_stochastic_admm.jl")
 
 include("$base_path"*"7. Helper functions\\baseline_atering.jl")
 include("$base_path"*"7. Helper functions\\scenario_generation.jl")

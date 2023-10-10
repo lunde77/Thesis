@@ -1,4 +1,4 @@
-function Main_stochastic(CB_Is)
+function Main_stochastic_admm(CB_Is)
 
     # Static Parameters
     global T = 24 # hours on a day
@@ -46,9 +46,7 @@ function Main_stochastic(CB_Is)
         println(clock[3])
         ###### derrive bids based on stochastic model ######
 
-
-
-        global count_to = 15
+        global count_to = 20
         global per_dev_up_input = ones(M_d,S)*0.5
         global per_dev_do_input = ones(M_d,S)*0.5
         global slack_in_up = 1-sum(per_dev_up_input)/(M_d*S)
@@ -74,19 +72,10 @@ function Main_stochastic(CB_Is)
             for t=1:T
                 do_input = (sum(per_dev_do_input)-sum(per_dev_do_input[(t-1)*60+m,s] for m=1:M, s=1:S))
                 up_input = (sum(per_dev_up_input)-sum(per_dev_up_input[(t-1)*60+m,s] for m=1:M, s=1:S))
-                #slack_in_up = sum(slack_in_up)-slack_up[t]
-                #slack_in_up = sum(slack_in_do)-slack_do[t]
 
                 println(lambda[:,counter])
 
-                global C_up[t], C_do[t], per_dev_up_input_in_loop[(t-1)*60+1:t*60,:], per_dev_do_input_in_loop[(t-1)*60+1:t*60,:], slack_up[t], slack_do[t] = Stochastic_d1_model_hourly(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, flex_up_s, flex_do_s, total_flex_up_s, total_flex_do_s, I, S, t, RM, gamma, lambda[:,counter], up_input, do_input)
-                #per_dev_up_input, per_dev_do_input = deepcopy(per_dev_up_input_in_loop), deepcopy(per_dev_do_input_in_loop)
-                #lambda[1,counter] = lambda[1,counter]+(gamma[1])*(sum(per_dev_up_input)/(S*M_d)+sum(slack_up)/24-1)
-                #lambda[2,counter] = lambda[2,counter]+(gamma[2])*(sum(per_dev_do_input)/(S*M_d)+sum(slack_do)/24-1)
-
-                println("the bids were:")
-                println(C_do[t])
-                println(C_up[t])
+                global C_up[t], C_do[t], per_dev_up_input_in_loop[(t-1)*60+1:t*60,:], per_dev_do_input_in_loop[(t-1)*60+1:t*60,:], slack_up[t], slack_do[t] = Stochastic_admm(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, po_cap_s, kWh_cap_s, Power_s, Connected_s, SoC_start_s, SoC_A_cap_s, flex_up_s, flex_do_s, total_flex_up_s, total_flex_do_s, I, S, t, RM, gamma, lambda[:,counter], up_input, do_input)
 
             end
 
@@ -95,8 +84,8 @@ function Main_stochastic(CB_Is)
                 lambda[1,counter+1] = lambda[1,counter]+(gamma[1]-(counter*gamma[1]/count_to/0.9)   )*(sum(per_dev_up_input)/(S*M_d)-1)
                 lambda[2,counter+1] = lambda[2,counter]+(gamma[2]-(counter*gamma[2]/count_to/0.9)  )*(sum(per_dev_do_input)/(S*M_d)-1)
             else
-                lambda[1,counter+1] = lambda[1,counter]+(gamma[1]-(count_to*0.7*gamma[1]/count_to/0.75)  )*(sum(per_dev_up_input)/(S*M_d)-1)
-                lambda[2,counter+1] = lambda[2,counter]+(gamma[2]-(count_to*0.7*gamma[2]/count_to/0.75)  )*(sum(per_dev_do_input)/(S*M_d)-1)
+                lambda[1,counter+1] = lambda[1,counter]+(gamma[1]-(count_to*0.75*gamma[1]/count_to/0.9)  )*(sum(per_dev_up_input)/(S*M_d)-1)
+                lambda[2,counter+1] = lambda[2,counter]+(gamma[2]-(count_to*0.75*gamma[2]/count_to/0.9)  )*(sum(per_dev_do_input)/(S*M_d)-1)
             end
             println("the bids were:")
             println(C_do)
@@ -115,18 +104,44 @@ function Main_stochastic(CB_Is)
         end
 
         println(counter )
-
-        global lambda = lambda
-        #global down_shadow = down_shadow
-        global per_dev_up_input = per_dev_up_input
-        global C_do = C_do
-        global C_up = C_up
+        for t=1:24
+            for m=1:60
+                global Do_bids_A[(t-1)*60+m,Day] = C_do[t]
+                global Up_bids_A[(t-1)*60+m,Day] = C_up[t]
+            end
+        end
 
         clock[4] = round((time_ns() - start) / 1e9, digits = 3)
 
+        ###### Initialize the SoC for the begining of th day ######
+        for i=1:I
+            if Day == start_day
+                global SoC_start_r[i] = 0
+            else
+                global SoC_start_r[i] = SoC_end[i]
+            end
+            # Alter the power if it's conflicting with the SoC limits
+            Power_r[:,i], altered = baseline_altering(Power_r[:,i], SoC_start_r[i], Connected_r[:,i], po_cap_r[:,i], kWh_cap_r[:,i])
+        end
 
+
+        ###### Simulate day of operation on realized data ######
+        obj, SoC_end, missing_del, A_E, missing_delivery_storer[Day,:] = operation(kWh_cap_r, po_cap_r, Power_r, SoC_start_r, Max_Power_r, Connected_r, Ac_do_r, Ac_up_r, Do_bids_A[:,Day], Up_bids_A[:,Day], La_do_r, La_up_r, RM)
+
+        # update results:
+        Activation_energy[:,Day,:] = A_E
+        revenue[1] = revenue[1] + obj
+        println("The revenue  mode would be $obj")
+        missing_delivery[1] = missing_delivery[1] + missing_del
+
+        global SoC_end
 
 
     end
-    return
+    total_cap_missed = zeros(2)
+    total_cap_missed[1] = sum(missing_delivery_storer[:,1])/(1-start_day+end_day) # down
+    total_cap_missed[2] = sum(missing_delivery_storer[:,2])/(1-start_day+end_day) # up
+    println("The revenue  mode would be $(revenue[1])")
+    println("The missing delivery would be $(missing_delivery[1])")
+    return revenue[1], missing_delivery[1], total_cap_missed, change_lambda_do, change_lambda_up, counter
 end

@@ -73,10 +73,10 @@ function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_
         end
 
         # find potential flexibility issues, as wee need to have enough flexibility in both direction concerning the activátion level
-        if sum(flex[:,1]) <= C_do[m]
+        if sum(flex[:,1]) < C_do[m]
             Leftover_storer[m,1] = 1
         end
-        if sum(flex[:,2]) <= C_up[m]+C_do[m]*0.2
+        if sum(flex[:,2]) < C_up[m]+C_do[m]*0.2
             Leftover_storer[m,2] = 1
         end
 
