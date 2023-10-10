@@ -16,7 +16,7 @@ Objetives = zeros(150,1)
 Missing_del_results = zeros(150,1)
 cap_missed_results = zeros(150,2)
 
-for i=1:1
+for i=1:150
     CB_Is = [i]
     Objetives[i], Missing_del_results[i], cap_missed_results[i,:]  = Main_stochastic(CB_Is)
 end

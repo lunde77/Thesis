@@ -1,0 +1,23 @@
+   ### aggregator helper varibles ###
+for m=1:M_d
+    m_a_max = m+19
+    if m_a_max > M_d
+      m_a_max = M_d
+    end
+    duration = (m_a_max+1-m)/60 # how long we have to sustain the activation, will 1/3 if we're lower than 1440
+    for s=1:S
+      for i=1:I
+          if m !=  1
+             if po_cap[m-1,i,s] > 0
+                @constraint(Mo,  ( (kWh_cap[m-1,i,s]/po_cap[m-1,i,s]-kWh_cap[m-1,i,s]/RM) - sum( flex_do[m_a ,i,s]*dis[m_a,s] for m_a=m:m_a_max)*duration  + epsilon )  / (kWh_cap[m-1,i,s]/po_cap[m-1,i,s]-kWh_cap[m-1,i,s]/RM + epsilon)  +cap_mis_p[m,i,s] >= 0 )       #  get ratio between abaible capacity and if we had full activation for 20 minutes
+             else
+                @constraint(Mo,  ( 0 - sum( flex_do[m_a,i,s]*dis[m_a,s] for m_a=m:m_a_max)*duration  + epsilon )  / ( 0 + epsilon)  +cap_mis_p[m,i,s]  >= 0 )
+             end
+          else
+             @constraint(Mo,  ( (kWh_cap[m_a_max,i,s]/po_cap[1,i,s]-SoC_start[i,s]/RM) - sum( flex_do[m_a,i,s]*dis[m_a,s] for m_a=m:m_a_max)*duration  + epsilon )  / (kWh_cap[m,i,s]/po_cap[1,i,s]-SoC_start[i,s]/RM  + epsilon)  +cap_mis_p[m,i,s]  >= 0 )                  #  get ratio between abaible capacity and if we had full activation for 20 minutes
+          end
+      end
+      @constraint(Mo, per_dev_do[m,s] >= sum( cap_mis_p[m,i,s]  * sum( flex_do[m+m_a,i,s]/total_flex_do[m+m_a,s]  for m_a=m:m_a_max) for i=1:I)  )         # the overbid in upwards bid must be equal to at least the sverage charge box bid in avaible capacity in respect to full activation for 20 minutes
+    end
+end
+

@@ -18,7 +18,6 @@ function load_daily_data(Day)
 
 
     ###### Initialize the scenarios for the given day ######
-
     global La_do_s = scenario_generation_m(Do_prices_d1, Day, 1)                                           # Scenarios for prices down for d-1
     global La_up_s = scenario_generation_m(Up_prices_d1, Day, 1)                                           # Scenarios for prices up for d-1
     global Ac_do_s = scenario_generation_m(Ac_dowards, Day, 1)                                             # Scenarios for activation % downwards
@@ -31,10 +30,8 @@ function load_daily_data(Day)
     global Connected_s  = scenario_generation_m(Connected_all, Day, 2)                                     # Scenarios for minutes where CB is connected
     global SoC_A_cap_s  = scenario_generation_m(SoC_A_cap_all, Day, 1)                                     # Scenarios for The aggregated resovior capacity
     global SoC_start_s = scenario_generation_d1(kWh_cap_all, Day)                                          # Scenarios for the start SoC
-
     global flex_do_s, flex_up_s, total_flex_do_s, total_flex_up_s = baseline_flex(kWh_cap_s, po_cap_s, Power_s, Max_Power_s, Connected_s, SoC_start_s, S, RM)                # Scenarios for the start SoC
 
-    println(sum(Power_s))
     global P90_Power = Power_scenario_90(Power_s)                                                          # The aggregated power in p90 scenario
     global P90_MP = Power_scenario_90(Max_Power_s)                                                         # The aggregated max power in p90 scenario
 end
