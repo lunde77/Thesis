@@ -36,13 +36,13 @@ function baseline_flex(kWh_cap, po_cap, Power, Power_rate, Connected, SoC_starts
                     # see if power rate or SoC is limitd factor for flexibility
                     # and find downwards flexibility
                     if m==1
-                        if (kWh_cap[m,i,s]/po_cap[m,i,s]-SoC_starts[i,s])*60 < Power_rate[m,i,s]
+                        if (kWh_cap[m,i,s]/po_cap[m,i,s]/RM-SoC_starts[i,s])*60 < Power_rate[m,i,s]
                             flex[m,i,s,1] = (kWh_cap[m,i,s]/po_cap[m,i,s]/RM-SoC_starts[i,s])*60-Power[m,i,s]
                         else
                             flex[m,i,s,1] = Power_rate[m,i,s]-Power[m,i,s]
                         end
                     else
-                        if (kWh_cap[m-1,i,s]/po_cap[m-1,i,s]-kWh_cap[m-1,i,s])*60 < Power_rate[m,i,s]
+                        if (kWh_cap[m-1,i,s]/po_cap[m-1,i,s]/RM-kWh_cap[m-1,i,s])*60 < Power_rate[m,i,s]
                             flex[m,i,s,1] = (kWh_cap[m,i,s]/po_cap[m,i,s]/RM-kWh_cap[m-1,i,s])*60-Power[m,i,s]
                         else
                             flex[m,i,s,1] = Power_rate[m,i,s]-Power[m,i,s]

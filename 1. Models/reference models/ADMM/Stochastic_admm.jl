@@ -38,10 +38,10 @@ function Stochastic_admm(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh_cap
    Pen_do = deepcopy(La_do)*Pen_e_coef  # intialize penalty cost
    Pen_up = deepcopy(La_up)*Pen_e_coef  # intialize penalty cost
    S = 10
-   if I <= 5
+   if I <= 0
       I_o = I
    else
-      I_o = 5
+      I_o = 0
    end
    Pi = 1/S
    epsilon = 0.1                 # helper, so demominator won't become zero
@@ -76,6 +76,22 @@ function Stochastic_admm(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh_cap
       end
    end
 
+
+   # make quick fix to vettorize model
+
+   fixer_cons_1 = zeros(M, I_o, S) # it the constrinat is fullfilled the fixer will take a one, meaning the max charge it not zero
+
+   for i=1:I_o
+      for m=2:M
+         for s=1:S
+            if Connected[(t-1)*60+m,i,s] == 1 && Connected[(t-1)*60+m-1,i,s] != 0  # We need to look at m-1 for the resovior levels, as the power delivered at m, is what gives the SoC at the end
+               fixer_cons_1[m,i,s] = 1        # The charging must not violaate the resovior max
+            end
+         end
+      end
+   end
+
+   global start = time_ns()
    #************************************************************************
    # Model
    Mo  = Model(Gurobi.Optimizer)
@@ -94,7 +110,6 @@ function Stochastic_admm(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh_cap
    @variable(Mo, 0 <= C_up_I[1:M, 1:I, 1:S])      # amount of upregulation distributed on CB on given scenario
    @variable(Mo, 0 <= dis_do[1:M, 1:S])           # give us the minute wise distributions of bid flexibility
    @variable(Mo, 0 <= dis_up[1:M, 1:S])           # give us the minute wise distributions of bid flexibility
-   @variable(Mo, 0 <= Ma_base[1:M, 1:I_o, 1:S])     # Max power baseline - kW
 
    # Bid Varibles
    @variable(Mo, 0 <= C_up)                    # Chosen upwards bid
@@ -113,7 +128,7 @@ function Stochastic_admm(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh_cap
    @variable(Mo, Penalty)                        # Total penalty based on missied activation
 
    ### Obejective ###
-   @objective(Mo, Min,  -Income+Penalty+lambda[1]*(sum(per_dev_up[m,s] for m=1:M, s=1:S)/(M_d*S))+lambda[2]*(sum(per_dev_do[m,s] for m=1:M, s=1:S )/(M_d*S) ) + (gamma[1])*( (sum(per_dev_up[m,s] for m=1:M, s=1:S)+up_input)/(M_d*S)-1+slack_up)^2+(gamma[2])*( (sum(per_dev_do[m,s] for m=1:M, s=1:S )+do_input)/(M_d*S)+slack_do-1)^2  )
+   @objective(Mo, Min,  -Income+lambda[1]*(sum(per_dev_up[m,s] for m=1:M, s=1:S)/(M_d*S))+lambda[2]*(sum(per_dev_do[m,s] for m=1:M, s=1:S )/(M_d*S) ) + (gamma[1])*( (sum(per_dev_up[m,s] for m=1:M, s=1:S)+up_input)/(M_d*S)-1+slack_up)^2+(gamma[2])*( (sum(per_dev_do[m,s] for m=1:M, s=1:S )+do_input)/(M_d*S)+slack_do-1)^2  )
 
    # summerizing constraints
    @constraint(Mo, Income == sum( (C_up*La_up[t,s] + C_do*La_do[t,s])*Pi for s=1:S) ) ###
@@ -133,8 +148,6 @@ function Stochastic_admm(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh_cap
    @constraint(Mo, [m=1:M, t=1:T, s=1:S], Ap_up[(t-1)*60+m,s] <= Ap_P_up[t,s] )                                # Hourly activation penalty must be equal to minute where most energy is missed down
    @constraint(Mo, [m=1:M, t=1:T, s=1:S], Ap_do[(t-1)*60+m,s] <= Ap_P_do[t,s] )                                # Hourly activation penalty must be equal to minute where most energy is missed up
 
-   @constraint(Mo, 1 >= slack_up)
-   @constraint(Mo, 1 >= slack_do)
 
    #### P90/bid available in 85% approximation constraints ###
 
@@ -147,77 +160,24 @@ function Stochastic_admm(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh_cap
    @constraint(Mo, [m=1:M, i=1:I_o, s=1:S], Po[m,i,s] == Power[(t-1)*60+m,i,s]-Ac_up[(t-1)*60+m,s]*(C_up_I[m,i,s]-Ap_up_I[m,i,s]) +Ac_do[(t-1)*60+m,s]*(C_do_I[m,i,s]-Ap_do_I[m,i,s]))   # The power is the baseline + the sum activation power
 
    # Activation power constraint - these almost mimics the constraints above, however down and upwards activation within the same minute, can cancel out, and thus not mimic the actial flexibility needed to be delivered, hence the constraints below
-   @constraint(Mo, [m=1:M, i=1:I_o, s=1:S], Ac_up[(t-1)*60+m,s]*(C_up_I[m,i,s]-Ap_up_I[m,i,s]) <= Power[(t-1)*60+m,i,s])                        # The upwards regulation delivered must be smaller than the power had + the potential penalty
-   @constraint(Mo, [m=1:M, i=1:I_o, s=1:S], Power[(t-1)*60+m,i,s]+Ac_do[(t-1)*60+m,s]*(C_do_I[m,i,s]-Ap_do_I[m,i,s]) <= Ma[m,i,s])              # The downwards regulation delivered must smaller than the max effect + the potential penalty
+   @constraint(Mo, [m=1:M, i=1:I_o, s=1:S], Ac_up[(t-1)*60+m,s]*(C_up_I[m,i,s]-Ap_up_I[m,i,s]) <= Power[(t-1)*60+m,i,s] )                        # The upwards regulation delivered must be smaller than the power had + the potential penalty
+   @constraint(Mo, [m=1:M, i=1:I_o, s=1:S], Power[(t-1)*60+m,i,s]+Ac_do[(t-1)*60+m,s]*(C_do_I[m,i,s]-Ap_do_I[m,i,s]) <= Ma[m,i,s] )              # The downwards regulation delivered must smaller than the max effect + the potential penalty
 
 
    # Max power constraint
    @constraint(Mo, [m=1:M, i=1:I_o, s=1:S], Ma[m,i,s] <= Power_rate[(t-1)*60+m,i,s]*Connected[(t-1)*60+m,i,s]  )                    # The charging power rate of the box must be higher than the Max power (Ma)
 
 
+   @constraint(Mo, [m=1:M, i=1:I_o, s=1:S], Ma[m,i,s] <= (kWh_cap[(t-1)*60+m-1,i,s]/(po_cap[(t-1)*60+m-1,i,s]+0.00001)/RM-SoC[m-1,i,s] )*60*fixer_cons_1[m,i,s] )
 
-   for i=1:I_o
-      for m=2:M
-         for s=1:S
-            if Connected[(t-1)*60+m,i,s] == 1 && Connected[(t-1)*60+m-1,i,s] != 0  # We need to look at m-1 for the resovior levels, as the power delivered at m, is what gives the SoC at the end
-               @constraint(Mo, Ma[m,i,s] <= (kWh_cap[(t-1)*60+m-1,i,s]/po_cap[(t-1)*60+m-1,i,s]/RM-SoC[m-1,i,s] )*60  )             # The charging must not violaate the resovior max
-            end
-         end
-      end
-   end
 
-   # SoC constraint
-   for i=1:I_o
-      for m=1:M
-         for s=1:S
-            if Connected[(t-1)*60+m,i,s] == 0
-               @constraint(Mo, SoC[m,i,s] ==  0)                                                                     # The SoC is to itepreted after the minutes, i.e. af after a non Connected minute, the SoC must be zero
-            else
-               if m == 1 && t == 1
-                  @constraint(Mo, SoC[m,i,s] ==  SoC_start[i,s]+Po[m,i,s]/60)                                        # Update the SoC to have the power realized stored
-               elseif m == 1
-                  if po_cap[(t-1)*60+m-1,i,s] != 1
-                     @constraint(Mo, SoC[m,i,s] ==  0+Po[m,i,s]/60)
-                  else
-                     @constraint(Mo, SoC[m,i,s] ==  kWh_cap[(t-1)*60+m-1,i,s]/po_cap[(t-1)*60+m-1,i,s]+Po[m,i,s]/60)                                        # Update the SoC to have the power realized stored
-                  end
-               else
-                  @constraint(Mo, SoC[m,i,s] ==  SoC[m-1,i,s]+Po[m,i,s]/60)                                          # Update the SoC to have the power realized stored
-                  @constraint(Mo, SoC[m,i,s] <= kWh_cap[(t-1)*60+m,i,s]/po_cap[(t-1)*60+m,i,s]/RM )                                    # The SoC is not allowed to be greater or equal to the end SoC for chargin seesion
-               end
-            end
-         end
-      end
-   end
-"""
-   for m=1:M_d
-       m_a_max = m+19
-       if m_a_max > M_d
-         m_a_max = M_d
-       end
-       duration = (m_a_max+1-m)/60 # how long we have to sustain the activation, will 1/3 if we're lower than 1440
-       for s=1:S
-            for i=1:I
-               for m1=m+1:m_a_max
-                  if m1 == m_a_max && Connected[m1,i,s] == 1
-                     @constraint(Mo, ( (kWh_cap[m1-1,i,s]/po_cap[m1-1,i,s]/RM - kWh_cap[m1-1,i,s]) - sum(C_up_I[m_2,i,s] for m_2=m:m1)/60 )/ (kWh_cap[m1-1,i,s]/po_cap[m1-1,i,s]/RM)  +kWh_left[m,m1-m,i,s]  >= 0 )        # get the kWh we missed for each minute
-                     if m1 == 1
-                        @constraint(Mo, ( (kWh_cap[m1,i,s]/po_cap[m1,i,s]/RM - SoC_start[i,s]) - sum(C_up_I[m_2,i,s] for m_2=m:m1)/60 )/ ( Wh_cap[m1,i,s]/po_cap[m1,i,s]/RM)  + kWh_left[m,m1-m,i,s] >= 0 )        # get the kWh we missed for each minute
-                     end
-                  elseif Connected[m1+1,i,s] == 0 && Connected[m1,i,s] == 1
-                     @constraint(Mo, ( (kWh_cap[m1-1,i,s]/po_cap[m1-1,i,s]/RM - kWh_cap[m1-1,i,s]) - sum(C_up_I[m_2,i,s] for m_2=m:m1)/60 )/ (kWh_cap[m1-1,i,s]/po_cap[m1-1,i,s]/RM)  + kWh_left[m,m1-m,i,s]  >= 0 )        # get the kWh we missed for each minute
-                     if m1 == 1
-                        @constraint(Mo, ( (kWh_cap[m1,i,s]/po_cap[m1,i,s]/RM - SoC_start[i,s]) - sum(C_up_I[m_2,i,s] for m_2=m:m1)/60 )/ ( Wh_cap[m1,i,s]/po_cap[m1,i,s]/RM)  + kWh_left[m,m1-m,i,s]  >= 0 )        # get the kWh we missed for each minute
-                     end
-                  else
-                     @constraint(Mo, kWh_left[m,m1-m,i,s] == 0)
-                  end
-               end
-            end
-       end
-   end
-"""
-   #@constraint(Mo, per_dev_do[m,s] >= sum( sum(kWh_left[m,m1,i,s] for m1=1:20)  * sum( flex_do[m+m_a,i,s]/total_flex_do[m+m_a,s]  for m_a=m:m_a_max) for i=1:I)  )         # the overbid in upwards bid must be equal to at least the sverage charge box bid in avaible capacity in respect to full activation for 20 minutes
+   @constraint(Mo, [m=1:M, i=1:I_o, s=1:S], SoC[m,i,s] <=  Connected[(t-1)*60+m,i,s]*25 )
+
+   @constrinat(Mo, [i=I_o, s=1:S], SoC[1, i, s] ==  kWh_cap[(t-1)*60+m,i,s]/(po_cap[(t-1)*60+m,i,s]+0.00001)*Connected[(t-1)*60+m,i,s]+Po[m,i,s]/60 )  #### this has to be changed to SoC_start, as we're for now not reffering to the correct SoC, it should be m-1
+
+   @constraint(Mo, [m=2:M, i=1:I_o, s=1:S], SoC[m,i,s] == (SoC[m-1,i,s]+Po[m,i,s]/60)*Connected[(t-1)*60+m,i,s] )
+
+   @constraint(Mo, [m=2:M, i=1:I_o, s=1:S],  SoC[m,i,s] <= kWh_cap[(t-1)*60+m,i,s]/po_cap[(t-1)*60+m,i,s]/RM*Connected[(t-1)*60+m,i,s] )
 
 
    #************************************************************************
@@ -233,6 +193,6 @@ function Stochastic_admm(La_do, La_up, Ac_do, Ac_up, Power_rate, po_cap, kWh_cap
    end
    #************************************************************************
 
-
+   println(round((time_ns() - start) / 1e9, digits = 3))
    return value(C_up), value(C_do), value.(per_dev_up), value.(per_dev_do), value(slack_up), value(slack_do)
 end

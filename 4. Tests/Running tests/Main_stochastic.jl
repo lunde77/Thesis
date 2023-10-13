@@ -48,10 +48,10 @@ function Main_stochastic(CB_Is)
         obj, SoC_end, missing_del, A_E, missing_delivery_storer[Day,:] = operation(kWh_cap_r, po_cap_r, Power_r, SoC_start_r, Max_Power_r, Connected_r, Ac_do_r, Ac_up_r, Do_bids_A[:,Day], Up_bids_A[:,Day], La_do_r, La_up_r, RM)
 
         # update results:
-        Activation_energy[:,Day,:] = A_E
+        missing_delivery[1] = missing_delivery[1] + missing_del
         revenue[1] = revenue[1] + obj
         println("The revenue  mode would be $obj")
-        missing_delivery[1] = missing_delivery[1] + missing_del
+
 
         global SoC_end
     end

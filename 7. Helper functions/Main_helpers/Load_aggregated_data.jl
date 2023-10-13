@@ -5,6 +5,8 @@ function Load_aggregated(CB_Is)
     global kWh_cap_all = Matrix{Float64}(undef, M_d*Days, I)                                                # kWh of resovior charged
     global Power_all =  Matrix{Float64}(undef, M_d*Days, I)                                                 # baseline power
     global Connected_all =  Matrix{Float64}(undef, M_d*Days, I)                                             # minutes where CB is connected
+    global Upwards_flex_all =  Matrix{Float64}(undef, M_d*Days, I)                                          # Upwards flexibity for all charge boxses
+    global Downwards_flex_all =  Matrix{Float64}(undef, M_d*Days, I)                                        # downwards flexibity for all charge boxses
 
     global SoC_A_cap_all = zeros(M_d*Days)                                                                  # the total capacity for each scenario
 
@@ -15,11 +17,13 @@ function Load_aggregated(CB_Is)
         kWh_cap_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,2]
         Power_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,3]
         Connected_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,4]
+        Upwards_flex_all[:,i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,8]
+        Downwards_flex_all[:,i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,7]
 
-        for m=1:525600
-            if Connected_all[m,i] == 1
-                global SoC_A_cap_all[m] = SoC_A_cap_all[m]+kWh_cap_all[m,i]/po_cap_all[m,i]
-            end
-        end
+        #for m=1:525600
+        #    if Connected_all[m,i] == 1
+        #        global SoC_A_cap_all[m] = SoC_A_cap_all[m]+kWh_cap_all[m,i]/po_cap_all[m,i]
+        #    end
+        #end
     end
 end

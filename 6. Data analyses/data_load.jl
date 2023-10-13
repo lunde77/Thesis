@@ -67,37 +67,79 @@ for m=1:Mi
 end
 
 
-####### LOAD DATA FOR EV CHARGE box ########
 
-# Get a list of all CSV files in the folder
-file_names = readdir("$base_path"*"EV\\cleaned data\\", join=true)
-dataframe_names = file_names
-# Create a dictionary to store the loaded DataFrames
-global EV_dataframes = Dict{String, DataFrame}()
+WF = true
 
-# Set the number of files to load - defount is all
-#num_files_to_load = size(dataframe_names)[1] # outcomment this (not delete), if other option than all is selceted
-num_files_to_load = 500
+if WF == true
 
-# Load only CSV files and store them in the dictionary
-global i = 0
-for file_path in file_names
-    global i = i + 1
+    ####### LOAD DATA FOR EV CHARGE box ########
 
-    if i > num_files_to_load
-        break
-    end
-    if endswith(file_path, ".csv")
-        #_, filename, _ = splitpath(file_path)  # Extract the file name without extension
-        filename = file_path
-        if Emil
-            dataframe_name = filename[64:67]
-        else
-            dataframe_name = filename[58:61]  # Remove the first 3 characters
+    # Get a list of all CSV files in the folder
+    file_names = readdir("$base_path"*"EV\\cleaned_data_RM90\\", join=true)
+    dataframe_names = file_names
+    # Create a dictionary to store the loaded DataFrames
+    global EV_dataframes = Dict{String, DataFrame}()
+
+    # Set the number of files to load - defount is all
+    #num_files_to_load = size(dataframe_names)[1] # outcomment this (not delete), if other option than all is selceted
+    num_files_to_load = 500
+
+
+    # Load only CSV files and store them in the dictionary
+    global i = 0
+    for file_path in file_names
+        global i = i + 1
+
+        if i > num_files_to_load
+            break
         end
-        dataframe_names[i] = dataframe_name
-        println("File Path: $file_path")
-        println("Dataframe Name: $dataframe_name")
-        global EV_dataframes[dataframe_name] = CSV.File(file_path) |> DataFrame
+        if endswith(file_path, ".csv")
+            #_, filename, _ = splitpath(file_path)  # Extract the file name without extension
+            filename = file_path
+            if Emil
+                dataframe_name = filename[66:69]
+            else
+                dataframe_name = filename[60:63]  # Remove the first 3 characters
+            end
+            dataframe_names[i] = dataframe_name
+            println("File Path: $file_path")
+            println("Dataframe Name: $dataframe_name")
+            global EV_dataframes[dataframe_name] = CSV.File(file_path) |> DataFrame
+        end
+    end
+else
+    ####### LOAD DATA FOR EV CHARGE box ########
+
+    # Get a list of all CSV files in the folder
+    file_names = readdir("$base_path"*"EV\\cleaned data\\", join=true)
+    dataframe_names = file_names
+    # Create a dictionary to store the loaded DataFrames
+    global EV_dataframes = Dict{String, DataFrame}()
+
+    # Set the number of files to load - defount is all
+    #num_files_to_load = size(dataframe_names)[1] # outcomment this (not delete), if other option than all is selceted
+    num_files_to_load = 0
+
+    # Load only CSV files and store them in the dictionary
+    global i = 0
+    for file_path in file_names
+        global i = i + 1
+
+        if i > num_files_to_load
+            break
+        end
+        if endswith(file_path, ".csv")
+            #_, filename, _ = splitpath(file_path)  # Extract the file name without extension
+            filename = file_path
+            if Emil
+                dataframe_name = filename[64:67]
+            else
+                dataframe_name = filename[58:61]  # Remove the first 3 characters
+            end
+            dataframe_names[i] = dataframe_name
+            println("File Path: $file_path")
+            println("Dataframe Name: $dataframe_name")
+            global EV_dataframes[dataframe_name] = CSV.File(file_path) |> DataFrame
+        end
     end
 end
