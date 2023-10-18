@@ -12,7 +12,7 @@
 # SoC[M,:]:         The SoC at end of the day for each CB - kWh - 1XI
 # missing_del:      The total amount of activation delivery missed - kWh
 
-function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_do, ac_up, C_do, C_up, La_do, La_up, RM)
+function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_do_e, ac_up_e, ac_do_m, ac_up_m, C_do, C_up, La_do, La_up, RM)
 
 
     missing_del = 0
@@ -21,14 +21,14 @@ function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_
     T= 24
     SoC = zeros(M,I)
     Act_E = zeros(M,I) # see activation energy
-    Leftover_storer = zeros(M,2) # see activation energy
-
+    Missing_capacity_storer = zeros(M,2) # Store how much less capacity we have realtive to the bid
+    Missing_activation_storer = zeros(M,2) # Store the missed activation - this is not energy - but power missed
 
     #println(SoC_start[:])
 
     for m=1:M
         # for each minutes intialize minute varibles
-        ac = -ac_up[m]+ac_do[m]         # Find the summed activation
+        ac = -ac_up_e[m]+ac_do_e[m]     # Find the summed activation (relative to the energy)
         ac_p = 0                        # The percentual activation of each connected unit
         flex = zeros(I,2)               # for each unit, find it's flexibility in each activation direction, for flex = 1 downwards flex and vice versa
         leftover = zeros(2)             # activation not met in both direction
@@ -37,9 +37,10 @@ function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_
 
             # for all Connections find flexibility in both direction
             if Connected[m,i] == 1
+
                 # cap baseline power if SoC does not allow for it to be followed
                 if m==1
-                    if kWh_cap[m,i]/po_cap[m,i] < Power[m,i]/60+SoC_start[i]
+                    if kWh_cap[m,i]/po_cap[m,i]/RM < Power[m,i]/60+SoC_start[i]
                         Power[m,i] = (kWh_cap[m,i]/po_cap[m,i]/RM-SoC_start[i])*60
                     end
                 else
@@ -48,17 +49,16 @@ function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_
                     end
                 end
 
-
                 # see if power rate or SoC is limitd factor for flexibility
                 # and find downwards flexibility
                 if m==1
-                    if (kWh_cap[m,i]/po_cap[m,i]-SoC_start[i])*60 < Power_rate[m,i]
+                    if (kWh_cap[m,i]/po_cap[m,i]/RM-SoC_start[i])*60 < Power_rate[m,i]
                         flex[i,1] = (kWh_cap[m,i]/po_cap[m,i]/RM-SoC_start[i])*60-Power[m,i]
                     else
                         flex[i,1] = Power_rate[m,i]-Power[m,i]
                     end
                 else
-                    if (kWh_cap[m-1,i]/po_cap[m-1,i]-SoC[m-1,i])*60 < Power_rate[m,i]
+                    if (kWh_cap[m-1,i]/po_cap[m-1,i]/RM-SoC[m-1,i])*60 < Power_rate[m,i]
                         flex[i,1] = (kWh_cap[m-1,i]/po_cap[m-1,i]/RM-SoC[m-1,i])*60-Power[m,i]
                     else
                         flex[i,1] = Power_rate[m,i]-Power[m,i]
@@ -74,11 +74,20 @@ function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_
 
         # find potential flexibility issues, as wee need to have enough flexibility in both direction concerning the activátion level
         if sum(flex[:,1]) < C_do[m]
-            Leftover_storer[m,1] = 1
+            Missing_capacity_storer[m,1] = 1
         end
         if sum(flex[:,2]) < C_up[m]+C_do[m]*0.2
-            Leftover_storer[m,2] = 1
+            Missing_capacity_storer[m,2] = 1
         end
+
+        # find the actual that we could not meet
+        if sum(flex[:,1]) < C_do[m]
+            Missing_activation_storer[m,1] = 1
+        end
+        if sum(flex[:,2]) < C_up[m]*ac_up_m
+            Missing_activation_storer[m,2] =  sum(flex[:,2])/C_up[m]*ac_up_m
+        end
+
 
         # find % activation energy for each unit, used to update the SoC
         if ac > 0 && C_do[m] > 0
@@ -96,6 +105,7 @@ function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_
         else
             ac_p = 0
         end
+
 
         # update the SoC, as function of altered baseline power and activation
         for i=1:I
@@ -121,8 +131,8 @@ function operation(kWh_cap, po_cap, Power, SoC_start, Power_rate, Connected, ac_
 
     # calculate the % where the capacity where over bid
     pr = zeros(2)
-    pr[2] = sum(Leftover_storer[:,2])/M                 # % of time missed up
-    pr[1] = sum(Leftover_storer[:,1])/M                 # % of time missed down
+    pr[2] = sum(Missing_capacity_storer[:,2])/M                 # % of time capacity were missed up
+    pr[1] = sum(Missing_capacity_storer[:,1])/M                 # % of time capacity were missed down
 
     return revenue, SoC[M,:], missing_del, Act_E, pr
 end

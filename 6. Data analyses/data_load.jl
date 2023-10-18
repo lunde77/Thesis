@@ -40,6 +40,10 @@ Freq_data =  XLSX.readxlsx("$base_path"*"Frequency\\Activation.xlsx")
 global Ac_dowards =  Freq_data["Sheet1!A2:A525601"]  # in %
 global Ac_upwards =  Freq_data["Sheet1!B2:B525601"]  # in #
 
+Freq_data_max =  XLSX.readxlsx("$base_path"*"Frequency\\Max_Activation.xlsx")
+global Ac_dowards_M =  Freq_data_max["Sheet1!A2:A525601"]  # in %
+global Ac_upwards_M =  Freq_data_max["Sheet1!B2:B525601"]  # in #
+
 
 
 ####### Load FCR-D prices ########
@@ -65,8 +69,6 @@ for m=1:Mi
         global Do_prices_d1[m] = Do_prices_d1[m]/1000*7.8
         global Do_prices_d2[m] = Do_prices_d2[m]/1000*7.8
 end
-
-
 
 WF = true
 
@@ -118,7 +120,7 @@ else
 
     # Set the number of files to load - defount is all
     #num_files_to_load = size(dataframe_names)[1] # outcomment this (not delete), if other option than all is selceted
-    num_files_to_load = 0
+    num_files_to_load = 500
 
     # Load only CSV files and store them in the dictionary
     global i = 0
@@ -142,4 +144,32 @@ else
             global EV_dataframes[dataframe_name] = CSV.File(file_path) |> DataFrame
         end
     end
+end
+
+
+
+global file_names_20 = readdir("$base_path"*"EV\\20_minute data\\", join=true)
+global dataframe_names_20 = file_names_20
+# Create a dictionary to store the loaded DataFrames
+global EV_20_dataframes = Dict{String, DataFrame}()
+global i = 0
+for file_path in file_names_20
+    global i = i + 1
+
+    if endswith(file_path, ".csv")
+        #_, filename, _ = splitpath(file_path)  # Extract the file name without extension
+        filename = file_path
+        if Emil
+            dataframe_name = filename[62:65]
+        else
+            dataframe_name = filename[57:59]  # Remove the first 3 characters
+        end
+        dataframe_names_20[i] = dataframe_name
+        dataframe_names_20[i] = replace.(dataframe_names_20[i], "." => "")
+
+        println("File Path: $file_path")
+        println("Dataframe Name: $(dataframe_names_20[i])")
+        global EV_20_dataframes[dataframe_names_20[i]] = CSV.File(file_path) |> DataFrame
+    end
+
 end

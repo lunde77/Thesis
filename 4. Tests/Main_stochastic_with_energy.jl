@@ -30,7 +30,7 @@ function Main_stochastic(CB_Is)
         load_daily_data(Day)
 
         ###### run model - make the bids ######
-        global C_up, C_do, model_runtime = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_s, Ac_up_s, Max_Power_s, Power_s, Connected_s, total_flex_up_s, total_flex_do_s, S)
+        global C_up, C_do, model_runtime = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_s, Ac_up_s, total_flex_up_s, total_flex_do_s, S)
 
 
         for t=1:24

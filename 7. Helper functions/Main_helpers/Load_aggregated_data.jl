@@ -10,6 +10,7 @@ function Load_aggregated(CB_Is)
 
     global SoC_A_cap_all = zeros(M_d*Days)                                                                  # the total capacity for each scenario
 
+    global energy_20_all = EV_20_dataframes["$I"][:,1]
     # Loop through each vector and add it to the matrix
     for i=1:I
         Max_Power_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,5]
@@ -25,5 +26,6 @@ function Load_aggregated(CB_Is)
         #        global SoC_A_cap_all[m] = SoC_A_cap_all[m]+kWh_cap_all[m,i]/po_cap_all[m,i]
         #    end
         #end
+
     end
 end
