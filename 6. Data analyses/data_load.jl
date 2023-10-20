@@ -146,30 +146,33 @@ else
     end
 end
 
+WE = true
 
+if WE == true
 
-global file_names_20 = readdir("$base_path"*"EV\\20_minute data\\", join=true)
-global dataframe_names_20 = file_names_20
-# Create a dictionary to store the loaded DataFrames
-global EV_20_dataframes = Dict{String, DataFrame}()
-global i = 0
-for file_path in file_names_20
-    global i = i + 1
+    global file_names_20 = readdir("$base_path"*"EV\\20_minute data\\", join=true)
+    global dataframe_names_20 = file_names_20
+    # Create a dictionary to store the loaded DataFrames
+    global EV_20_dataframes = Dict{String, DataFrame}()
+    global i = 0
+    for file_path in file_names_20
+        global i = i + 1
 
-    if endswith(file_path, ".csv")
-        #_, filename, _ = splitpath(file_path)  # Extract the file name without extension
-        filename = file_path
-        if Emil
-            dataframe_name = filename[62:65]
-        else
-            dataframe_name = filename[57:59]  # Remove the first 3 characters
+        if endswith(file_path, ".csv")
+            #_, filename, _ = splitpath(file_path)  # Extract the file name without extension
+            filename = file_path
+            if Emil
+                dataframe_name = filename[62:65]
+            else
+                dataframe_name = filename[57:59]  # Remove the first 3 characters
+            end
+            dataframe_names_20[i] = dataframe_name
+            dataframe_names_20[i] = replace.(dataframe_names_20[i], "." => "")
+
+            println("File Path: $file_path")
+            println("Dataframe Name: $(dataframe_names_20[i])")
+            global EV_20_dataframes[dataframe_names_20[i]] = CSV.File(file_path) |> DataFrame
         end
-        dataframe_names_20[i] = dataframe_name
-        dataframe_names_20[i] = replace.(dataframe_names_20[i], "." => "")
 
-        println("File Path: $file_path")
-        println("Dataframe Name: $(dataframe_names_20[i])")
-        global EV_20_dataframes[dataframe_names_20[i]] = CSV.File(file_path) |> DataFrame
     end
-
 end
