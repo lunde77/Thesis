@@ -11,7 +11,7 @@
 # model_runtime: How long is takes solve the model (stochastig model)
 # clock: Total runtime for the entery sumlation
 
-function Main_stochastic(CB_Is)
+function Main_stochastic_CC(CB_Is)
 
     # Static Parameters
     global T = 24 # hours on a day
@@ -25,7 +25,7 @@ function Main_stochastic(CB_Is)
 
     # test days
     start_day = 1
-    end_day = 365
+    end_day = 1
     global start_1 = time_ns()
 
 
@@ -47,7 +47,17 @@ function Main_stochastic(CB_Is)
 
 
         ###### run model - make the bids ######
-        global C_up, C_do, model_runtime, binder_shadow = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_M_s, Ac_up_M_s, total_flex_up_s, total_flex_do_s, res_20_s, S)
+        fail_rate = 0.1
+        q_down = 0
+        q_up = fail_rate*M_d*S
+
+        # store the itteration
+        counter = 1
+
+        global q_up_counter = zeros(100)
+        global q_down_counter = zeros(100)
+
+        global y_s, C_do, model_runtime, obj = Stochastic_chancer_bin(La_do_s, total_flex_do_s, S)
 
 
         for t=1:24
@@ -77,8 +87,8 @@ function Main_stochastic(CB_Is)
     total_cap_missed[1] = round( sum(missing_capacity_storer[:,1])/(-start_day+end_day+1),  digits= 3 )   # % of minute where down capacity were missed
     total_cap_missed[2] = round( sum(missing_capacity_storer[:,2])/(-start_day+end_day+1) ,  digits= 3 )   # % of minute where up capacity were missed
 
-    total_delivery_missed[1] =  round( sum(missing_delivery_storer[:,1])/(-start_day+end_day+1) ,  digits= 5 )   # % of of down bids that could not be delivered
-    total_delivery_missed[2] =  round( sum(missing_delivery_storer[:,2])/(-start_day+end_day+1) ,  digits= 5 )  # % of of up bids that could not be delivered
+    total_delivery_missed[1] =  round( sum(missing_delivery_storer[:,1])/(-start_day+end_day+1) ,  digits= 3 )   # % of of down bids that could not be delivered
+    total_delivery_missed[2] =  round(  sum(missing_delivery_storer[:,2])/(-start_day+end_day+1) ,  digits= 3 )  # % of of up bids that could not be delivered
 
     println("The revenue for the entery perioed was $(revenue[1])")
     println("The Penalty would be $(penalty[1])")

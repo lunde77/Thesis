@@ -37,9 +37,17 @@ function operation(Total_flex_up, Total_flex_do, ac_do_m, ac_up_m, C_do, C_up, L
         # find the actual that we could not meet
         if Total_flex_do[m] < C_do[m]*ac_do_m[m]
             Missing_activation_storer[m,1] =  -Total_flex_do[m]+C_up[m]*ac_do_m[m]       # find difference between actual flexibility and activation
+            if Missing_activation_storer[m,1]  < 0
+                error()
+            end
+
         end
         if Total_flex_up[m] < C_up[m]*ac_up_m[m]
             Missing_activation_storer[m,2] =  -Total_flex_up[m]+C_up[m]*ac_up_m[m]       # find difference between actual flexibility and activation
+            if Missing_activation_storer[m,2] < 0
+                error()
+            end
+
         end
 
     end
@@ -72,12 +80,20 @@ function operation(Total_flex_up, Total_flex_do, ac_do_m, ac_up_m, C_do, C_up, L
     # calculate the % of bids where we did not meet the activation
     M_A = zeros(2)
     if sum(C_up[m]*ac_up_m[m] for m=1:M_d) > 0
-        M_A[2] = sum(Missing_activation_storer[:,2])/sum(C_up[m]*ac_up_m[m] for m=1:M_d)/M                 # % of total bid we did not meet up
+        M_A[2] = sum(Missing_activation_storer[:,2])/sum(C_up[m]*ac_up_m[m] for m=1:M_d)                 # % of total bid we did not meet up
+        if M_A[2] < 0
+            error()
+        end
     else
         M_A[2] = 0
     end
     if  sum(C_do[m]*ac_do_m[m] for m=1:M_d) > 0
-        M_A[1] = sum(Missing_activation_storer[:,1])/sum(C_do[m]*ac_do_m[m] for m=1:M_d)/M                 # % of total bid we did not meet down
+        M_A[1] = sum(Missing_activation_storer[:,1])/sum(C_do[m]*ac_do_m[m] for m=1:M_d)                 # % of total bid we did not meet down
+        if M_A[1] < 0
+            println(sum(C_do[m]*ac_do_m[m] for m=1:M_d))
+            println(sum(Missing_activation_storer[:,1]))
+            error()
+        end
     else
         M_A[1] = 0
     end

@@ -25,11 +25,11 @@ results = zeros(8,10)
 
 
 
-for i=3:10
+for i=1:1
     CB_Is = collect(1:i*50)
     global start = time_ns()
 
-    results[i-2,1], results[i-2,2], results[i-2,3:4], results[i-2,5:6], results[i-2,7], results[i-2,8], results[i-2,9], results[i-2,10] = Main_stochastic(CB_Is)
+    results[i,1], results[i,2], results[i,3:4], results[i,5:6], results[i,7], results[i,8], results[i,9], results[i,10] = Main_stochastic_CC(CB_Is)
     results_df = DataFrame(results, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\150-500_50.csv", results_df)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\also_x.csv", results_df)
 end

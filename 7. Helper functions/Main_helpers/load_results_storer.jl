@@ -19,8 +19,8 @@ function load_results_storer()
     global expected_over_do = zeros(M_d, Days, S )                                                             # How many % did we overbid on our capacity
     global expected_over_up = zeros(M_d, Days, S )                                                             # How many % did we overbid on our capacity
 
-    global Total_flex_up = zeros(Days)                                                                       # How many % did we overbid on our capacity
-    global Total_flex_do = zeros(Days)                                                                       # How many % did we overbid on our capacity
+    global Total_flex_up = zeros(M_d, Days)                                                                       # How many % did we overbid on our capacity
+    global Total_flex_do = zeros(M_d, Days)                                                                       # How many % did we overbid on our capacity
     global total_cap_missed = zeros(2)                                                                       # how often were we overbidbing
-    global total_delivery_missed = zeros(2)                                                                  # how large a proption of the activation we missed 
+    global total_delivery_missed = zeros(2)                                                                  # how large a proption of the activation we missed
 end
