@@ -24,8 +24,8 @@ function Main_stochastic(CB_Is)
     global RM = 0.9 # %-end SoC assumed, e.g. 0.9 means we assume all charges charge to 90%
 
     # test days
-    start_day = 1
-    end_day = 365
+    start_day = 8
+    end_day = 8
     global start_1 = time_ns()
 
 
@@ -44,7 +44,6 @@ function Main_stochastic(CB_Is)
         load_daily_data(Day)
         println("daily data took")
         println(round((time_ns() - start_2) / 1e9, digits = 3))
-
 
         ###### run model - make the bids ######
         global C_up, C_do, model_runtime, binder_shadow = Stochastic_d1_model(La_do_s, La_up_s, Ac_do_M_s, Ac_up_M_s, total_flex_up_s, total_flex_do_s, res_20_s, S)
