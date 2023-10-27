@@ -79,5 +79,8 @@ function Stochastic_chancer_model(total_flex_do, total_flex_up, total_res_20, q)
    #### Consstraint overbid ####
    @constraint(Mo, [m=1:M, s=1:S], Y[m,s]  <= 1 )
 
+   # optimize
+   optimize!(Mo)
+
    return Mo, Con, Y, C_do, C_up
 end
