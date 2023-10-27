@@ -42,12 +42,14 @@ function Main_stochastic_CC(CB_Is)
         println("day is $Day")
 
         global start_2 = time_ns()
+
         ###### intialize all daily data, so it's loaded ######
         load_daily_data(Day)
         println("daily data took")
         println(round((time_ns() - start_2) / 1e9, digits = 3))
 
 
+        ###### solve the model in a decomposed matter, and by appliying the Also-x method ######
         global C_do, C_up, model_runtime = ALSO_X(total_flex_up_s, total_flex_do_s, res_20_s)
 
         for t=1:24
@@ -62,7 +64,7 @@ function Main_stochastic_CC(CB_Is)
 
         # update results:
         global Total_flex_up[:, Day]   = total_flex_up_r
-        global Total_flex_do[:, Day] = total_flex_do_r
+        global Total_flex_do[:, Day]   = total_flex_do_r
 
         revenue[1] = revenue[1] + obj
         penalty[1] = penalty[1] + pen
@@ -70,7 +72,7 @@ function Main_stochastic_CC(CB_Is)
     end
 
     pr_flex_used_up = round( sum( Up_bids_A )/sum(Total_flex_up ), digits= 3 )
-    pr_flex_used_do = round(  sum( Do_bids_A )/sum(Total_flex_do), digits= 3 )
+    pr_flex_used_do = round( sum( Do_bids_A )/sum(Total_flex_do), digits= 3 )
 
 
 
