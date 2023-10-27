@@ -1,4 +1,4 @@
-
+using Random
 # all data is made gloabl, so It can be used in the mail
 function load_daily_data(Day)
 
