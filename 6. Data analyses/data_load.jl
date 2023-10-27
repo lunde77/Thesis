@@ -162,13 +162,13 @@ if WE == true
             #_, filename, _ = splitpath(file_path)  # Extract the file name without extension
             filename = file_path
             if Emil
-                dataframe_name = filename[62:65]
+                dataframe_name = filename[63:65]
             else
                 dataframe_name = filename[57:59]  # Remove the first 3 characters
             end
             dataframe_names_20[i] = dataframe_name
             dataframe_names_20[i] = replace.(dataframe_names_20[i], "." => "")
-
+            dataframe_names_20[i] = replace.(dataframe_names_20[i], "\\" => "")
             println("File Path: $file_path")
             println("Dataframe Name: $(dataframe_names_20[i])")
             global EV_20_dataframes[dataframe_names_20[i]] = CSV.File(file_path) |> DataFrame
