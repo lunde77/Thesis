@@ -38,14 +38,15 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, total_flex_up, total_fl
    epsilon = 0.001                 # helper, so demominator won't become zero
 
    # CVaR related parameters
-   k = 0
+   k = 0.9
    alpha = 0.9
 
 
    #************************************************************************
    # Model
    Mo  = Model(Gurobi.Optimizer)
-
+   #Mo  = Model(optimizer_with_attributes(Gurobi.Optimizer,  "Threads" => 8))
+   #Mo  = Model(optimizer_with_attributes(Gurobi.Optimizer,  "Threads" => 1))
 
    # Bid Varibles
    @variable(Mo, 0 <= C_up[1:T])                    # Chosen upwards bid
@@ -62,9 +63,9 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, total_flex_up, total_fl
    @variable(Mo, Penalty)                             # Total income on capacity
 
    # CVaR related variables
-   @variable(Mo, zeta[1:T])                      # zeta
-   @variable(Mo, CVaR[1:T])                      # Total income on capacity
-   @variable(Mo, 0 <= eta[1:T, 1:S])                       # eta
+   @variable(Mo, zeta[1:T])                           # zeta
+   @variable(Mo, CVaR[1:T])                           # CVaR
+   @variable(Mo, 0 <= eta[1:T, 1:S])                  # eta
                              
    ### Obejective ###
    @objective(Mo, Max,  (1-k)*(Income-Penalty) + k*sum(CVaR[t] for t=1:T)) ###
@@ -77,7 +78,7 @@ function Stochastic_d1_model(La_do, La_up, Ac_do, Ac_up, total_flex_up, total_fl
 
    # CVaR 
    @constraint(Mo, [t=1:T], CVaR[t] == zeta[t] - 1/(1-alpha)*sum(Pi*eta[t,s] for s=1:S) )
-   @constraint(Mo, [s=1:S, t=1:T], zeta[t] - (C_up[t]*La_up[t,s]+C_do[t]*La_do[t,s]-Ap_P_up[t,s]*Pen_up[t,s]-Ap_P_do[t,s]*Pen_do[t,s])*Pi <= eta[t,s]) 
+   @constraint(Mo, [s=1:S, t=1:T], zeta[t] - (C_up[t]*La_up[t,s]+C_do[t]*La_do[t,s]-Ap_P_up[t,s]*Pen_up[t,s]-Ap_P_do[t,s]*Pen_do[t,s]) <= eta[t,s]) 
    
 
    #### activation pentalty ####
