@@ -64,8 +64,6 @@ function ALSO_X(La_do_s, La_up_s, Ac_do_M_s, Ac_up_M_s, total_flex_up_s, total_f
     end
 
 
-
-
     model_runtime = round((time_ns() - start_also) / 1e9, digits = 3)
     return C_do, C_up, model_runtime
 end

@@ -33,12 +33,15 @@ function Stochastic_chancer_model(La_do, La_up, Ac_do, Ac_up, total_flex_do, tot
    T = 24 # hours on a day
    M = 60 # minutes in an hour
    M_d = T*M # minutes per model, i.e. per day
-   Pen_e_coef = 6 # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
    Pen_do = deepcopy(La_do)*Pen_e_coef  # intialize penalty cost
    Pen_up = deepcopy(La_up)*Pen_e_coef  # intialize penalty cost
-   S = 10
    Pi = 1/S
    epsilon = 0.001                 # helper, so demominator won't become zero
+
+   # CVaR related parameters
+   # k is defined as input to the model
+   alpha = 0.9
+
 
    M_do = findmax(total_flex_do)[1]+1000
    M_up = findmax(total_flex_up)[1]+1000
@@ -66,12 +69,24 @@ function Stochastic_chancer_model(La_do, La_up, Ac_do, Ac_up, total_flex_do, tot
    @variable(Mo, 0 <= Y_up[m=1:M_d,s=1:S] )            # Binary varibles chosing when to overbid Upwards flexibity
    @variable(Mo, 0 <= Y_e[m=1:M_d,s=1:S] )             # Binary varibles chosing when to overbid the energy available
 
+
+   # CVaR related variables
+   @variable(Mo, zeta[1:T])                      # zeta
+   @variable(Mo, CVaR[1:T])                      # Total income on capacity
+   @variable(Mo, 0 <= eta[1:T, 1:S])             # eta
+
    ### Obejective ###
-   @objective(Mo, Max,  Income-Penalty) ###
+   @objective(Mo, Max,  (1-k)*(Income-Penalty) + k*sum(CVaR[t] for t=1:T)) ###
 
    # summerizing constraints
    @constraint(Mo, Income == sum( (C_do[t]*La_do[t,s]+C_up[t]*La_up[t,s])*Pi for t=1:T, s=1:S) )
    @constraint(Mo, Penalty == sum(  (Ap_P_up[t,s]*Pen_up[t,s]+Ap_P_do[t,s]*Pen_do[t,s])*Pi for s=1:S, t=1:T) ) ###
+
+
+   #### CVaR constraints ####
+   @constraint(Mo, [t=1:T], CVaR[t] == zeta[t] - 1/(1-alpha)*sum(Pi*eta[t,s] for s=1:S) )
+   @constraint(Mo, [s=1:S, t=1:T], zeta[t] - (C_up[t]*La_up[t,s]+C_do[t]*La_do[t,s]-Ap_P_up[t,s]*Pen_up[t,s]-Ap_P_do[t,s]*Pen_do[t,s]) <= eta[t,s])
+
 
    #### P90/bid available in 85% approximation constraints ###
    # upwards power flexibity
@@ -80,13 +95,13 @@ function Stochastic_chancer_model(La_do, La_up, Ac_do, Ac_up, total_flex_do, tot
    @constraint(Mo, Con_do, sum(Y_do[m,s] for s=1:S, m=1:M_d) <= q_do)
 
    # downwards power flexibity
-   @constraint(Mo, [m=1:M, t=1:T, s=1:S], -M_up*(1-Y_up[(t-1)*60+m,s]) <= C_do[t]*0.2+C_up[t]-total_flex_do[(t-1)*60+m,s] )
-   @constraint(Mo, [m=1:M, t=1:T, s=1:S], C_do[t]*0.2+C_up[t]-total_flex_do[(t-1)*60+m,s] <= M_up*Y_up[(t-1)*60+m,s] )
+   @constraint(Mo, [m=1:M, t=1:T, s=1:S], -M_up*(1-Y_up[(t-1)*60+m,s]) <= C_do[t]*0.2+C_up[t]-total_flex_up[(t-1)*60+m,s] )
+   @constraint(Mo, [m=1:M, t=1:T, s=1:S], C_do[t]*0.2+C_up[t]-total_flex_up[(t-1)*60+m,s] <= M_up*Y_up[(t-1)*60+m,s] )
    @constraint(Mo, Con_up, sum(Y_up[m,s] for s=1:S, m=1:M_d) <= q_up)
 
    # downwards power flexibity
    @constraint(Mo, [m=1:M, t=1:T, s=1:S], -M_e*(1-Y_e[(t-1)*60+m,s]) <= C_do[t]-total_res_20[(t-1)*60+m,s]*60 )
-   @constraint(Mo, [m=1:M, t=1:T, s=1:S], C_do[t]*0.2+C_up[t]-total_res_20[(t-1)*60+m,s]*60 <= M_e*Y_e[(t-1)*60+m,s] )
+   @constraint(Mo, [m=1:M, t=1:T, s=1:S], C_do[t]-total_res_20[(t-1)*60+m,s]*60 <= M_e*Y_e[(t-1)*60+m,s] )
    @constraint(Mo, Con_e, sum(Y_e[m,s] for s=1:S, m=1:M_d) <= q_e)
 
 

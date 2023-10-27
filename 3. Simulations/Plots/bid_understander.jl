@@ -9,8 +9,8 @@ for d=1:day_end
         up_bid[t,d] = Up_bids_A[t*60,d]
         do_bid[t,d] = Do_bids_A[t*60,d]
 
-        flex_do[t,d] = Total_flex_do[t*60,d]
-        flex_up[t,d] = Total_flex_up[t*60,d]
+        flex_do[t,d] = sum(Total_flex_do[(t-1)*60+1:t*60,d])/60
+        flex_up[t,d] = sum(Total_flex_up[(t-1)*60+1:t*60,d])/60
 
     end
     println(sum(flex_up[:,d]))
@@ -18,9 +18,9 @@ for d=1:day_end
     println()
 end
 
-day = 6
+day = 40
 
-plot(do_bid[:,day])
-plot!(up_bid[:,day])
-plot!(flex_do[:,day])
-plot!(flex_up[:,day])
+plot(Do_bids_A[:,day], label="down bid")
+plot!(Up_bids_A[:,day], label="up bid")
+plot!(Total_flex_do[:,day], label="avg down flexibility")
+plot!(Total_flex_up[:,day], label="avg up flexibility")

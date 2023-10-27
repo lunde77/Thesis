@@ -14,13 +14,14 @@
 # M_C:              The % of the time the entire bid were not available - up and down [2]
 # M_A:              How much of the activation were not meet - up and down [2]
 
-function operation(Total_flex_up, Total_flex_do, ac_do_m, ac_up_m, C_do, C_up, La_do, La_up)
+function operation(Total_flex_up, Total_flex_do, res_20, ac_do_m, ac_up_m, C_do, C_up, La_do, La_up)
 
 
     M_d = 1440
     T= 24
-    Missing_capacity_storer = zeros(M_d,2) # Store how much less capacity we have realtive to the bid
-    Missing_activation_storer = zeros(M_d,2) # Store the missed activation - this is not energy - but power missed
+    Missing_capacity_storer_per = zeros(M_d,3) # store how much we overbid when we do - it in %
+    Missing_capacity_storer = zeros(M_d,3) # Store how much less capacity we have realtive to the bid
+    Missing_activation_storer = zeros(M_d,3) # Store the missed activation - this is not energy - but power missed
     Pen_activation_up = zeros(24)          # penalty for upwards for ach hour
     Pen_activation_do = zeros(24)          # penalty for downwards for ach hour
 
@@ -29,25 +30,23 @@ function operation(Total_flex_up, Total_flex_do, ac_do_m, ac_up_m, C_do, C_up, L
         # find potential flexibility issues, as wee need to have enough flexibility in both direction concerning the activátion level
         if Total_flex_do[m] < C_do[m]
             Missing_capacity_storer[m,1] = 1
+            Missing_capacity_storer_per[m,1] = (C_do[m]-Total_flex_do[m])/C_do[m]
         end
         if Total_flex_up[m] < C_up[m]+C_do[m]*0.2
             Missing_capacity_storer[m,2] = 1
+            Missing_capacity_storer_per[m,2] = (( C_up[m]+C_do[m]*0.2)-Total_flex_up[m])/( C_up[m]+C_do[m]*0.2)
+        end
+        if res_20_r[m]*60 < C_do[m]
+            Missing_capacity_storer[m,3] = 1
+            Missing_capacity_storer_per[m,3] = ((C_do[m])-res_20_r[m])/(C_do[m])
         end
 
         # find the actual that we could not meet
         if Total_flex_do[m] < C_do[m]*ac_do_m[m]
-            Missing_activation_storer[m,1] =  -Total_flex_do[m]+C_up[m]*ac_do_m[m]       # find difference between actual flexibility and activation
-            if Missing_activation_storer[m,1]  < 0
-                error()
-            end
-
+            Missing_activation_storer[m,1] =  -Total_flex_do[m]+C_do[m]*ac_do_m[m]       # find difference between actual flexibility and activation
         end
         if Total_flex_up[m] < C_up[m]*ac_up_m[m]
             Missing_activation_storer[m,2] =  -Total_flex_up[m]+C_up[m]*ac_up_m[m]       # find difference between actual flexibility and activation
-            if Missing_activation_storer[m,2] < 0
-                error()
-            end
-
         end
 
     end
@@ -73,30 +72,23 @@ function operation(Total_flex_up, Total_flex_do, ac_do_m, ac_up_m, C_do, C_up, L
     revenue = sum( (C_up[(t-1)*60+1]*La_up[t] + C_do[(t-1)*60+1]*La_do[t]) for t=1:T)
 
     # calculate the % where the capacity where over bid
-    M_C = zeros(2)
-    M_C[2] = sum(Missing_capacity_storer[:,2])/M                 # % of time capacity were missed up
-    M_C[1] = sum(Missing_capacity_storer[:,1])/M                 # % of time capacity were missed down
+    M_C = zeros(3)
+    M_C[3] = sum(Missing_capacity_storer[:,3])/M_d                 # % of time capacity were missed energy
+    M_C[2] = sum(Missing_capacity_storer[:,2])/M_d                 # % of time capacity were missed up
+    M_C[1] = sum(Missing_capacity_storer[:,1])/M_d                 # % of time capacity were missed down
 
     # calculate the % of bids where we did not meet the activation
     M_A = zeros(2)
     if sum(C_up[m]*ac_up_m[m] for m=1:M_d) > 0
         M_A[2] = sum(Missing_activation_storer[:,2])/sum(C_up[m]*ac_up_m[m] for m=1:M_d)                 # % of total bid we did not meet up
-        if M_A[2] < 0
-            error()
-        end
     else
         M_A[2] = 0
     end
     if  sum(C_do[m]*ac_do_m[m] for m=1:M_d) > 0
         M_A[1] = sum(Missing_activation_storer[:,1])/sum(C_do[m]*ac_do_m[m] for m=1:M_d)                 # % of total bid we did not meet down
-        if M_A[1] < 0
-            println(sum(C_do[m]*ac_do_m[m] for m=1:M_d))
-            println(sum(Missing_activation_storer[:,1]))
-            error()
-        end
     else
         M_A[1] = 0
     end
 
-    return revenue, penalty, M_A, M_C
+    return revenue, penalty, M_A, M_C, Missing_capacity_storer_per
 end
