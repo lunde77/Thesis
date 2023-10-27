@@ -39,7 +39,7 @@ function ALSO_X(total_flex_up_s, total_flex_do_s, res_20_s)
 
             global Y_counter_up = count(x -> x == 0, y)
 
-            if Y_counter_up >= (1-fail_rate)*M_d*S
+            if Y_counter_up >= (1-fail_rate)*M*S
                 q_L = q
             else
                 q_H = q
