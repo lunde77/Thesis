@@ -25,23 +25,56 @@ using JuMP
 # value.(Ma_A)              # the expected Ma charging rate for the aggregator
 # objective_value(Mo)       # The expected net ernings after pentalty
 
-function Stochastic_chancer_solver_hourly(Mo, Con, Y, C_do, C_up, q)
-   #println(Mo)
-   #println(Mo)
-   # Now change the RHS of the constraint to 20
-   JuMP.set_normalized_rhs(Con, q)
-   #************************************************************************
-   # Solve
-   solution = optimize!(Mo)
-   println("Termination status: $(termination_status(Mo))")
-   #************************************************************************
+function Stochastic_chancer_model_NOLER(total_flex_do, total_flex_up, total_res_20, q)
 
-   if termination_status(Mo) == MOI.OPTIMAL
-      println("Optimal objective value: $(objective_value(Mo))")
-   else
-      println("No optimal solution available")
-   end
+   global start = time_ns()
    #************************************************************************
+   # Static Parameters
+   M = 60 # minutes in an hour
+   Pi = 1/S
+   epsilon = 0.001                 # helper, so demominator won't become zero
 
-   return value.(Y), value(C_do), value(C_up), objective_value(Mo)
+
+   M_do = findmax(total_flex_do)[1]+1000
+   M_up = findmax(total_flex_up)[1]+1000
+   M_e  = findmax(total_res_20)[1]*60+1000
+
+
+   #************************************************************************
+   # Model
+   Mo  = Model(Gurobi.Optimizer)
+
+   # Bid Varibles
+   @variable(Mo, 0 <= C_do)                    # Chosen downwards bid
+   @variable(Mo, 0 <= C_up)                    # Chosen Upwards bid
+
+   # Objetives
+   @variable(Mo, Capacity)                              # Total  capacity
+
+   # Binary relaxed varible
+   @variable(Mo, 0 <= Y[m=1:M,s=1:S] )            # Binary varibles chosing when to overbid downwards flexibity
+
+   ### Obejective ###
+   @objective(Mo, Max,  Capacity ) ###
+
+   # summerizing constraints
+   @constraint(Mo, Capacity == C_do+C_up )
+
+   #### P90/bid available in 85% approximation constraints ###
+   # upwards power flexibity
+   #@constraint(Mo, [m=1:M, s=1:S], -M_do*(1-Y[m,s]) <= C_do-total_flex_do[m,s] )
+   @constraint(Mo, [m=1:M, s=1:S], C_do-total_flex_do[m,s] <= M_do*Y[m,s] )
+
+   # downwards power flexibity
+   #@constraint(Mo, [m=1:M, s=1:S], -M_up*(1-Y[m,s]) <= C_do+C_up-total_flex_up[m,s] )
+   @constraint(Mo, [m=1:M, s=1:S], C_do+C_up-total_flex_up[m,s] <= M_up*Y[m,s] )
+
+
+   # overall violation needs to be below q
+   @constraint(Mo, Con, sum(Y[m,s] for s=1:S, m=1:M) <= q)
+
+   #### Consstraint overbid ####
+   @constraint(Mo, [m=1:M, s=1:S], Y[m,s]  <= 1 )
+
+   return Mo, Con, Y, C_do, C_up
 end

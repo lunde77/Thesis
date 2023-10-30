@@ -25,7 +25,7 @@ using JuMP
 # value.(Ma_A)              # the expected Ma charging rate for the aggregator
 # objective_value(Mo)       # The expected net ernings after pentalty
 
-function Stochastic_chancer_model(total_flex_do, total_flex_up, total_res_20, q)
+function Stochastic_chancer_model_hourly(total_flex_do, total_flex_up, total_res_20, q)
 
    global start = time_ns()
    #************************************************************************
@@ -33,10 +33,6 @@ function Stochastic_chancer_model(total_flex_do, total_flex_up, total_res_20, q)
    M = 60 # minutes in an hour
    Pi = 1/S
    epsilon = 0.001                 # helper, so demominator won't become zero
-
-   # CVaR related parameters
-   # k is defined as input to the model
-   alpha = 0.9
 
 
    M_do = findmax(total_flex_do)[1]+1000
@@ -81,7 +77,7 @@ function Stochastic_chancer_model(total_flex_do, total_flex_up, total_res_20, q)
    @constraint(Mo, Con, sum(Y[m,s] for s=1:S, m=1:M) <= q)
 
    #### Consstraint overbid ####
-   @constraint(Mo, [m=M, s=1:S], Y[m,s]  <= 1 )
+   @constraint(Mo, [m=1:M, s=1:S], Y[m,s]  <= 1 )
 
    # optimize
    optimize!(Mo)

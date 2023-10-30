@@ -19,11 +19,11 @@ function operation(Total_flex_up, Total_flex_do, res_20, ac_do_m, ac_up_m, C_do,
 
     M_d = 1440
     T= 24
-    Missing_capacity_storer_per = zeros(M_d,3) # store how much we overbid when we do - it in %
-    Missing_capacity_storer = zeros(M_d,3) # Store how much less capacity we have realtive to the bid
-    Missing_activation_storer = zeros(M_d,3) # Store the missed activation - this is not energy - but power missed
-    Pen_activation_up = zeros(24)          # penalty for upwards for ach hour
-    Pen_activation_do = zeros(24)          # penalty for downwards for ach hour
+    Missing_capacity_storer_per = zeros(M_d,3)  # store how much we overbid when we do - it in %
+    Missing_capacity_storer = zeros(M_d,4)      # Store how much less capacity we have realtive to the bid
+    Missing_activation_storer = zeros(M_d,2)    # Store the missed activation - this is not energy - but power missed
+    Pen_activation_up = zeros(24)               # penalty for upwards for ach hour
+    Pen_activation_do = zeros(24)               # penalty for downwards for ach hour
 
     for m=1:M_d
 
@@ -39,6 +39,9 @@ function operation(Total_flex_up, Total_flex_do, res_20, ac_do_m, ac_up_m, C_do,
         if res_20_r[m]*60 < C_do[m]
             Missing_capacity_storer[m,3] = 1
             Missing_capacity_storer_per[m,3] = ((C_do[m])-res_20_r[m])/(C_do[m])
+        end
+        if sum(Missing_capacity_storer[m,:]) > 0.01 # if any capacity is violated
+            Missing_capacity_storer[m,4] = 1
         end
 
         # find the actual that we could not meet
@@ -72,7 +75,8 @@ function operation(Total_flex_up, Total_flex_do, res_20, ac_do_m, ac_up_m, C_do,
     revenue = sum( (C_up[(t-1)*60+1]*La_up[t] + C_do[(t-1)*60+1]*La_do[t]) for t=1:T)
 
     # calculate the % where the capacity where over bid
-    M_C = zeros(3)
+    M_C = zeros(4)
+    M_C[4] = sum(Missing_capacity_storer[:,4])/M_d                 # % of time capacity were missed in any of the catergories
     M_C[3] = sum(Missing_capacity_storer[:,3])/M_d                 # % of time capacity were missed energy
     M_C[2] = sum(Missing_capacity_storer[:,2])/M_d                 # % of time capacity were missed up
     M_C[1] = sum(Missing_capacity_storer[:,1])/M_d                 # % of time capacity were missed down

@@ -10,7 +10,8 @@ else
 
 end
 
-results = zeros(9,14)
+results = zeros(1,15)
+
 # 1: revenue
 # 2: penalty
 # 3: down capacity missed
@@ -40,10 +41,10 @@ for k_in=1:0
 end
 
 for i=1:1
-    CB_Is = collect(1:i*50)
+    CB_Is = collect(1:i*100)
     global start = time_ns()
 
-    global results[i,1], results[i,2], results[i,3:5], results[i,6:8], results[i,9:10], results[i,11], results[i,12], results[i,13], results[i,14], overbidder  = Main_stochastic_CC(CB_Is, [0.1])
+    global results[i,1], results[i,2], results[i,3:6], results[i,7:9], results[i,10:11], results[i,12], results[i,13], results[i,14], results[i,15], overbidder  = Main_stochastic_CC(CB_Is)
     results_df = DataFrame(results, :auto)
     CSV.write("$base_path"*"3. Simulations\\Stochastic results\\also_x_tester.csv", results_df)
 end
