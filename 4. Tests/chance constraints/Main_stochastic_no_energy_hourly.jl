@@ -16,30 +16,18 @@ function Main_stochastic_CC(CB_Is)
     # Static Parameters
     global T = 24 # hours on a day
     global M = 60 # minutes in an hour
-<<<<<<< HEAD
-    global S = 12
-=======
-    global S = 10 #162
->>>>>>> 8c44f125e7817d27700679285acab3da00249dfc
+    global S = 162 #162
     global M_d = T*M # minutes per model, i.e. per day
     global Pen_e_coef = 3 # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
     global Days = 365
     global I = size(CB_Is)[1]
-<<<<<<< HEAD
-    global S = 162
-=======
->>>>>>> 8c44f125e7817d27700679285acab3da00249dfc
     global RM = 0.9 # %-end SoC assumed, e.g. 0.9 means we assume all charges charge to 90%
 #    global k = k_in[1] # set coefecient for how to value "bad scenarios"
 
     # test days
-<<<<<<< HEAD
     global start_day = 11
     global end_day = 11
-=======
-    global start_day = 1
-    global end_day = 8
->>>>>>> 8c44f125e7817d27700679285acab3da00249dfc
+
     global start_1 = time_ns()
 
 

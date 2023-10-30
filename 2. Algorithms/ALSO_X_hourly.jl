@@ -15,7 +15,7 @@ function ALSO_X(total_flex_up_s, total_flex_do_s, res_20_s)
 
         q = (q_H+q_L)/2
 
-        Mo, Con, Y_v, C_do_v, C_up_v = Stochastic_chancer_model(total_flex_do_s[t,:,:], total_flex_up_s[t,:,:], res_20_s[t,:,:], q)
+        Mo, Con, Y_v, C_do_v, C_up_v = Stochastic_chancer_model_hourly(total_flex_do_s[t,:,:], total_flex_up_s[t,:,:], res_20_s[t,:,:], q)
 
         C_do_v = C_do_v
         C_up_v = C_up_v
@@ -31,10 +31,10 @@ function ALSO_X(total_flex_up_s, total_flex_do_s, res_20_s)
             q = (q_H+q_L)/2
 
 
-            y, C_do, C_up, obj = Stochastic_chancer_solver(Mo, Con, Y_v, C_do_v, C_up_v, q)
+            y, C_do_m, C_up_m, obj = Stochastic_chancer_solver_hourly(Mo, Con, Y_v, C_do_v, C_up_v, q)
 
-            C_do_s[counter] = C_do
-            C_up_s[counter] = C_up
+            C_do_s[counter] = deepcopy(C_do_m)
+            C_up_s[counter] = deepcopy(C_up_m)
 
 
             Y_counter_up = count(x -> x == 0, y)
@@ -48,9 +48,14 @@ function ALSO_X(total_flex_up_s, total_flex_do_s, res_20_s)
             q_H_counter[counter] = q_H
 
             counter = counter + 1
+            println(C_do_m)
+            println(C_do_m)
+            C_do_all[t] = C_do_m
+            C_up_all[t] = C_up_m
         end
-        C_do_all = C_do
-        C_up_all = C_up
+
+
+
     end
 
     model_runtime = round((time_ns() - start_also) / 1e9, digits = 3)

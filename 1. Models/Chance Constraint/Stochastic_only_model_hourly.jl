@@ -25,7 +25,7 @@ using JuMP
 # value.(Ma_A)              # the expected Ma charging rate for the aggregator
 # objective_value(Mo)       # The expected net ernings after pentalty
 
-function Stochastic_chancer_model(total_flex_do, total_flex_up, total_res_20, q)
+function Stochastic_chancer_model_hourly(total_flex_do, total_flex_up, total_res_20, q)
 
    global start = time_ns()
    #************************************************************************

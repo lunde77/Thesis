@@ -25,7 +25,7 @@ using JuMP
 # value.(Ma_A)              # the expected Ma charging rate for the aggregator
 # objective_value(Mo)       # The expected net ernings after pentalty
 
-function Stochastic_chancer_solver(Mo, Con, Y, C_do, C_up, q)
+function Stochastic_chancer_solver_hourly(Mo, Con, Y, C_do, C_up, q)
    #println(Mo)
    #println(Mo)
    # Now change the RHS of the constraint to 20

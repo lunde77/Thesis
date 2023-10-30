@@ -41,7 +41,7 @@ for k_in=1:0
 end
 
 for i=1:1
-    CB_Is = collect(1:i*250)
+    CB_Is = collect(1:i*100)
     global start = time_ns()
 
     global results[i,1], results[i,2], results[i,3:6], results[i,7:9], results[i,10:11], results[i,12], results[i,13], results[i,14], results[i,15], overbidder  = Main_stochastic_CC(CB_Is)
