@@ -49,8 +49,8 @@ function ALSO_X(total_flex_up_s, total_flex_do_s, res_20_s)
 
             counter = counter + 1
         end
-        C_do_all = C_do
-        C_up_all = C_up
+        C_do_all[t] = C_do
+        C_up_all[t] = C_up
     end
 
     model_runtime = round((time_ns() - start_also) / 1e9, digits = 3)
