@@ -35,9 +35,9 @@ function Stochastic_chancer_model_hourly(total_flex_do, total_flex_up, total_res
    epsilon = 0.001                 # helper, so demominator won't become zero
 
 
-   M_do = findmax(total_flex_do)[1]+1000
-   M_up = findmax(total_flex_up)[1]+1000
-   M_e  = findmax(total_res_20)[1]*60+1000
+   M_do = findmax(total_flex_do)[1]+100000
+   M_up = findmax(total_flex_up)[1]+100000
+   M_e  = findmax(total_res_20[1:60])[1]+100000
 
 
    #************************************************************************
@@ -62,16 +62,16 @@ function Stochastic_chancer_model_hourly(total_flex_do, total_flex_up, total_res
 
    #### P90/bid available in 85% approximation constraints ###
    # upwards power flexibity
-   @constraint(Mo, [m=1:M, s=1:S], -M_do*(1-Y[m,s]) <= C_do-total_flex_do[m,s] )
+   #@constraint(Mo, [m=1:M, s=1:S], -M_do*(1-Y[m,s]) <= C_do-total_flex_do[m,s] )
    @constraint(Mo, [m=1:M, s=1:S], C_do-total_flex_do[m,s] <= M_do*Y[m,s] )
 
    # downwards power flexibity
-   @constraint(Mo, [m=1:M, s=1:S], -M_up*(1-Y[m,s]) <= C_do*0.2+C_up-total_flex_up[m,s] )
+   #@constraint(Mo, [m=1:M, s=1:S], -M_up*(1-Y[m,s]) <= C_do*0.2+C_up-total_flex_up[m,s] )
    @constraint(Mo, [m=1:M, s=1:S], C_do*0.2+C_up-total_flex_up[m,s] <= M_up*Y[m,s] )
 
    # downwards power flexibity
-   @constraint(Mo, [m=1:M, s=1:S], -M_e*(1-Y[m,s]) <= C_do-total_res_20[m,s]*60 )
-   @constraint(Mo, [m=1:M, s=1:S], C_do-total_res_20[m,s]*60 <= M_e*Y[m,s] )
+   #@constraint(Mo, [m=1:M, s=1:S], -M_e*(1-Y[m,s]) <= C_do-total_res_20[m,s] )
+   @constraint(Mo, [m=1:M, s=1:S], C_do-total_res_20[m,s] <= M_e*Y[m,s] )
 
    # overall violation needs to be below q
    @constraint(Mo, Con, sum(Y[m,s] for s=1:S, m=1:M) <= q)

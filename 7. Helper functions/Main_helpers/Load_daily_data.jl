@@ -69,18 +69,35 @@ function load_daily_data(Day)
     global total_flex_do_s = zeros(24, 60, num_samples)
     global res_20_s = zeros(24, 60, num_samples)
 
-    for t=1:24
-        for m=1:60
-            # Shuffle the array randomly
-            shuffled_values = randperm(length(all_values))
+    Sampling = 2
 
-            # Select the first num_samples values from the shuffled array
-            sampled_numbers = all_values[shuffled_values[1:num_samples]]
-            total_flex_do_s[t,m,:] = dis[1,sampled_numbers,t]
-            total_flex_up_s[t,m,:] = dis[2,sampled_numbers,t]
-            res_20_s[t,m,:] = dis[3,sampled_numbers,t]
+    if Sampling == 1
+        for t=1:24
+            for m=1:60
+                # Shuffle the array randomly
+                shuffled_values = randperm(length(all_values))
+                # Select the first num_samples values from the shuffled array
+                sampled_numbers = all_values[shuffled_values[1:num_samples]]
+
+                total_flex_do_s[t,m,:] = dis[1,sampled_numbers,t]
+                total_flex_up_s[t,m,:] = dis[2,sampled_numbers,t]
+                res_20_s[t,m,:] = dis[3,sampled_numbers,t]
+            end
+        end
+    elseif Sampling == 2 # if we want to capture teh correlation, hence
+        # Shuffle the array randomly
+        shuffled_values = randperm(length(collect(1:365)))
+        # Select the first num_samples values from the shuffled array
+        sampled_numbers = all_values[shuffled_values[1:num_samples]]
+        for t=1:24
+            for m=1:60
+                total_flex_do_s[t,m,:] = dis[1,sampled_numbers,t,m]
+                total_flex_up_s[t,m,:] = dis[2,sampled_numbers,t,m]
+                res_20_s[t,m,:] = dis[3,sampled_numbers,t,m]
+            end
         end
     end
+
 
 
 end

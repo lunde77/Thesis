@@ -25,13 +25,57 @@ using JuMP
 # value.(Ma_A)              # the expected Ma charging rate for the aggregator
 # objective_value(Mo)       # The expected net ernings after pentalty
 
-function Stochastic_chancer_solver(Mo, Con_do, Con_up, Con_e, Y_do, Y_up, Y_e, C_do, C_up, q_do, q_up, q_e)
-   #println(Mo)
-   #println(Mo)
-   # Now change the RHS of the constraint to 20
-   JuMP.set_normalized_rhs(Con_do, q_do)
-   JuMP.set_normalized_rhs(Con_up, q_up)
-   JuMP.set_normalized_rhs(Con_e, q_e)
+function Stochastic_chancer_model_hourly(total_flex_do, total_flex_up, total_res_20)
+
+   global start = time_ns()
+   #************************************************************************
+   # Static Parameters
+   M = 60 # minutes in an hour
+   T = 24
+   Pi = 1/S
+   epsilon = 0.001                 # helper, so demominator won't become zero
+   alpha = 0.1
+
+   #************************************************************************
+   # Model
+   Mo  = Model(Gurobi.Optimizer)
+
+   # Bid Varibles
+   @variable(Mo, 0 <= C_do)                    # Chosen downwards bid
+   @variable(Mo, 0 <= C_up)                    # Chosen Upwards bid
+
+   # CVaR related variables
+   @variable(Mo, zeta[1:M,1:S])                           # zeta
+   @variable(Mo, 0 <= eta[1:M, 1:S])                  # eta
+   @variable(Mo, 0 >= beta[1:M])                  # eta
+
+
+   # Objetives
+   @variable(Mo, Capacity)                              # Total  capacity
+
+   # Binary relaxed varible
+   @variable(Mo, 0 <= Y[m=1:M,s=1:S] )            # Binary varibles chosing when to overbid downwards flexibity
+
+   ### Obejective ###
+   @objective(Mo, Max,  Capacity ) ###
+
+   # summerizing constraints
+   @constraint(Mo, Capacity == C_do+C_up*0 )
+
+   @constraint(Mo, Capacity <= 100000)
+
+   # CVaR
+   @constraint(Mo, [m=1:M, s=1:S],  C_do-total_flex_do[m,s]   <=  zeta[m,s] )
+   @constraint(Mo, [m=1:M, s=1:S],  C_do*0.2+C_up-total_flex_up[m,s]  <=  zeta[m,s] )
+   @constraint(Mo, [m=1:M, s=1:S],  C_do-total_res_20[m,s]   <=  zeta[m,s] )
+   @constraint(Mo, [m=1:M], sum(zeta[m,s] for s=1:S)*Pi-(1-alpha)*beta[m] <= 0 )
+   @constraint(Mo, [m=1:M, s=1:S], zeta[m,s]  >= beta[m] )
+
+   #@constraint(Mo, [s=1:S, m=1:M], -zeta[m] +  C_do-total_res_20[m,s]   <= eta[m,s])
+   #@constraint(Mo, [s=1:S, m=1:M], -zeta[m] +  C_do*0.2+C_up-total_flex_up[m,s]  <= eta[m,s])
+   #@constraint(Mo, [s=1:S, m=1:M], -zeta[m] +  <= eta[m,s])
+
+
    #************************************************************************
    # Solve
    solution = optimize!(Mo)
@@ -44,6 +88,7 @@ function Stochastic_chancer_solver(Mo, Con_do, Con_up, Con_e, Y_do, Y_up, Y_e, C
       println("No optimal solution available")
    end
    #************************************************************************
-
-   return value.(Y_do), value.(Y_up), value.(Y_e), value.(C_do), value.(C_up), objective_value(Mo)
+   global zeta_v = value.(zeta)
+   global beta_v = value.(beta)
+   return value.(C_do), value.(C_up)
 end

@@ -28,15 +28,28 @@ function Load_aggregated(CB_Is)
         #end
 
     end
-    global dis = zeros(3,21900,24)                                                                          # The minute-resolution distribution of each hour, the first index gives which distribution assesing -> dis[1]= upwards, dis[2], downwards, dis[3]= energy
-    for d=1:365                                                                                             # The second index is the samples, and the third is hour of concer, i.e. the hour we're inspecting
-        for t=1:24
-            for m=1:M
-                dis[1,(d-1)*60+m,t] = float(sum( Downwards_flex_all[(d-1)*1440+(t-1)*60+m,:] ))
-                dis[2,(d-1)*60+m,t] = float(sum( Upwards_flex_all[(d-1)*1440+(t-1)*60+m,:] ))
-                dis[3,(d-1)*60+m,t] = float(sum( energy_20_all[(d-1)*1440+(t-1)*60+m,:] )*60)
+    Sampling = 2
+    if Sampling == 1
+        global dis = zeros(3,21900,24)                                                                          # The minute-resolution distribution of each hour, the first index gives which distribution assesing -> dis[1]= upwards, dis[2], downwards, dis[3]= energy
+        for d=1:365                                                                                             # The second index is the samples, and the third is hour of concer, i.e. the hour we're inspecting
+            for t=1:24
+                for m=1:M
+                    dis[1,(d-1)*60+m,t] = float(sum( Downwards_flex_all[(d-1)*1440+(t-1)*60+m,:] ))
+                    dis[2,(d-1)*60+m,t] = float(sum( Upwards_flex_all[(d-1)*1440+(t-1)*60+m,:] ))
+                    dis[3,(d-1)*60+m,t] = float(sum( energy_20_all[(d-1)*1440+(t-1)*60+m,:] )*60)
+                end
+            end
+        end
+    elseif Sampling == 2
+        global dis = zeros(3,365,24,60)                                                                          # The minute-resolution distribution of each hour, the first index gives which distribution assesing -> dis[1]= upwards, dis[2], downwards, dis[3]= energy
+        for d=1:365                                                                                             # The second index is the samples, and the third is hour of concer, i.e. the hour we're inspecting
+            for t=1:24
+                for m=1:M
+                    dis[1,d,t,m] = float(sum( Downwards_flex_all[(d-1)*1440+(t-1)*60+m,:] ))
+                    dis[2,d,t,m] = float(sum( Upwards_flex_all[(d-1)*1440+(t-1)*60+m,:] ))
+                    dis[3,d,t,m] = float(sum( energy_20_all[(d-1)*1440+(t-1)*60+m,:] )*60)
+                end
             end
         end
     end
-
 end

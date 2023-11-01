@@ -18,21 +18,24 @@ end
 
 
 
-data = zeros(21900,  24)
 
-for j=1:24
-    data[:,j] = p[j]
-end
+#for j=1:24
+#    data[:,j] = p[j]
+#end
 
 # Convert the vector of vectors to a DataFrame
-df = DataFrame(dis[3,:,:], :auto)
+df = DataFrame(dis[1,:,:], :auto)
 
 # Specify the output file path
-output_file = raw"C:\Users\Gustav\Documents\Kandidat\tester.csv"
-
-# Create an Excel workbook and write the data to a sheet
+output_file = raw"C:\Users\Gustav\Documents\Kandidat\tester_do.csv"
 CSV.write(output_file, df)
 
+df = DataFrame(dis[2,:,:], :auto)
+output_file = raw"C:\Users\Gustav\Documents\Kandidat\tester_up.csv"
+CSV.write(output_file, df)
 
+df = DataFrame(dis[3,:,:], :auto)
+output_file = raw"C:\Users\Gustav\Documents\Kandidat\tester_E.csv"
+CSV.write(output_file, df)
 
 histogram(dis[2,:,1], legend=false, title="Data Distribution", xlabel="Value", ylabel="Frequency")

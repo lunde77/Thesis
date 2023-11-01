@@ -24,7 +24,7 @@ function Main_stochastic_CC(CB_Is, k_in)
 
 
     global I = size(CB_Is)[1]
-    global S = 10
+    global S = 119
     global RM = 0.9 # %-end SoC assumed, e.g. 0.9 means we assume all charges charge to 90%
     global k = k_in[1] # set coefecient for how to value "bad scenarios"
 
@@ -49,15 +49,15 @@ function Main_stochastic_CC(CB_Is, k_in)
         load_daily_data(Day)
         println("daily data took")
         println(round((time_ns() - start_2) / 1e9, digits = 3))
-        global C_do, C_up, model_runtime = ALSO_X(La_do_s, La_up_s, Ac_do_M_s, Ac_up_M_s, total_flex_up_s, total_flex_do_s, res_20_s)
-
+        global start_1 = time_ns()
         for t=1:24
+            C_do, C_up = Stochastic_chancer_model_hourly(total_flex_do_s[t,:,:], total_flex_up_s[t,:,:], res_20_s[t,:,:])
             for m=1:60
-                global Do_bids_A[(t-1)*60+m,Day] = C_do[t]
-                global Up_bids_A[(t-1)*60+m,Day] = C_up[t]
+                global Do_bids_A[(t-1)*60+m,Day] = C_do
+                global Up_bids_A[(t-1)*60+m,Day] = C_up
             end
         end
-
+        global model_runtime = round((time_ns() - start_2) / 1e9, digits = 3)
         ###### Simulate day of operation on realized data ######
         obj, pen, missing_delivery_storer[Day,:], missing_capacity_storer[Day,:], missing_capacity_storer_per[Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,Day], Up_bids_A[:,Day], La_do_r, La_up_r)
 

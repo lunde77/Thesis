@@ -25,8 +25,8 @@ function Main_stochastic_CC(CB_Is)
 #    global k = k_in[1] # set coefecient for how to value "bad scenarios"
 
     # test days
-    global start_day = 11
-    global end_day = 11
+    global start_day = 1
+    global end_day = 1
 
     global start_1 = time_ns()
 
