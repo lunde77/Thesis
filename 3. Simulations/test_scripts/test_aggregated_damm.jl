@@ -1,7 +1,7 @@
 using CSV
 using DataFrames
 
-global Emil = false
+global Emil = true
 
 if Emil
     base_path = "C:\\Users\\ASUS\\Documents\\11. sem - kand\\github\\Thesis\\"
