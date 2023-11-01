@@ -21,12 +21,15 @@ results = zeros(2,8)
 # 7: itteation in last bid shcudle creation
 # 8: time taken
 
-for i=1:1
-    CB_Is = collect(1:150+i*50)
+for i=1:2
+    CB_Is = collect(1:i*50)
+    if i == 1
+        CB_Is = collect(1:50)
+    else
+        CB_Is = collect(1:250)
+    end
     global start = time_ns()
-
-    results[i,1], results[i,2], results[i,3:4], results[i,5], results[i,6], results[i,7] = Main_stochastic_admm(CB_Is)
-    results[i,8] = round((time_ns() - start) / 1e9, digits = 3)
+    global results[i,1], results[i,2], results[i,3:6], results[i,7:9], results[i,10:11], results[i,12], results[i,13], results[i,14], results[i,15], overbidder =  Main_stochastic_CC(CB_Is, 2)
     results_df = DataFrame(results, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\aggregated_200_250_50_test.csv", results_df)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\CVAR_tests.csv", results_df)
 end
