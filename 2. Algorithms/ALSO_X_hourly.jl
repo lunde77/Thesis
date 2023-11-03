@@ -53,14 +53,7 @@ function ALSO_X(total_flex_up_s, total_flex_do_s, res_20_s)
             C_do_all[t] = C_do_m
             C_up_all[t] = C_up_m
         end
-<<<<<<< HEAD
-        C_do_all[t] = C_do
-        C_up_all[t] = C_up
-=======
 
-
-
->>>>>>> c691cb34d8611d0475af2cdebd9e34d97e387ff1
     end
 
     model_runtime = round((time_ns() - start_also) / 1e9, digits = 3)

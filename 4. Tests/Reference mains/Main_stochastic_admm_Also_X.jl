@@ -1,3 +1,5 @@
+
+
 # input:
 # CB_Is: number of chargeboxses used
 
@@ -11,12 +13,12 @@
 # model_runtime: How long is takes solve the model (stochastig model)
 # clock: Total runtime for the entery sumlation
 
-function Main_stochastic_CC(CB_Is, S)
+function Main_stochastic_CC_admm(CB_Is)
 
     # Static Parameters
     global T = 24 # hours on a day
     global M = 60 # minutes in an hour
-    global S = S #162
+    global S = 162 #162
     global M_d = T*M # minutes per model, i.e. per day
     global Pen_e_coef = 3 # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
     global Days = 365
@@ -26,7 +28,7 @@ function Main_stochastic_CC(CB_Is, S)
 
     # test days
     global start_day = 1
-    global end_day = 30
+    global end_day = 1
 
     global start_1 = time_ns()
 
@@ -49,8 +51,54 @@ function Main_stochastic_CC(CB_Is, S)
         println(round((time_ns() - start_2) / 1e9, digits = 3))
 
 
-        ###### solve the model in a decomposed matter, and by appliying the Also-x method ######
-        global C_do, C_up, model_runtime = ALSO_X(total_flex_up_s, total_flex_do_s, res_20_s)
+        ###### derrive bids based on stochastic model ######
+
+        global count_to = 25
+        global Y_input = zeros(T)
+        global C_up = zeros(T)
+        global C_do = zeros(T)
+        global slack_up = zeros(T)
+        global slack_do = zeros(T)
+        global Y_out = zeros(T)
+        global Y_zeros = ones(T)*60*S
+        lambda = zeros(count_to+1)
+        lambda[1] = 0.14*I  # upwards gamma Penalty
+        gamma = lambda[1]/5+1   # upwards gamma Penalty
+        global change_lambda_up = 100
+        global change_lambda_do = 100
+        global counter =  1
+
+        while change_lambda_up >= 0.01  && counter <= count_to
+
+            for t=1:T
+                println("at hour $t")
+
+                Y_in = sum(Y_out)-Y_out[t]
+                Y_in_zeros = sum(Y_zeros)-Y_zeros[t]
+
+                C_do[t], C_up[t], Y_out[t], Y_zeros[t] = ALSO_X_admm(total_flex_up_s, total_flex_do_s, res_20_s, Y_in, Y_in_zeros, lambda[counter], gamma, t)
+
+            end
+
+
+            if counter < count_to*0.7
+                lambda[counter+1] = lambda[counter]+(gamma-(counter*gamma/count_to/0.9)   )*( ( S*M_d-sum(Y_zeros)/(S*M_d) )  - 0.1)
+            else
+                lambda[counter+1] = lambda[counter]+(gamma-(counter*gamma/count_to/0.9)   )*( ( S*M_d-sum(Y_zeros)/(S*M_d) )  - 0.1)
+            end
+
+            println("the bids were:")
+            println(C_do)
+            println(C_up)
+
+            global change_lambda_up = abs(lambda[counter+1] -lambda[counter])
+            println("lambda change is")
+            println(abs(lambda[counter+1] -lambda[counter]) )
+
+            global counter = counter + 1
+
+            println(counter)
+        end
 
         for t=1:24
             for m=1:60
@@ -91,5 +139,5 @@ function Main_stochastic_CC(CB_Is, S)
 
     clock = round((time_ns() - start_1) / 1e9, digits = 3)
 
-    return revenue[1], penalty[1], total_cap_missed, average_cap_missed, total_delivery_missed, pr_flex_used_up, pr_flex_used_do, model_runtime, clock, missing_capacity_storer, missing_capacity_storer[:,4]
+    return revenue[1], penalty[1], total_cap_missed, average_cap_missed, total_delivery_missed, pr_flex_used_up, pr_flex_used_do, model_runtime, clock, missing_capacity_storer_per
 end

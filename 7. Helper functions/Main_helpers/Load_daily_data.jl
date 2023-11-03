@@ -85,10 +85,22 @@ function load_daily_data(Day)
             end
         end
     elseif Sampling == 2 # if we want to capture teh correlation, hence
-        # Shuffle the array randomly
-        shuffled_values = randperm(length(collect(1:365)))
-        # Select the first num_samples values from the shuffled array
-        sampled_numbers = all_values[shuffled_values[1:num_samples]]
+
+        if S == 364
+            sampled_numbers =  [x for x in 1:365 if x != Day]
+        else
+            # Shuffle the array randomly
+            shuffled_values = randperm(length(collect(1:365)))
+            # Select the first num_samples values from the shuffled array
+            sampled_numbers = all_values[shuffled_values[1:num_samples]]
+
+            global OOS_numbers = all_values[shuffled_values[num_samples+1:end]]
+            while Day in sampled_numbers
+                shuffled_values = randperm(length(collect(1:365)))
+                sampled_numbers = all_values[shuffled_values[1:num_samples]]
+            end
+        end
+
         for t=1:24
             for m=1:60
                 total_flex_do_s[t,m,:] = dis[1,sampled_numbers,t,m]
