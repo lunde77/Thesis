@@ -94,6 +94,7 @@ function Main_stochastic_admm(CB_Is)
                 lambda[1,counter+1] = lambda[1,counter]+(gamma[1]-(count_to*0.75*gamma[1]/count_to/0.9)  )*(sum(per_dev_up_input)/(S*M_d)-1)
                 lambda[2,counter+1] = lambda[2,counter]+(gamma[2]-(count_to*0.75*gamma[2]/count_to/0.9)  )*(sum(per_dev_do_input)/(S*M_d)-1)
             end
+            
             println("the bids were:")
             println(C_do)
             println(C_up)

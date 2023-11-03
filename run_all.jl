@@ -13,8 +13,8 @@ end
 include("$base_path"*"1. Models\\Deterministic.jl")
 include("$base_path"*"1. Models\\Stochastic.jl")
 include("$base_path"*"1. Models\\Stochastic_with_penalty.jl")
-include("$base_path"*"1. Models\\Chance Constraint\\Stochastic_only_model.jl")
-include("$base_path"*"1. Models\\Chance Constraint\\Stochastic_only_solver.jl")
+include("$base_path"*"1. Models\\Chance Constraint\\Stochastic_only_model_hourly.jl")
+include("$base_path"*"1. Models\\Chance Constraint\\Stochastic_only_solver_hourly.jl")
 
 include("$base_path"*"2. Algorithms\\Day_simulater_with_energy.jl")
 include("$base_path"*"2. Algorithms\\Day_simulater_without_energy.jl")

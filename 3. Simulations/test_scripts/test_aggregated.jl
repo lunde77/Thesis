@@ -10,7 +10,12 @@ else
 
 end
 
-results = zeros(2,15)
+TE = 3
+
+results = zeros(TE,15)
+
+
+Overbid_distribution = zeros(365,TE)
 
 # 1: revenue
 # 2: penalty
@@ -28,27 +33,24 @@ results = zeros(2,15)
 # 14: time taken to load all data
 
 
-for k_in=1:0
-    k_model = (k_in-1)*0.2
-    for i=1:9
-        CB_Is = collect(1:i*50)
+
+for i=1:TE
+    CB_Is = collect(1:i*250)
+    if i == 3
         global start = time_ns()
-
-        global results[i,1], results[i,2], results[i,3:6], results[i,7:9], results[i,10:11], results[i,12], results[i,13], results[i,14], results[i,15], overbidder = Main_stochastic_CC(CB_Is, k_model)
-        results_df = DataFrame(results, :auto)
-        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\also_x_results_$k.csv", results_df)
+        global results[i,1], results[i,2], results[i,3:6], results[i,7:9], results[i,10:11], results[i,12], results[i,13], results[i,14], results[i,15], overbidder, Overbid_distribution[:,i] = Main_stochastic_CC(CB_Is, 364)
     end
-end
-
-for i=1:2
-    CB_Is = collect(1:i*50)
+    if i == 2
+        global start = time_ns()
+        global results[i,1], results[i,2], results[i,3:6], results[i,7:9], results[i,10:11], results[i,12], results[i,13], results[i,14], results[i,15], overbidder, Overbid_distribution[:,i] = Main_stochastic_CC(CB_Is, 162)
+    end
     if i == 1
-        CB_Is = collect(1:50)
-    else
-        CB_Is = collect(1:250)
+        global start = time_ns()
+        global results[i,1], results[i,2], results[i,3:6], results[i,7:9], results[i,10:11], results[i,12], results[i,13], results[i,14], results[i,15], overbidder, Overbid_distribution[:,i] = Main_stochastic_CC_OSS(CB_Is)
     end
-    global start = time_ns()
-    global results[i,1], results[i,2], results[i,3:6], results[i,7:9], results[i,10:11], results[i,12], results[i,13], results[i,14], results[i,15], overbidder = Main_stochastic_CC(CB_Is)
     results_df = DataFrame(results, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\advanced_sampling.csv", results_df)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\tester_2.csv", results_df)
+
+    results_df = DataFrame(Overbid_distribution, :auto)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\tester_2.overbids.csv", results_df)
 end
