@@ -69,8 +69,6 @@ function load_daily_data(Day)
     global total_flex_do_s = zeros(24, 60, num_samples)
     global res_20_s = zeros(24, 60, num_samples)
 
-    Sampling = 2
-
     if Sampling == 1
         for t=1:24
             for m=1:60
