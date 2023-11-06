@@ -9,17 +9,21 @@ function Load_aggregated(CB_Is)
     global Downwards_flex_all =  Matrix{Float64}(undef, M_d*Days, I)                                        # downwards flexibity for all charge boxses
 
     global SoC_A_cap_all = zeros(M_d*Days)                                                                  # the total capacity for each scenario
-
-    global energy_20_all = EV_20_dataframes["$I"][:,1]
+    
+    if CB_Is[1] != 1
+        global energy_20_all = EV_20_dataframes["$((CB_Is[I]))"][:,1] - EV_20_dataframes["$((CB_Is[1]-1))"][:,1]
+    else
+        global energy_20_all = EV_20_dataframes["$I"][:,1] 
+    end
     # Loop through each vector and add it to the matrix
-    for i=1:I
-        Max_Power_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,5]
-        po_cap_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,1]
-        kWh_cap_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,2]
-        Power_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,3]
-        Connected_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,4]
-        Upwards_flex_all[:,i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,8]
-        Downwards_flex_all[:,i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,7]
+    for i=CB_Is[1]:CB_Is[I]
+        Max_Power_all[:, i-CB_Is[1]+1] = EV_dataframes[dataframe_names[CB_Is[i]]][:,5]
+        po_cap_all[:, i-CB_Is[1]+1] = EV_dataframes[dataframe_names[CB_Is[i]]][:,1]
+        kWh_cap_all[:, i-CB_Is[1]+1] = EV_dataframes[dataframe_names[CB_Is[i]]][:,2]
+        Power_all[:, i-CB_Is[1]+1] = EV_dataframes[dataframe_names[CB_Is[i]]][:,3]
+        Connected_all[:, i-CB_Is[1]+1] = EV_dataframes[dataframe_names[CB_Is[i]]][:,4]
+        Upwards_flex_all[:,i-CB_Is[1]+1] = EV_dataframes[dataframe_names[CB_Is[i]]][:,8]
+        Downwards_flex_all[:,i-CB_Is[1]+1] = EV_dataframes[dataframe_names[CB_Is[i]]][:,7]
 
         #for m=1:525600
         #    if Connected_all[m,i] == 1
