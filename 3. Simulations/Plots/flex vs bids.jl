@@ -16,34 +16,34 @@ if true # plot flexibility of sample sapce vs bids
 
     for t=1:24
         for m=1:60
-            total_flex_do_s_pl[(t-1)*60+m,:] = res_20_s[t,m,:]
+            total_flex_do_s_pl[(t-1)*60+m,:] = total_flex_do_s[t,m,:]
         end
     end
 
     plot_sample_start = 1
-    plot_sample_end = 1440-60
+    plot_sample_end = 1440
 
-    q10_values = [quantile(total_flex_do_s_pl[i, :], 0.00) for i in 1:1440]
-    q10_valuesT = [quantile(total_flex_do_s_pl[i, :], 0.10) for i in 1:1440]
-    q90_values = [quantile(total_flex_do_s_pl[i, :], 1.0) for i in 1:1440]
+    q10_values = [quantile(total_flex_do_s_pl[i, :], 0.10) for i in 1:1440]
+    q00_values = [findmin(total_flex_do_s_pl[i,:])[1] for i in 1:1440]
+    q100_values = [findmax(total_flex_do_s_pl[i,:])[1] for i in 1:1440]
     q50_values = [quantile(total_flex_do_s_pl[i, :], 0.5) for i in 1:1440]
 
-    plot(x[plot_sample_start:plot_sample_end], bid_values[plot_sample_start:plot_sample_end], ribbon = (-q10_values[plot_sample_start:plot_sample_end]+bid_values[plot_sample_start:plot_sample_end], q90_values[plot_sample_start:plot_sample_end]-bid_values[plot_sample_start:plot_sample_end]), label = "Sample space (energy flexibility)", fillalpha = 0.2, legend = true)
+    plot(x[plot_sample_start:plot_sample_end], bid_values[plot_sample_start:plot_sample_end], ribbon = (-q00_values[plot_sample_start:plot_sample_end]+bid_values[plot_sample_start:plot_sample_end], q100_values[plot_sample_start:plot_sample_end]-bid_values[plot_sample_start:plot_sample_end]), label = "Sample space (energy flexibility)", fillalpha = 0.2, legend = true)
 
     # Label the ribbon and the line components individually
-    plot!(x[plot_sample_start:plot_sample_end], bid_values[plot_sample_start:plot_sample_end], alpha = 1.0, label = "Bid")
-    plot!(x[plot_sample_start:plot_sample_end], q10_valuesT[plot_sample_start:plot_sample_end], line = :dash, color = :blue, alpha = 0.3, label = "10th Quantile")
+    #plot(x[plot_sample_start:plot_sample_end], bid_values[plot_sample_start:plot_sample_end], alpha = 1.0, label = "Bid")
+    plot!(x[plot_sample_start:plot_sample_end], q10_values[plot_sample_start:plot_sample_end], line = :dash, color = :blue, alpha = 0.3, label = "10th Quantile")
 
     xlabel!("Time (Minutes)")
-    ylabel!("Values")
-    title!("bids and samples for a given day (downwards)")
-    savefig(raw"C:\Users\Gustav\Documents\Thesis\Git\3. Simulations\Plots\bids vs sample space.png")
+    ylabel!("downwards flexibility (kW)")
+    title!("Sample space for hourly sampling")
+    savefig(raw"C:\Users\Gustav\Documents\Thesis\Git\3. Simulations\Plots\sample space sampling 1 500 CBS.png")
 
 end
 
 ######
 
-if true  # plot distribution of overbids 
+if false  # plot distribution of overbids
 
     # Flatten the 3D array into a 1D array
     flattened_matrix_1 = vec(overbidder[:,:,1])

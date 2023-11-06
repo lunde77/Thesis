@@ -11,7 +11,7 @@
 # model_runtime: How long is takes solve the model (stochastig model)
 # clock: Total runtime for the entery sumlation
 
-function Main_stochastic_CC(CB_Is, k_in)
+function Main_stochastic_CC(CB_Is, S_method)
 
     # Static Parameters
     global T = 24 # hours on a day
@@ -19,6 +19,7 @@ function Main_stochastic_CC(CB_Is, k_in)
     global M_d = T*M # minutes per model, i.e. per day
     global Pen_e_coef = 3 # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
     global Days = 365
+    global Sampling = S_method
 
 
 
@@ -36,8 +37,7 @@ function Main_stochastic_CC(CB_Is, k_in)
 
     # results data are intialized to be stored
     load_results_storer()
-
-
+    
     # load all the aggregated data
     Load_aggregated(CB_Is)
 

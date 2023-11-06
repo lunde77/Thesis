@@ -11,7 +11,7 @@
 # model_runtime: How long is takes solve the model (stochastig model)
 # clock: Total runtime for the entery sumlation
 
-function Main_stochastic_CC_OSS(CB_Is)
+function Main_stochastic_CC_OSS(CB_Is, S_method)
 
     # Static Parameters
     global T = 24 # hours on a day
@@ -22,7 +22,7 @@ function Main_stochastic_CC_OSS(CB_Is)
     global Days = 365
     global I = size(CB_Is)[1]
     global RM = 0.9 # %-end SoC assumed, e.g. 0.9 means we assume all charges charge to 90%
-
+    global Sampling = S_method
 
 
     global start_1 = time_ns()
@@ -75,8 +75,8 @@ function Main_stochastic_CC_OSS(CB_Is)
 
     end
 
-    pr_flex_used_up = round( sum( Up_bids_A )/sum(Total_flex_up ), digits= 3 )
-    pr_flex_used_do = round( sum( Do_bids_A )/sum(Total_flex_do ), digits= 3 )
+    pr_flex_used_up = round( sum( Up_bids_A )*end_day/sum(Total_flex_up ), digits= 3 )
+    pr_flex_used_do = round( sum( Do_bids_A )*end_day/sum(Total_flex_do ), digits= 3 )
 
     total_cap_missed[1] = round( (sum(missing_capacity_storer[:,1]))/(-start_day+end_day+1),  digits= 3 )   # % of minute where down capacity were missed
     total_cap_missed[2] = round( sum(missing_capacity_storer[:,2])/(-start_day+end_day+1) ,  digits= 3 )   # % of minute where up capacity were missed

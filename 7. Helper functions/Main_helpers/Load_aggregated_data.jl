@@ -16,6 +16,7 @@ function Load_aggregated(CB_Is)
         global energy_20_all = EV_20_dataframes["$I"][:,1] 
     end
     # Loop through each vector and add it to the matrix
+<<<<<<< HEAD
     for i=CB_Is[1]:CB_Is[I]
         Max_Power_all[:, i-CB_Is[1]+1] = EV_dataframes[dataframe_names[CB_Is[i]]][:,5]
         po_cap_all[:, i-CB_Is[1]+1] = EV_dataframes[dataframe_names[CB_Is[i]]][:,1]
@@ -24,15 +25,33 @@ function Load_aggregated(CB_Is)
         Connected_all[:, i-CB_Is[1]+1] = EV_dataframes[dataframe_names[CB_Is[i]]][:,4]
         Upwards_flex_all[:,i-CB_Is[1]+1] = EV_dataframes[dataframe_names[CB_Is[i]]][:,8]
         Downwards_flex_all[:,i-CB_Is[1]+1] = EV_dataframes[dataframe_names[CB_Is[i]]][:,7]
+=======
+    for i=CB_Is[1]:I
+        Max_Power_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,5]
+        po_cap_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,1]
+        kWh_cap_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,2]
+        Power_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,3]
+        Connected_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,4]
+        Upwards_flex_all[:,i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,8]
+        Downwards_flex_all[:,i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,7]
+>>>>>>> 392b28381e5ca0f0f431102a31daa38d4f79f3cf
 
-        #for m=1:525600
-        #    if Connected_all[m,i] == 1
-        #        global SoC_A_cap_all[m] = SoC_A_cap_all[m]+kWh_cap_all[m,i]/po_cap_all[m,i]
-        #    end
-        #end
+
+        # midlettidligt fix
+        if Max_Power_all[2,i] > 30
+            println(dataframe_names[CB_Is[i]])
+            Max_Power_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,5]*0
+            po_cap_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,1]*0
+            kWh_cap_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,2]*0
+            Power_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,3]*0
+            Connected_all[:, i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,4]*0
+            Upwards_flex_all[:,i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,8]*0
+            Downwards_flex_all[:,i] = EV_dataframes[dataframe_names[CB_Is[i]]][:,7]*0
+        end
+
+
 
     end
-    Sampling = 2
     if Sampling == 1
         global dis = zeros(3,21900,24)                                                                          # The minute-resolution distribution of each hour, the first index gives which distribution assesing -> dis[1]= upwards, dis[2], downwards, dis[3]= energy
         for d=1:365                                                                                             # The second index is the samples, and the third is hour of concer, i.e. the hour we're inspecting
