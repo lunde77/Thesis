@@ -16,7 +16,7 @@ function Main_stochastic_CC(CB_Is)
     # Static Parameters
     global T = 24 # hours on a day
     global M = 60 # minutes in an hour
-    global S = S #162
+    global S = 162 #S
     global M_d = T*M # minutes per model, i.e. per day
     global Pen_e_coef = 3 # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
     global Days = 365
@@ -26,7 +26,7 @@ function Main_stochastic_CC(CB_Is)
 
     # test days
     global start_day = 1
-    global end_day = 30
+    global end_day = 7
 
     global start_1 = time_ns()
 

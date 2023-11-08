@@ -25,7 +25,6 @@ function Load_aggregated(CB_Is)
         Upwards_flex_all[:,i-CB_Is[1]+1]= EV_dataframes[dataframe_names[CB_Is[i-CB_Is[1]+1]]][:,8]
         Downwards_flex_all[:,i-CB_Is[1]+1]= EV_dataframes[dataframe_names[CB_Is[i-CB_Is[1]+1]]][:,7]
 
-
         # midlettidligt fix
         if Max_Power_all[2,i-CB_Is[1]+1]> 30
             println(dataframe_names[CB_Is[i-CB_Is[1]+1]])
