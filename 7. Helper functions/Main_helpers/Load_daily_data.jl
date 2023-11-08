@@ -58,18 +58,17 @@ function load_daily_data(Day)
     #end
 
     # Set the range and the number of samples
-    start_range = 1
-    end_range = 21900
     num_samples = S
-
-    # Create an array containing all possible values in the range
-    all_values = collect(start_range:end_range)
 
     global total_flex_up_s = zeros(24, 60, num_samples)
     global total_flex_do_s = zeros(24, 60, num_samples)
     global res_20_s = zeros(24, 60, num_samples)
 
-    if Sampling == 1
+    if Sampling == 1 # radnom sampling with drawing from hourly Overbid_distribution
+        # Create an array containing all possible values in the range
+        start_range = 1
+        end_range = 21900
+        all_values = collect(start_range:end_range)
         for t=1:24
             for m=1:60
                 # Shuffle the array randomly
@@ -83,27 +82,22 @@ function load_daily_data(Day)
             end
         end
     elseif Sampling == 2 # if we want to capture teh correlation, hence
-
-        if S == 364
-            sampled_numbers =  [x for x in 1:365 if x != Day]
-        else
-            if true
-                shuffled_values = randperm(length(collect(1:365)))
-                sampled_numbers = shuffled_values[1:num_samples]
-                global OOS_numbers = all_values[shuffled_values[num_samples+1:end]]
-            else
-                 sampled_numbers = sampled_numbers_tester[1:num_samples]
-                 global OOS_numbers = sampled_numbers_tester[1+num_samples:end]
-            end
-
-
-
+        if test_type = "T1"
+            shuffled_values = randperm(length(collect(1:365)))
+            sampled_numbers = shuffled_values[1:num_samples]
+            global OOS_numbers = all_values[shuffled_values[num_samples+1:end]]
             while Day in sampled_numbers
                 shuffled_values = randperm(length(collect(1:365)))
                 sampled_numbers = all_values[shuffled_values[1:num_samples]]
             end
+        else
+            Random.seed!(3) # set this to a number if we want to have same in sample and out sample across samples  
+            sampled_numbers_tester = randperm(length(collect(1:365)))
+            sampled_numbers = sampled_numbers_tester[1:num_samples]
+            global OOS_numbers = sampled_numbers_tester[1+num_samples:end]
         end
 
+        # draw samples, all samplesa re drawn form the same random days
         for t=1:24
             for m=1:60
                 total_flex_do_s[t,m,:] = dis[1,sampled_numbers,t,m]
@@ -112,7 +106,5 @@ function load_daily_data(Day)
             end
         end
     end
-
-
 
 end

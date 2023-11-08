@@ -1,6 +1,6 @@
 using Plots
 
-for i=301:500
+for i=519:1600
   println(i)
   CB = i
   M_d = 1440
@@ -12,15 +12,20 @@ for i=301:500
   Power = EV_dataframes[dataframe_names[CB]][:,3]      # baseline power
   Connected = EV_dataframes[dataframe_names[CB]][:,4]  # minutes where CB is connected
 
-  Downwards_flex, upwards_flex =  baseline_flex_realized(kWh_cap, po_cap, Power, Max_Power, Connected, 0.9)
+  if Max_Power[1] <30
+    println(i)
 
-  plot(Downwards_flex)
-  plot!(upwards_flex)
+    Downwards_flex, upwards_flex =  baseline_flex_realized(kWh_cap, po_cap, Power, Max_Power, Connected, 0.9)
 
-  EV_dataframes[dataframe_names[CB]].Downwards_flex  = Downwards_flex
-  EV_dataframes[dataframe_names[CB]].upwards_flex = upwards_flex
+    plot(Downwards_flex)
+    plot!(upwards_flex)
 
-  base_path = "C:\\Users\\Gustav\\Documents\\Thesis\\data\\EV\\cleaned_data_RM90\\"
+    EV_dataframes[dataframe_names[CB]].Downwards_flex  = Downwards_flex
+    EV_dataframes[dataframe_names[CB]].upwards_flex = upwards_flex
 
-  CSV.write(base_path*"$(dataframe_names[CB]).csv", EV_dataframes[dataframe_names[CB]])
+    base_path = "C:\\Users\\Gustav\\Documents\\Thesis\\data\\EV\\cleaned_data_RM90\\"
+
+    CSV.write(base_path*"$(dataframe_names[CB]).csv", EV_dataframes[dataframe_names[CB]])
+
+  end
 end

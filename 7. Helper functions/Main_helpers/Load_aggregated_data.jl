@@ -28,6 +28,8 @@ function Load_aggregated(CB_Is)
         # midlettidligt fix
         if Max_Power_all[2,i-CB_Is[1]+1]> 30
             println(dataframe_names[CB_Is[i-CB_Is[1]+1]])
+
+
             Max_Power_all[:,i-CB_Is[1]+1]= EV_dataframes[dataframe_names[CB_Is[i-CB_Is[1]+1]]][:,5]*0
             po_cap_all[:,i-CB_Is[1]+1]= EV_dataframes[dataframe_names[CB_Is[i-CB_Is[1]+1]]][:,1]*0
             kWh_cap_all[:,i-CB_Is[1]+1]= EV_dataframes[dataframe_names[CB_Is[i-CB_Is[1]+1]]][:,2]*0

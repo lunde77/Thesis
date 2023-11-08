@@ -49,8 +49,5 @@ function baseline_flex_realized(kWh_cap, po_cap, Power, Power_rate, Connected, R
     end
 
 
-
-
-
     return flex[:,1], flex[:,2]
 end

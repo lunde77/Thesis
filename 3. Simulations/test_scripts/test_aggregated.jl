@@ -1,5 +1,6 @@
 using CSV
 using DataFrames
+using Random
 
 global Emil = false
 
@@ -10,62 +11,44 @@ else
 
 end
 
-TE = 10
+TE = 50
 
-#results_Cvar = zeros(TE,15)
-#results = zeros(TE,15)
-
-
-#Overbid_distribution = zeros(365,TE)
+results = zeros(TE,15)
+Overbid_distribution = zeros(365,TE)
+Upwards_bids = zeros(24,TE)
+Downwards_bids = zeros(24,TE)
 
 # 1: revenue
 # 2: penalty
-# 3: down capacity missed
-# 4: up capacity missed
-# 5: energy capacity missed
-# 6: avg. missed down capacity missed
-# 7: avg. missed up capacity missed
-# 8: avg. missed energy capacity missed
-# 9: % down acatvation missed
-# 10: % up acatvation missed
-# 11: % of total upwards flexibity bid into the marked
-# 12: % of total downwards flexibity bid into the marked
-# 13: time taken for model to run
-# 14: time taken to load all data
+# 3: down capacity missed - frequecy of overbid
+# 4: up capacity missed - frequecy of overbid
+# 5: energy capacity missed - frequecy of overbid
+# 6: Total capacity missed - frequecy of overbid
+# 7: avg. missed down capacity missed
+# 8: avg. missed up capacity missed
+# 9: avg. missed energy capacity missed
+# 10: % down acatvation missed
+# 11: % up acatvation missed
+# 12: % of total upwards flexibity bid into the marked
+# 13: % of total downwards flexibity bid into the marked
+# 14: time taken for model to run
+# 15: time taken to load all data
+
+# 18: Upwards bid for each hour
+# 18: downwards bid for each hour
 
 
 
-for i=1:5
-    CB_Is = collect(1:i*100)
+for i=1:50
+    CB_Is = collect(1:250)
     global start = time_ns()
 
-    global results_Cvar[i,1], results_Cvar[i,2], results_Cvar[i,3:6], results_Cvar[i,7:9], results_Cvar[i,10:11], results_Cvar[i,12], results_Cvar[i,13], results_Cvar[i,14], results_Cvar[i,15], overbidder, Overbid_distribution[:,i] = Main_stochastic_CVAR_OSS(CB_Is, 2)
-
-    global start = time_ns()
-    global results_Cvar[i+5,1], results_Cvar[i+5,2], results_Cvar[i+5,3:6], results_Cvar[i+5,7:9], results_Cvar[i+5,10:11], results_Cvar[i+5,12], results_Cvar[i+5,13], results_Cvar[i+5,14], results_Cvar[i+5,15], overbidder, Overbid_distribution[:,i+5] = Main_stochastic_CVAR_OSS(CB_Is, 1)
+    global results[i,1], results[i,2], results[i,3:6], results[i,7:9], results[i,10:11], results[i,12], results[i,13], results[i,14], results[i,15], overbidder, Overbid_distribution[:,i], Upwards_bids[:,i], Downwards_bids[:,i] = Main_stochastic_CC_OSS(CB_Is, 1, 162)
 
 
     results_df = DataFrame(results_Cvar, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\CVaR results 2.csv", results_df)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Bid difference.csv", results_df)
 
     results_df = DataFrame(Overbid_distribution, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\CVaR overbidder 2 .csv", results_df)
-end
-
-for i=2:0
-    if i <= 10
-        CB_Is = collect(1+(i-1)*50:50*i)
-    else
-        CB_Is = collect(1:500)
-    end
-
-    samples = 163
-
-    global results[i,1], results[i,2], results[i,3:6], results[i,7:9], results[i,10:11], results[i,12], results[i,13], results[i,14], results[i,15], overbidder, Overbid_distribution[:,i] = Main_stochastic_CC_OSS(CB_Is, 2, samples)
-
-    results_df = DataFrame(results, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\50 different CB_Is.csv", results_df)
-
-    results_df = DataFrame(Overbid_distribution, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\50 different CB_Is overbidder.csv", results_df)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Bid difference.csv", results_df)
 end

@@ -9,8 +9,8 @@ for i=1:500
     end
     println(i)
     CB = i
-    M_d = 1440
-    Days = 365
+    global M_d = 1440
+    global Days = 365
 
 
     global po_cap_all =  Matrix{Float64}(undef, M_d*Days,1)                                                # % of resovior stored

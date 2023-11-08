@@ -14,9 +14,10 @@
 function Main_stochastic_CC_OSS(CB_Is, S_method, samples_in)
 
     # Static Parameters
+    global Tester_type = "T2"
     global T = 24 # hours on a day
     global M = 60 # minutes in an hour
-    global S = 163 #162
+    global S = 162
     global M_d = T*M # minutes per model, i.e. per day
     global Pen_e_coef = 3 # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
     global Days = 365
@@ -24,8 +25,6 @@ function Main_stochastic_CC_OSS(CB_Is, S_method, samples_in)
     global RM = 0.9 # %-end SoC assumed, e.g. 0.9 means we assume all charges charge to 90%
     global Sampling = S_method
     global S = samples_in
-
-
     global start_1 = time_ns()
 
 
@@ -96,5 +95,5 @@ function Main_stochastic_CC_OSS(CB_Is, S_method, samples_in)
 
     clock = round((time_ns() - start_1) / 1e9, digits = 3)
 
-    return revenue[1], penalty[1], total_cap_missed, average_cap_missed, total_delivery_missed, pr_flex_used_up, pr_flex_used_do, model_runtime, clock, missing_capacity_storer, missing_capacity_storer[:,4]
+    return revenue[1], penalty[1], total_cap_missed, average_cap_missed, total_delivery_missed, pr_flex_used_up, pr_flex_used_do, model_runtime, clock, missing_capacity_storer, missing_capacity_storer[:,4], C_up, C_up
 end

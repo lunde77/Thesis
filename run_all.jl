@@ -44,5 +44,7 @@ include("$base_path"*"1. Models\\Chance Constraint\\Stochastic_only_model_hourly
 include("$base_path"*"1. Models\\Chance Constraint\\Stochastic_only_solver_hourly.jl")
 include("$base_path"*"2. Algorithms\\ALSO_X_hourly.jl")
 include("$base_path"*"4. Tests\\chance constraints\\Main_stochastic_no_energy_hourly.jl")
+include("$base_path"*"4. Tests\\OSS test\\Main_stochastic_no_energy_hourly_OSS.jl")
+
 
 include("$base_path"*"6. Data analyses\\data_load.jl") # funciton for loading all data, needs to be last, as base_path is altered

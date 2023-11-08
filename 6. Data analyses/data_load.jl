@@ -120,7 +120,7 @@ else
 
     # Set the number of files to load - defount is all
     #num_files_to_load = size(dataframe_names)[1] # outcomment this (not delete), if other option than all is selceted
-    num_files_to_load = 500
+    num_files_to_load = 1600
 
     # Load only CSV files and store them in the dictionary
     global i = 0
@@ -149,7 +149,6 @@ end
 WE = true
 
 if WE == true
-
     global file_names_20 = readdir("$base_path"*"EV\\20_minute data\\", join=true)
     global dataframe_names_20 = file_names_20
     # Create a dictionary to store the loaded DataFrames
