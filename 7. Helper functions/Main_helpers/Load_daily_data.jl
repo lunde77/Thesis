@@ -87,12 +87,17 @@ function load_daily_data(Day)
         if S == 364
             sampled_numbers =  [x for x in 1:365 if x != Day]
         else
-            # Shuffle the array randomly
-            shuffled_values = randperm(length(collect(1:365)))
-            # Select the first num_samples values from the shuffled array
-            sampled_numbers = all_values[shuffled_values[1:num_samples]]
+            if true
+                shuffled_values = randperm(length(collect(1:365)))
+                sampled_numbers = shuffled_values[1:num_samples]
+                global OOS_numbers = all_values[shuffled_values[num_samples+1:end]]
+            else
+                 sampled_numbers = sampled_numbers_tester[1:num_samples]
+                 global OOS_numbers = sampled_numbers_tester[1+num_samples:end]
+            end
 
-            global OOS_numbers = all_values[shuffled_values[num_samples+1:end]]
+
+
             while Day in sampled_numbers
                 shuffled_values = randperm(length(collect(1:365)))
                 sampled_numbers = all_values[shuffled_values[1:num_samples]]

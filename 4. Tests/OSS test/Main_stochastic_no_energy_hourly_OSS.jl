@@ -11,18 +11,19 @@
 # model_runtime: How long is takes solve the model (stochastig model)
 # clock: Total runtime for the entery sumlation
 
-function Main_stochastic_CC_OSS(CB_Is, S_method)
+function Main_stochastic_CC_OSS(CB_Is, S_method, samples_in)
 
     # Static Parameters
     global T = 24 # hours on a day
     global M = 60 # minutes in an hour
-    global S = 162 #162
+    global S = 163 #162
     global M_d = T*M # minutes per model, i.e. per day
     global Pen_e_coef = 3 # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
     global Days = 365
     global I = size(CB_Is)[1]
     global RM = 0.9 # %-end SoC assumed, e.g. 0.9 means we assume all charges charge to 90%
     global Sampling = S_method
+    global S = samples_in
 
 
     global start_1 = time_ns()
@@ -47,9 +48,9 @@ function Main_stochastic_CC_OSS(CB_Is, S_method)
             global Up_bids_A[(t-1)*60+m,1] = C_up[t]
         end
     end
-
     start_day = 1
     end_day = length(OOS_numbers)
+
 
 
     for Day in OOS_numbers

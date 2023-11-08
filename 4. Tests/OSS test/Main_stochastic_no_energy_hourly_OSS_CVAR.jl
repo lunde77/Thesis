@@ -37,8 +37,8 @@ function Main_stochastic_CVAR_OSS(CB_Is, S_method)
     ###### intialize all daily data, so it's loaded - yet here is just to get the samples ######
     load_daily_data(1)
 
-    println(round((time_ns() - start_2) / 1e9, digits = 3))
-    global start_1 = time_ns()
+    println(round((time_ns() - start_1) / 1e9, digits = 3))
+    global start_2 = time_ns()
     for t=1:24
         C_do, C_up = Stochastic_chancer_model_hourly_CVAR(total_flex_do_s[t,:,:], total_flex_up_s[t,:,:], res_20_s[t,:,:])
         for m=1:60
@@ -75,8 +75,8 @@ function Main_stochastic_CVAR_OSS(CB_Is, S_method)
 
     end
 
-    pr_flex_used_up = round( sum( Up_bids_A )/sum(Total_flex_up ), digits= 3 )
-    pr_flex_used_do = round( sum( Do_bids_A )/sum(Total_flex_do ), digits= 3 )
+    pr_flex_used_up = round( sum( Up_bids_A )*end_day/sum(Total_flex_up ), digits= 3 )
+    pr_flex_used_do = round( sum( Do_bids_A )*end_day/sum(Total_flex_do ), digits= 3 )
 
     total_cap_missed[1] = round( (sum(missing_capacity_storer[:,1]))/(-start_day+end_day+1),  digits= 3 )   # % of minute where down capacity were missed
     total_cap_missed[2] = round( sum(missing_capacity_storer[:,2])/(-start_day+end_day+1) ,  digits= 3 )   # % of minute where up capacity were missed
