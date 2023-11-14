@@ -46,7 +46,7 @@ function Load_aggregated(CB_Is)
                 end
             end
         end
-    elseif Sampling == 3 ||  Sampling == 2
+    elseif  Sampling == 4 || Sampling == 3 ||  Sampling == 2
         global dis = zeros(3,365,24,60)                                                                          # The minute-resolution distribution of each hour, the first index gives which distribution assesing -> dis[1]= upwards, dis[2], downwards, dis[3]= energy
         for d=1:365                                                                                             # The second index is the samples, and the third is hour of concer, i.e. the hour we're inspecting
             for t=1:24

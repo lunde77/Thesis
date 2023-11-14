@@ -24,9 +24,11 @@ include("$base_path"*"2. Algorithms\\ALSO_X_hourly.jl")
 include("$base_path"*"3. Simulations\\Plots\\Deterministic\\plot_function.jl")
 
 include("$base_path"*"4. Tests\\Reference mains\\Main_determistic.jl")
-include("$base_path"*"4. Tests\\Main_stochastic_no_energy.jl")
-include("$base_path"*"4. Tests\\Main_stochastic_no_energy_hourly_OSS_CVAR.jl")
-include("$base_path"*"4. Tests\\Main_stochastic_no_energy_hourly_OSS.jl")
+include("$base_path"*"4. Tests\\Main_OPR.jl")
+include("$base_path"*"4. Tests\\Main_OB_MR_K_folded.jl")
+include("$base_path"*"4. Tests\\Main_OB_MR_CVAR.jl")
+include("$base_path"*"4. Tests\\Main_OB_MR.jl")
+include("$base_path"*"4. Tests\\Main__OB_MR_K_folded.jl")
 
 include("$base_path"*"7. Helper functions\\Non main function\\baseline_atering.jl")
 include("$base_path"*"7. Helper functions\\Non main function\\scenario_generation.jl")
@@ -39,5 +41,7 @@ include("$base_path"*"7. Helper functions\\Non main function\\SoC_start_r.jl")
 include("$base_path"*"7. Helper functions\\Load_aggregated_data.jl")
 include("$base_path"*"7. Helper functions\\Load_daily_data.jl")
 include("$base_path"*"7. Helper functions\\load_results_storer.jl")
+include("$base_path"*"7. Helper functions\\Load_sampling.jl")
+include("$base_path"*"7. Helper functions\\load_folds.jl")
 
 include("$base_path"*"6. Data analyses\\data_load.jl") # funciton for loading all data, needs to be last, as base_path is altered

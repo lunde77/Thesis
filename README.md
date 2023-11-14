@@ -9,7 +9,7 @@ This repository contains the implementation of an optimal bidding strategy for d
 7.	Helper Functions: This directory houses small functions that support the main code or are used for data transformation. These functions are designed for the reader's convenience during the evaluation process.
 8.	Old Files: This functions as a bin for old files that may not be used again but are retained temporarily in case they prove useful before submission.
 
-The most critical code for each folder is preset in the folder, i.e. not in a subfolder. Scripts stored in a subfolder, are typically scripts, which are under development or don't provide much information about the overall implementation. 
+The most critical code for each folder is preset in the folder, i.e. not in a subfolder. Scripts stored in a subfolder, are typically scripts, which are under development or don't provide much information about the overall implementation. A Radme files is avaible in each folder, which shortly present the scripts.
 
 Necessities to run code 
 To use the code in this repository, ensure that the following packages are installed:
@@ -20,6 +20,9 @@ To use the code in this repository, ensure that the following packages are insta
 •	Statistics
 •	CSV
 •	DataFrames
+
+As a first step, one can intiliaze all function and data by runing the "run all.jl" file.
+
 Additionally, the program utilizes threads to optimize runtime. Ensure that your Julia environment has initialized threads for computational efficiency.
 
 Lastly, the user needs to obtain permission to gain access to the data. For now, it is not available to all. 
