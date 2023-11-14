@@ -102,6 +102,10 @@ function load_daily_data(Day)
                 res_20_s[t,m,:] = dis[3,sampled_numbers,t]
             end
         end
+<<<<<<< HEAD:7. Helper functions/Main_helpers/Load_daily_data.jl
+    elseif Sampling == 2 # if we want to capture teh correlation, hence
+        if test_type == "T1"
+=======
     elseif Sampling == 2 # Minute-to_minute distribution sampled in correaltion
         # Create an array containing all possible values in the range
         start_range = 1
@@ -138,6 +142,7 @@ function load_daily_data(Day)
 
     elseif Sampling == 3 # Minute-to_minute distribution sampled in correaltion
         if test_type == "T1" # t1 refers to we are making a new bid for every test day
+>>>>>>> f7d7bf97232319fd0e7d80f1416f6b1e54baf191:7. Helper functions/Non main function/Load_daily_data_with_energy.jl
             shuffled_values = randperm(length(collect(1:365)))
             sampled_numbers = shuffled_values[1:num_samples]
             while Day in sampled_numbers # make sure the day we test OSS are not included in in-sample set
@@ -145,7 +150,11 @@ function load_daily_data(Day)
                 sampled_numbers = all_values[shuffled_values[1:num_samples]]
             end
         else
+<<<<<<< HEAD:7. Helper functions/Main_helpers/Load_daily_data.jl
+            # Random.seed!(3) # set this to a number if we want to have same in sample and out sample across samples  
+=======
             Random.seed!(3) # set this to a number if we want to have same in sample and out sample across samples
+>>>>>>> f7d7bf97232319fd0e7d80f1416f6b1e54baf191:7. Helper functions/Non main function/Load_daily_data_with_energy.jl
             sampled_numbers_tester = randperm(length(collect(1:365)))
             sampled_numbers = sampled_numbers_tester[1:num_samples]
             global OOS_numbers = sampled_numbers_tester[1+num_samples:N_OSS+num_samples]

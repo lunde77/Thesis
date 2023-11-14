@@ -11,7 +11,7 @@ else
 
 end
 
-TE = 4
+TE = 12
 
 results = zeros(TE,15)
 Overbid_distribution_out = zeros(365,TE)# the overbid distribution for out sample tests
