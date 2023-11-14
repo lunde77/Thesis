@@ -1,6 +1,6 @@
 using Plots
 
-for i=519:1600
+for i=1600:1700
   println(i)
   CB = i
   M_d = 1440

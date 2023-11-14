@@ -24,9 +24,5 @@ git push -u origin main # push changes, derved er dine ændringer fuldført
 ---------------------------------
 
 
-failure distribution 
-- if they chech every day
-- if they check every month 
-
-
-increase samples 
+5106
+5431

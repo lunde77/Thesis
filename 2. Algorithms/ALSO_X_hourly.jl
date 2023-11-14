@@ -24,7 +24,7 @@ function ALSO_X(total_flex_up_s, total_flex_do_s, res_20_s)
         C_do_s = zeros(100)
         C_up_s = zeros(100)
 
-        while (-q_L+q_H) > 0.001  && counter < 200
+        while (-q_L+q_H) > q_epilon  && counter < 200
             println(counter)
 
 

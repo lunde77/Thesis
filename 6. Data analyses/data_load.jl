@@ -26,7 +26,6 @@ using XLSX
 
 ####### Paths ########
 
-
 if Emil
     base_path = "C:\\Users\\ASUS\\Documents\\11. sem - kand\\data\\"
 else
@@ -120,7 +119,7 @@ else
 
     # Set the number of files to load - defount is all
     #num_files_to_load = size(dataframe_names)[1] # outcomment this (not delete), if other option than all is selceted
-    num_files_to_load = 1600
+    num_files_to_load = 1800
 
     # Load only CSV files and store them in the dictionary
     global i = 0
