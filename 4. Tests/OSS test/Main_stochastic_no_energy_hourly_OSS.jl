@@ -14,7 +14,7 @@
 function Main_stochastic_CC_OSS(CB_Is, S_method, samples_in)
 
     # Static Parameters
-    global Tester_type = "T2"
+    global test_type = "T2"
     global T = 24 # hours on a day
     global M = 60 # minutes in an hour
     global S = 162

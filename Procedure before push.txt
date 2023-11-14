@@ -1,4 +1,4 @@
-##ssProcedure before push:
+##Procedure before push:
 
 
 ### to pull

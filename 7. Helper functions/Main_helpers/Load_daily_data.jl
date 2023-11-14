@@ -82,7 +82,7 @@ function load_daily_data(Day)
             end
         end
     elseif Sampling == 2 # if we want to capture teh correlation, hence
-        if test_type = "T1"
+        if test_type == "T1"
             shuffled_values = randperm(length(collect(1:365)))
             sampled_numbers = shuffled_values[1:num_samples]
             global OOS_numbers = all_values[shuffled_values[num_samples+1:end]]
@@ -91,7 +91,7 @@ function load_daily_data(Day)
                 sampled_numbers = all_values[shuffled_values[1:num_samples]]
             end
         else
-            Random.seed!(3) # set this to a number if we want to have same in sample and out sample across samples  
+            # Random.seed!(3) # set this to a number if we want to have same in sample and out sample across samples  
             sampled_numbers_tester = randperm(length(collect(1:365)))
             sampled_numbers = sampled_numbers_tester[1:num_samples]
             global OOS_numbers = sampled_numbers_tester[1+num_samples:end]

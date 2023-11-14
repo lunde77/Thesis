@@ -17,21 +17,22 @@ results = zeros(TE,15)
 
 Overbid_distribution = zeros(365,TE)
 
-# 1: revenue
-# 2: penalty
+# 1: revenue *
+# 2: penalty *
 # 3: down capacity missed
 # 4: up capacity missed
 # 5: energy capacity missed
+# 6: avg. missed down capacity total *
 # 6: avg. missed down capacity missed
 # 7: avg. missed up capacity missed
 # 8: avg. missed energy capacity missed
 # 9: % down acatvation missed
 # 10: % up acatvation missed
-# 11: % of total upwards flexibity bid into the marked
-# 12: % of total downwards flexibity bid into the marked
+# 11: % of total upwards flexibity bid into the marked *
+# 12: % of total downwards flexibity bid into the marked *
 # 13: time taken for model to run
 # 14: time taken to load all data
-global Sampling = 2
+global Sampling = 1
 
 for i=1:11
     if i <= 10
