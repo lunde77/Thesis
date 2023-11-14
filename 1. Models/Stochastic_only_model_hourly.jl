@@ -37,7 +37,7 @@ function Stochastic_chancer_model_hourly(total_flex_do, total_flex_up, total_res
 
    M_do = findmax(total_flex_do)[1]+100000
    M_up = findmax(total_flex_up)[1]+100000
-   M_e  = findmax(total_res_20[1:60])[1]+100000
+   M_e  = findmax(total_res_20)[1]+100000
 
 
    #************************************************************************

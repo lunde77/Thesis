@@ -11,21 +11,19 @@
 # model_runtime: How long is takes solve the model (stochastig model)
 # clock: Total runtime for the entery sumlation
 
-function Main_stochastic_CVAR_OSS(CB_Is,  S_method, samples_in)
+function Main_stochastic_CVAR_OSS(CB_Is, S_method, N_s)
 
     # Static Parameters
     global test_type = "T2"
     global T = 24 # hours on a day
     global M = 60 # minutes in an hour
-    global S = 162
+    global S = N_s #162
     global M_d = T*M # minutes per model, i.e. per day
     global Pen_e_coef = 3 # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
     global Days = 365
     global I = size(CB_Is)[1]
     global RM = 0.9 # %-end SoC assumed, e.g. 0.9 means we assume all charges charge to 90%
     global Sampling = S_method
-    global S = samples_in
-    global start_1 = time_ns()
 
 
     global start_1 = time_ns()
@@ -38,7 +36,7 @@ function Main_stochastic_CVAR_OSS(CB_Is,  S_method, samples_in)
     Load_aggregated(CB_Is)
 
     ###### intialize all daily data, so it's loaded - yet here is just to get the samples ######
-    load_daily_data(1)
+    total_flex_do_s, total_flex_up_s, res_20_s, OOS_numbers, sampled_numbers, XX, XX, XX, XX, XX, XX, XX = load_daily_data(1) # XX imples that the output is not used
 
     println(round((time_ns() - start_1) / 1e9, digits = 3))
     global start_2 = time_ns()
@@ -58,18 +56,18 @@ function Main_stochastic_CVAR_OSS(CB_Is,  S_method, samples_in)
     end_day = length(OOS_numbers)
 
 
-    for Day in OOS_numbers
+    Threads.@threads for Day in OOS_numbers
         println("day is $Day")
 
         global start_2 = time_ns()
         ###### intialize all daily data, so it's loaded ######
-        load_daily_data(Day)
+        XX, XX, XX, XX, XX, La_do_r, La_up_r, Ac_do_M_r, Ac_up_M_r, total_flex_do_r, total_flex_up_r, res_20_r = load_daily_data(Day)
         println("daily data took")
 
 
 
         ###### Simulate day of operation on realized data ######
-        obj, pen, missing_delivery_storer[Day,:], missing_capacity_storer[Day,:], missing_capacity_storer_per[Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,1], Up_bids_A[:,1], La_do_r, La_up_r)
+        obj, pen, missing_delivery_storer[Day,:], missing_capacity_storer[Day,:], missing_capacity_storer_per[Day,:, :] = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,1], Up_bids_A[:,1], La_do_r, La_up_r)
 
         # update results:
         Total_flex_up[:, Day]   = total_flex_up_r

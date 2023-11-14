@@ -14,7 +14,7 @@
 # M_C:              The % of the time the entire bid were not available - up and down [2]
 # M_A:              How much of the activation were not meet - up and down [2]
 
-function operation(Total_flex_up, Total_flex_do, res_20, ac_do_m, ac_up_m, C_do, C_up, La_do, La_up)
+function operation(Total_flex_up, Total_flex_do, res_20_r, ac_do_m, ac_up_m, C_do, C_up, La_do, La_up)
 
 
     M_d = 1440
@@ -36,7 +36,7 @@ function operation(Total_flex_up, Total_flex_do, res_20, ac_do_m, ac_up_m, C_do,
             Missing_capacity_storer[m,2] = 1
             Missing_capacity_storer_per[m,2] = (( C_up[m]+C_do[m]*0.2)-Total_flex_up[m])/( C_up[m]+C_do[m]*0.2)
         end
-        if res_20_r[m]*60 < C_do[m]
+        if res_20_r[m] < C_do[m]
             Missing_capacity_storer[m,3] = 1
             Missing_capacity_storer_per[m,3] = ((C_do[m])-res_20_r[m])/(C_do[m])
         end
