@@ -69,10 +69,9 @@ function Main_stochastic_CC_OSS_folded(CB_Is)
             La_do_r, La_up_r, Ac_do_M_r, Ac_up_M_r, total_flex_do_r, total_flex_up_r, res_20_r = load_daily_data(Day)
             println("daily data took")
             println(round((time_ns() - start_2) / 1e9, digits = 3))
-            println("the 20 minutes average is $(mean(res_20_r[1:10]))")
 
             ###### Simulate day of operation on realized data ######
-            obj, pen, missing_delivery_storer[1,Day,:], missing_capacity_storer[1,Day,:], missing_capacity_storer_per[1,Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,1], Up_bids_A[:,1], La_do_r, La_up_r)
+            obj, pen, missing_delivery_storer[1,Day,:], missing_capacity_storer[1,Day,:], missing_capacity_storer_per[1,Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,w], Up_bids_A[:,w], La_do_r, La_up_r)
 
             # update results:
             Total_flex_up[1,:, Day]   = total_flex_up_r
@@ -83,10 +82,10 @@ function Main_stochastic_CC_OSS_folded(CB_Is)
 
         end
     end
-    pr_flex_used_up[1] = round( sum( Up_bids_A )*n_days/sum(Total_flex_up[1,:,:] ), digits= 3 )  # % of upwards flexibity bid into market
-    pr_flex_used_do[1] = round( sum( Do_bids_A )*n_days/sum(Total_flex_do[1,:,:] ), digits= 3 )  # % of downwards flexibity bid into market
+    pr_flex_used_up[1] = round( (sum( Up_bids_A )*n_days)/sum(Total_flex_up[1,:,:] ), digits= 3 )  # % of upwards flexibity bid into market
+    pr_flex_used_do[1] = round( (sum( Do_bids_A )*n_days)/sum(Total_flex_do[1,:,:] ), digits= 3 )  # % of downwards flexibity bid into market
 
-    total_cap_missed[1,1] = round( (sum(missing_capacity_storer[1,:,1]))/(n_days*NF),  digits= 3 )  # % of minute where down capacity were missed
+    total_cap_missed[1,1] = round( sum(missing_capacity_storer[1,:,1])/(n_days*NF),  digits= 3 )  # % of minute where down capacity were missed
     total_cap_missed[1,2] = round( sum(missing_capacity_storer[1,:,2])/(n_days*NF) ,  digits= 3 )   # % of minute where up capacity were missed
     total_cap_missed[1,3] = round( sum(missing_capacity_storer[1,:,3])/(n_days*NF) ,  digits= 3 )   # % of minute where energy capacity were missed
     total_cap_missed[1,4] = round( sum(missing_capacity_storer[1,:,4])/(n_days*NF) ,  digits= 3 )   # % of minute where we overbid in any category
@@ -98,13 +97,13 @@ function Main_stochastic_CC_OSS_folded(CB_Is)
     total_delivery_missed[1,1] =  round( sum(missing_delivery_storer[1,:,1])/(n_days*NF) ,  digits= 3 )   # % of of down bids that could not be delivered
     total_delivery_missed[1,2] =  round( sum(missing_delivery_storer[1,:,2])/(n_days*NF) ,  digits= 3 )   # % of of up bids that could not be delivered
 
-    revenue[1] = revenue[1]/n_days*NF       # normlize it so it on a daily scale
-    penalty[1] = penalty[1]/n_days*NF       # normlize it so it on a daily scale
+    revenue[1] = revenue[1]/(n_days*NF)       # normlize it so it on a daily scale
+    penalty[1] = penalty[1]/(n_days*NF)       # normlize it so it on a daily scale
 
     println("The revenue for the entery perioed was $(revenue[1])")
     println("The Penalty would be $(penalty[1])")
 
 
     clock = round((time_ns() - start_1) / 1e9, digits = 3)
-    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer[1,:,4], C_up, C_do
+    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer[1,:,4], Up_bids_A, Do_bids_A
 end

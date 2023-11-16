@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 
 
 # Load the first CSV file
-df1 = pd.read_csv( r"C:\Users\Gustav\Documents\Thesis\Git\3. Simulations\Stochastic results\Runtime results.csv")
+df1 = pd.read_csv( r"C:\Users\Gustav\Documents\Thesis\Git\3. Simulations\Stochastic results\test 6 runtime based on q\Runtime results.csv")
 Overibid = df1.iloc[1:7, 5]*100
 rutime = df1.iloc[1:7, 13]
 
@@ -37,7 +37,7 @@ fig, ax1 = plt.subplots(figsize=(10, 6))
 
 # Plotting veribid on the primary y-axis
 ax1.plot(q, Overibid, label='Freguency of overbid', marker='o', color='b')
-ax1.set_xlabel('Value of q')
+ax1.set_xlabel('Value of δ')
 ax1.set_ylabel('Freqeuncy of overbid % in OSS', color='b')
 ax1.tick_params('y', colors='b')
 

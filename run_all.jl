@@ -1,7 +1,7 @@
 
 # run all files, so all functions are intialized
 
-global Emil = true
+global Emil = false
 
 if Emil
     base_path = "C:\\Users\\ASUS\\Documents\\11. sem - kand\\github\\Thesis\\"
@@ -24,11 +24,11 @@ include("$base_path"*"2. Algorithms\\ALSO_X_hourly.jl")
 include("$base_path"*"3. Simulations\\Plots\\Deterministic\\plot_function.jl")
 
 include("$base_path"*"4. Tests\\Reference mains\\Main_determistic.jl")
-include("$base_path"*"4. Tests\\Main_OPR.jl")
-include("$base_path"*"4. Tests\\Main_OB_MR_K_folded.jl")
-include("$base_path"*"4. Tests\\Main_OB_MR_CVAR.jl")
-include("$base_path"*"4. Tests\\Main_OB_MR.jl")
-include("$base_path"*"4. Tests\\Main__OB_MR_K_folded.jl")
+include("$base_path"*"4. Tests\\Main_OR.jl")
+include("$base_path"*"4. Tests\\Main_MR_K_folded.jl")
+include("$base_path"*"4. Tests\\Main_MR_CVAR.jl")
+include("$base_path"*"4. Tests\\Main_MR.jl")
+include("$base_path"*"4. Tests\\Main_MR_K_folded_CVAR.jl")
 
 include("$base_path"*"7. Helper functions\\Non main function\\baseline_atering.jl")
 include("$base_path"*"7. Helper functions\\Non main function\\scenario_generation.jl")
