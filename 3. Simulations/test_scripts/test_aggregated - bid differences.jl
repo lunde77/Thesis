@@ -2,7 +2,7 @@ using CSV
 using DataFrames
 using Random
 
-global Emil = false
+global Emil = true
 
 if Emil
     base_path = "C:\\Users\\ASUS\\Documents\\11. sem - kand\\github\\Thesis\\"
@@ -45,9 +45,9 @@ for i=1:25
 
     global results[i,1], results[i,2], results[i,3:6], results[i,7:9], results[i,10:11], results[i,12], results[i,13], results[i,14], results[i,15], Overbid_distribution_out[:,i], Upwards_bids[:,i], Downwards_bids[:,i] = Main_stochastic_CC_OSS(CB_Is, 3, 162)
 
-    results_df = DataFrame(Upwards_bids, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Upwards_bids.csv", results_df)
+    results_df1 = DataFrame(Upwards_bids, :auto)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Upwards_bids.csv", results_df1)
 
-    results_df = DataFrame(Downwards_bids, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Downwards_bids.csv", results_df)
+    results_df2 = DataFrame(Downwards_bids, :auto)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Downwards_bids.csv", results_df2)
 end
