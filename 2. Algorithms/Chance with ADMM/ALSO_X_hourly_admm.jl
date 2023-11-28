@@ -1,10 +1,10 @@
 function ALSO_X_admm(total_flex_up_s, total_flex_do_s, res_20_s, Y_else, Y_zeros, lambda, gamma, t)
-    global start_also = time_ns()
+    start_also = time_ns()
 
     C_do_all = zeros(1)
     C_up_all = zeros(1)
-    Y_sum = 0
-    y_counter = 0
+    Y_sum = zeros(1)
+    Y_counter = zeros(1)
 
 
     println("hour is $t")
@@ -26,7 +26,7 @@ function ALSO_X_admm(total_flex_up_s, total_flex_do_s, res_20_s, Y_else, Y_zeros
     C_do_s = zeros(100)
     C_up_s = zeros(100)
 
-    while (-q_L+q_H) > 0.01  && counter < 20
+    while (-q_L+q_H) > 0.01  && counter < 100
         println(counter)
         println(counter)
 
@@ -39,12 +39,11 @@ function ALSO_X_admm(total_flex_up_s, total_flex_do_s, res_20_s, Y_else, Y_zeros
         C_do_s[counter] = deepcopy(C_do_m)
         C_up_s[counter] = deepcopy(C_up_m)
 
+        Y_counter[1] = count(x -> x <= 0.001, y)
 
-        Y_counter = count(x -> x == 0, y) + Y_zeros
+        Y_sum[1] = sum(y)
 
-        Y_sum = sum(y)
-
-        if Y_counter >= (1-fail_rate)*M_d*S
+        if Y_counter[1]+Y_zeros[1] >= (1-fail_rate)*M_d*S
             q_L = q
         else
             q_H = q
@@ -53,8 +52,6 @@ function ALSO_X_admm(total_flex_up_s, total_flex_do_s, res_20_s, Y_else, Y_zeros
         q_H_counter[counter] = q_H
 
         counter = counter + 1
-        println(C_do_m)
-        println(C_do_m)
         C_do_all[1] = C_do_m
         C_up_all[1] = C_up_m
     end
@@ -62,6 +59,5 @@ function ALSO_X_admm(total_flex_up_s, total_flex_do_s, res_20_s, Y_else, Y_zeros
 
 
     model_runtime = round((time_ns() - start_also) / 1e9, digits = 3)
-
-    return C_do_all[1], C_up_all[1], Y_sum, y_counter
+    return C_do_all[1], C_up_all[1], Y_sum[1], Y_counter[1], model_runtime
 end

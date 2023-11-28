@@ -45,27 +45,30 @@ function Stochastic_chancer_model_hourly_CVAR(total_flex_do, total_flex_up, tota
    @variable(Mo, 0 <= C_up)                    # Chosen Upwards bid
 
    # CVaR related variables
-   @variable(Mo, zeta[1:M,1:S])                           # zeta
-   @variable(Mo, 0 >= beta[1:M])                  # eta
+   @variable(Mo, zeta[1:M,1:S])                   # zeta
+   @variable(Mo, 0 >= beta)                    # eta
 
 
    # Objetives
    @variable(Mo, Capacity)                              # Total  capacity
-
-   # Binary relaxed varible
-   @variable(Mo, 0 <= Y[m=1:M,s=1:S] )            # Binary varibles chosing when to overbid downwards flexibity
 
    ### Obejective ###
    @objective(Mo, Max,  Capacity ) ###
 
    # summerizing constraints
    @constraint(Mo, Capacity == C_do+C_up )
-   # CVaR
+   ## CVaR
    @constraint(Mo, [m=1:M, s=1:S],  C_do-total_flex_do[m,s]   <=  zeta[m,s] )
    @constraint(Mo, [m=1:M, s=1:S],  C_do*0.2+C_up-total_flex_up[m,s]  <=  zeta[m,s] )
    @constraint(Mo, [m=1:M, s=1:S],  C_do-total_res_20[m,s]   <=  zeta[m,s] )
    @constraint(Mo, [m=1:M], sum(zeta[m,s] for s=1:S)*Pi-(1-alpha)*beta[m] <= 0 )
    @constraint(Mo, [m=1:M, s=1:S], zeta[m,s]  >= beta[m] )
+
+   #@constraint(Mo, [m=1:M, s=1:S],  C_do-total_flex_do[m,s]   <=  zeta[m,s] )
+   #@constraint(Mo, [m=1:M, s=1:S],  C_do*0.2+C_up-total_flex_up[m,s]  <=  zeta[m,s] )
+   #@constraint(Mo, [m=1:M, s=1:S],  C_do-total_res_20[m,s]   <=  zeta[m,s] )
+   #@constraint(Mo, sum(zeta[m,s] for s=1:S, m=1:M)*Pi-(1-alpha)*beta <= 0 )
+   #@constraint(Mo, [m=1:M, s=1:S], zeta[m,s]  >= beta )
 
    #************************************************************************
    # Solve

@@ -11,7 +11,7 @@ else
 
 end
 
-TE = 2
+TE = 10
 
 results = zeros(TE,15)
 Overbid_distribution = zeros(365,TE)
@@ -54,18 +54,22 @@ for i=2:25
     CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Bid_difference_2damm.csv", results_df2)
 =======
 for i=1:1
-    CB_Is = collect(1:250)
+    CB_Is = collect(1:250*i)
     global start = time_ns()
 
-    global results[i,1], results[i,2], results[i,3:6], results[i,7:9], results[i,10:11], results[i,12], results[i,13], results[i,14], results[i,15], overbidder, Overbid_distribution[:,i], Upwards_bids[:,i], Downwards_bids[:,i] = Main_stochastic_CVAR_OSS(CB_Is, 2, 162)
-    global results[i+1,1], results[i+1,2], results[i+1,3:6], results[i+1,7:9], results[i+1,10:11], results[i+1,12], results[i+1,13], results[i+1,14], results[i+1,15], overbidder, Overbid_distribution[:,i+1], Upwards_bids[:,i+1], Downwards_bids[:,i+1] = Main_stochastic_CC_OSS(CB_Is, 2, 162, 0.0001)
+    global results[i,1], results[i,2], results[i,3:6], results[i,7:9], results[i,10:11], results[i,12], results[i,13], results[i,14], results[i,15], Overbid_distribution[:,i], Upwards_bids[:,i], Downwards_bids[:,i] = Main_stochastic_CC_OSS_folded(CB_Is)
+    global results[i+5,1], results[i+5,2], results[i+5,3:6], results[i+5,7:9], results[i+5,10:11], results[i+5,12], results[i+5,13], results[i+5,14], results[i+5,15], Overbid_distribution[:,i+5], Upwards_bids[:,i+5], Downwards_bids[:,i+5] = Main_stochastic_CVAR_OSS_folded(CB_Is)
 
     results_df = DataFrame(results, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\CVaR VS ALSO-X generel results.csv", results_df)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\CVaR VS ALSO-X generel results2.csv", results_df)
 
     results_df = DataFrame(Overbid_distribution, :auto)
+<<<<<<< HEAD
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\CVaR VS ALSO-X overbid_distribution2.csv", results_df)
+=======
     CSV.write("$base_path"*"3. Simulations\\Stochastic results\\CVaR VS ALSO-X overbid_distribution.csv", results_df)
 >>>>>>> f7d7bf97232319fd0e7d80f1416f6b1e54baf191:3. Simulations/test_scripts/test finished/test_aggregated - Distribution of CVaR and ALSO-X.jl
+>>>>>>> 33fbb0ac395e4e927727969354dd286c5f99be6a
 end
 
 

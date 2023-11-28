@@ -11,13 +11,12 @@
 # model_runtime: How long is takes solve the model (stochastig model)
 # clock: Total runtime for the entery sumlation
 
-function Main_stochastic_CC_OSS(CB_Is, S_method, samples_in)
+function Main_stochastic_CC_OSS(CB_Is, S_method, samples_in, model_res)
 
     # Static Parameters
     global test_type = "T2"
     global T = 24 # hours on a day
     global M = 60 # minutes in an hour
-    global S = 162
     global M_d = T*M # minutes per model, i.e. per day
     global Pen_e_coef = 3 # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
     global Days = 365
@@ -36,22 +35,27 @@ function Main_stochastic_CC_OSS(CB_Is, S_method, samples_in)
     Load_aggregated(CB_Is)
 
     ###### intialize all daily data, so it's loaded - yet here is just to get the samples ######
-    total_flex_do_s, total_flex_up_s, res_20_s, OOS_numbers, sampled_numbers, XX, XX, XX, XX, XX, XX, XX = load_daily_data(1) # XX imples that the output is not used
+    total_flex_do_s, total_flex_up_s, res_20_s, OOS_numbers, sampled_numbers = load_sampling_data(1,0, "XX")# XX imples that the output is not used
 
     ###### solve the model in a decomposed matter, and by appliying the Also-x method ######
-    global C_do, C_up, model_runtime = ALSO_X(total_flex_up_s, total_flex_do_s, res_20_s)
+    if model_res == "hourly"
+        C_do, C_up, model_runtime = ALSO_X_hourly(total_flex_up_s, total_flex_do_s, res_20_s)
+    elseif model_res == "daily"
+        C_do, C_up, model_runtime = ALSO_X_daily(total_flex_up_s, total_flex_do_s, res_20_s)
+    end
+
 
     for t=1:24
         for m=1:60
-            global Do_bids_A[(t-1)*60+m,1] = C_do[t]
-            global Up_bids_A[(t-1)*60+m,1] = C_up[t]
+            Do_bids_A[(t-1)*60+m,1] = C_do[t]
+            Up_bids_A[(t-1)*60+m,1] = C_up[t]
         end
     end
 
     ### run test on the sample days
     println(sampled_numbers)
     println(OOS_numbers)
-    for i=1:0
+    for i=1:1 # set to only loop to one, as we only want OOS results for now
         if i == 1
             test_days = OOS_numbers
         else # we test in sample days
@@ -66,7 +70,7 @@ function Main_stochastic_CC_OSS(CB_Is, S_method, samples_in)
             start_2 = time_ns()
 
             ###### intialize all daily data, so it's loaded ######
-            XX, XX, XX, XX, XX, La_do_r, La_up_r, Ac_do_M_r, Ac_up_M_r, total_flex_do_r, total_flex_up_r, res_20_r = load_daily_data(Day)
+            La_do_r, La_up_r, Ac_do_M_r, Ac_up_M_r, total_flex_do_r, total_flex_up_r, res_20_r = load_daily_data(Day)
             println("daily data took")
             println(round((time_ns() - start_2) / 1e9, digits = 3))
             println("the 20 minutes average is $(mean(res_20_r[1:10]))")
@@ -106,5 +110,5 @@ function Main_stochastic_CC_OSS(CB_Is, S_method, samples_in)
     end
 
     clock = round((time_ns() - start_1) / 1e9, digits = 3)
-    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer[1,:,4], C_up, C_do, revenue[2], penalty[2], total_cap_missed[2,:], average_cap_missed[2,:], total_delivery_missed[2,:], pr_flex_used_up[2], pr_flex_used_do[2], model_runtime, clock, missing_capacity_storer[2,:,4]
+    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer[1,:,4], Up_bids_A[:,1], Do_bids_A[:,1], total_flex_up_s, total_flex_do_s, res_20_s, revenue[2], penalty[2], total_cap_missed[2,:], average_cap_missed[2,:], total_delivery_missed[2,:], pr_flex_used_up[2], pr_flex_used_do[2], model_runtime, clock, missing_capacity_storer[2,:,4]
 end
