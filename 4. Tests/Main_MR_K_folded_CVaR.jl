@@ -11,7 +11,7 @@
 # model_runtime: How long is takes solve the model (stochastig model)
 # clock: Total runtime for the entery sumlation
 
-function Main_stochastic_CVAR_OSS_folded(CB_Is)
+function Main_stochastic_CVAR_OSS_folded(CB_Is, model_res)
 
     # Static Parameters
     global NF = 5                                           # Number of folds
@@ -24,7 +24,7 @@ function Main_stochastic_CVAR_OSS_folded(CB_Is)
     global Days = 365
     global I = size(CB_Is)[1]
     global RM = 0.9                                         # %-end SoC assumed, e.g. 0.9 means we assume all charges charge to 90%
-    global Sampling = 4
+    global Sampling = 5
     global q_epilon = 0.0001
     global start_1 = time_ns()
 
@@ -56,8 +56,17 @@ function Main_stochastic_CVAR_OSS_folded(CB_Is)
         global start_2 = time_ns()
         global C_do = zeros(24)
         global C_up = zeros(24)
+
+        if model_res == "hourly"
+            for t=1:24
+                C_do[t], C_up[t] = Stochastic_chancer_model_hourly_CVAR(total_flex_do_s[t,:,:], total_flex_up_s[t,:,:], res_20_s[t,:,:])
+            end
+        elseif model_res == "daily"
+            C_do, C_up = Stochastic_chancer_model_daily_CVAR(total_flex_do_s, total_flex_up_s, res_20_s)
+        end
+
+
         for t=1:24
-            C_do[t], C_up[t] = Stochastic_chancer_model_hourly_CVAR(total_flex_do_s[t,:,:], total_flex_up_s[t,:,:], res_20_s[t,:,:])
             for m=1:60
                 global Do_bids_A[(t-1)*60+m,w] = C_do[t]
                 global Up_bids_A[(t-1)*60+m,w] = C_up[t]
@@ -112,5 +121,5 @@ function Main_stochastic_CVAR_OSS_folded(CB_Is)
 
 
     clock = round((time_ns() - start_1) / 1e9, digits = 3)
-    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer[1,:,4], Up_bids_A, Do_bids_A
+    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer_per[1,:,:,:], missing_capacity_storer[1,:,4], Up_bids_A[:,1:NF], Do_bids_A[:,1:NF]
 end

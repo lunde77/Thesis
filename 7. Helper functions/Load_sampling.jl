@@ -1,6 +1,6 @@
 using Random
 # all data is made gloabl, so It can be used in the mail
-function load_sampling_data(Day,sampled_numbers)
+function load_sampling_data(Day,sampled_numbers,d_in)
 
     ###### Initialize the samples for the given bid ######
 
@@ -96,7 +96,6 @@ function load_sampling_data(Day,sampled_numbers)
             sampled_numbers = sampled_numbers_tester[1:num_samples]
             OOS_numbers = sampled_numbers_tester[366-N_OSS:end]
         end
-
         # draw samples, all samplesa re drawn form the same random days
         for t=1:24
             for m=1:60
@@ -105,15 +104,36 @@ function load_sampling_data(Day,sampled_numbers)
                 res_20_s[t,m,:] = dis[3,sampled_numbers,t,m]
             end
         end
+    elseif Sampling == 4  # it is assmumed the K-folded OOS, with minut to minute correalted sampling, and we test based on which day we're on
+        if d_in == "W"
+            common_elements = intersect(sampled_numbers, D_w)
+        elseif d_in == "S"
+            common_elements = intersect(sampled_numbers, D_s)
+        end
+        sampled_days = Vector{Float64}()
+        for j=1:size(sampled_numbers)[1]
+            push!(sampled_days, Int16(rand(common_elements)))
+        end
+
+        for j=1:size(sampled_numbers)[1]
+            for t=1:24
+                for m=1:60
+                    total_flex_do_s[t,m,j] = dis[1,Int16(sampled_days[j]),t,m]
+                    total_flex_up_s[t,m,j] = dis[2,Int16(sampled_days[j]),t,m]
+                    res_20_s[t,m,j] = dis[3,Int16(sampled_days[j]),t,m]
+                end
+            end
+        end
+        OOS_numbers = 0
     else  # if not sampling methods is sated, it is assmumed the K-folded OOS, with minut to minute correalted sampling
         for t=1:24
             for m=1:60
                 total_flex_do_s[t,m,:] = dis[1,sampled_numbers,t,m]
                 total_flex_up_s[t,m,:] = dis[2,sampled_numbers,t,m]
                 res_20_s[t,m,:] = dis[3,sampled_numbers,t,m]
-                OOS_numbers = 0
             end
         end
+        OOS_numbers = 0
     end
 
     return total_flex_do_s, total_flex_up_s, res_20_s, OOS_numbers, sampled_numbers

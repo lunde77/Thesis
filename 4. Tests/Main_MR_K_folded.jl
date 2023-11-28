@@ -11,7 +11,7 @@
 # model_runtime: How long is takes solve the model (stochastig model)
 # clock: Total runtime for the entery sumlation
 
-function Main_stochastic_CC_OSS_folded(CB_Is)
+function Main_stochastic_CC_OSS_folded(CB_Is, model_res)
 
     # Static Parameters
     global NF = 5                                           # Number of folds
@@ -40,21 +40,28 @@ function Main_stochastic_CC_OSS_folded(CB_Is)
     sampled_numbers, OOS_days =  make_folds(NF)
 
     ### run test on the sample days
-    println(sampled_numbers)
-    println(OOS_days)
-
     for w=1:NF
         i = 1
-        ###### intialize sampling data, so it's loaded ######
-        total_flex_do_s, total_flex_up_s, res_20_s, xxxx, xxxx = load_sampling_data(1, sampled_numbers[w,:]) # XX imples that the output is not used
 
-        ###### solve the model in a decomposed matter, and by appliying the Also-x method ######
-        global C_do, C_up, model_runtime = ALSO_X(total_flex_up_s, total_flex_do_s, res_20_s)
+        for i=1:2
+            ###### intialize sampling data, so it's loaded ######
+            if i==1 # load samples for weekdays
+                total_flex_do_s, total_flex_up_s, res_20_s, xxxx, xxxx = load_sampling_data(1, sampled_numbers[w,:], "W") # XX imples that the output is not used
+            else    # load samples for weekendays
+                total_flex_do_s, total_flex_up_s, res_20_s, xxxx, xxxx = load_sampling_data(1, sampled_numbers[w,:], "S") # XX imples that the output is not used
+            end
+            ###### solve the model in a decomposed matter, and by appliying the Also-x method ######
+            if model_res == "hourly"
+                global C_do, C_up, model_runtime = ALSO_X_hourly(total_flex_up_s, total_flex_do_s, res_20_s)
+            elseif model_res == "daily"
+                global C_do, C_up, model_runtime = ALSO_X_daily(total_flex_up_s, total_flex_do_s, res_20_s)
+            end
 
-        for t=1:24
-            for m=1:60
-                global Do_bids_A[(t-1)*60+m,w] = C_do[t]
-                global Up_bids_A[(t-1)*60+m,w] = C_up[t]
+            for t=1:24
+                for m=1:60
+                    global Do_bids_A[(t-1)*60+m,w+(i-1)*NF] = C_do[t]
+                    global Up_bids_A[(t-1)*60+m,w+(i-1)*NF] = C_up[t]
+                end
             end
         end
         global n_days = Int32(floor(365/NF) )
@@ -62,6 +69,12 @@ function Main_stochastic_CC_OSS_folded(CB_Is)
         Threads.@threads for j=1:n_days
             Day = OOS_days[w,j]
             println("day is $Day")
+            if Day ∈ D_w
+                b =  w
+            else
+                b = w+NF
+            end
+
 
             start_2 = time_ns()
 
@@ -71,7 +84,7 @@ function Main_stochastic_CC_OSS_folded(CB_Is)
             println(round((time_ns() - start_2) / 1e9, digits = 3))
 
             ###### Simulate day of operation on realized data ######
-            obj, pen, missing_delivery_storer[1,Day,:], missing_capacity_storer[1,Day,:], missing_capacity_storer_per[1,Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,w], Up_bids_A[:,w], La_do_r, La_up_r)
+            obj, pen, missing_delivery_storer[1,Day,:], missing_capacity_storer[1,Day,:], missing_capacity_storer_per[1,Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,b], Up_bids_A[:,b], La_do_r, La_up_r)
 
             # update results:
             Total_flex_up[1,:, Day]   = total_flex_up_r
@@ -105,5 +118,5 @@ function Main_stochastic_CC_OSS_folded(CB_Is)
 
 
     clock = round((time_ns() - start_1) / 1e9, digits = 3)
-    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer[1,:,4], Up_bids_A, Do_bids_A
+    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer_per[1,:,:,:], missing_capacity_storer[1,:,4], Up_bids_A[:,1:NF*2], Do_bids_A[:,1:NF*2]
 end

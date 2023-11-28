@@ -1,4 +1,4 @@
-function ALSO_X(total_flex_up_s, total_flex_do_s, res_20_s)
+function ALSO_X_hourly(total_flex_up_s, total_flex_do_s, res_20_s)
     global start_also = time_ns()
 
     C_do_all = zeros(24)
@@ -37,9 +37,9 @@ function ALSO_X(total_flex_up_s, total_flex_do_s, res_20_s)
             C_up_s[counter] = deepcopy(C_up_m)
 
 
-            Y_counter_up = count(x -> x == 0, y)
+            Y_counter = count(x -> x == 0, y)
 
-            if Y_counter_up >= (1-fail_rate)*M*S
+            if Y_counter >= (1-fail_rate)*M*S
                 q_L = q
             else
                 q_H = q

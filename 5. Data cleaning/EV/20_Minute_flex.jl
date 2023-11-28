@@ -2,7 +2,7 @@
 println("I'm starting now")
 
 
-for i=1:500
+for i=1:1420
     if i==1
         global large_matrix_total = zeros(1440*365,20)
         global aggregated = collect(10:10:500)

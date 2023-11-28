@@ -14,12 +14,16 @@ include("$base_path"*"1. Models\\reference models\\Deterministic.jl")
 include("$base_path"*"1. Models\\reference models\\Stochastic.jl")
 include("$base_path"*"1. Models\\reference models\\Stochastic_with_penalty.jl")
 include("$base_path"*"1. Models\\Stochastic_only_model_hourly _CVAR.jl")
+include("$base_path"*"1. Models\\Stochastic_only_model_daily _CVAR.jl")
 include("$base_path"*"1. Models\\Stochastic_only_model_hourly.jl")
 include("$base_path"*"1. Models\\Stochastic_only_solver_hourly.jl")
+include("$base_path"*"1. Models\\Stochastic_only_model_daily.jl")
+include("$base_path"*"1. Models\\Stochastic_only_solver_daily.jl")
 
 include("$base_path"*"2. Algorithms\\reference algorithms\\Day_simulater_with_energy.jl")
 include("$base_path"*"2. Algorithms\\Day_simulater_without_energy.jl")
 include("$base_path"*"2. Algorithms\\ALSO_X_hourly.jl")
+include("$base_path"*"2. Algorithms\\ALSO_X_daily.jl")
 
 include("$base_path"*"3. Simulations\\Plots\\Deterministic\\plot_function.jl")
 
