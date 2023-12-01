@@ -52,8 +52,6 @@ function Stochastic_chancer_model_daily_CVAR(total_flex_do, total_flex_up, total
    # Objetives
    @variable(Mo, Capacity)                              # Total  capacity
 
-   # Binary relaxed varible
-   @variable(Mo, 0 <= Y[t=1:T,m=1:M,s=1:S] )            # Binary varibles chosing when to overbid downwards flexibity
 
    ### Obejective ###
    @objective(Mo, Max,  Capacity ) ###
@@ -87,7 +85,7 @@ function Stochastic_chancer_model_daily_CVAR(total_flex_do, total_flex_up, total
       println("No optimal solution available")
    end
    #************************************************************************
-   global zeta_v = value.(zeta)
-   global beta_v = value.(beta)
+   #global zeta_v = value.(zeta)
+   #global beta_v = value.(beta)
    return value.(C_do), value.(C_up)
 end

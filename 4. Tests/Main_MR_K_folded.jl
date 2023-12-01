@@ -18,13 +18,13 @@ function Main_stochastic_CC_OSS_folded(CB_Is, model_res)
     global test_type = "T2"
     global T = 24                                           # hours on a day
     global M = 60                                           # minutes in an hour
-    global S = Int32(floor(365/NF) )*4                      # number of samples in IS
+    global S = 202                                          # number of samples in IS
     global M_d = T*M                                        # minutes per model, i.e. per day
     global Pen_e_coef = 3                                   # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
     global Days = 365
     global I = size(CB_Is)[1]
     global RM = 0.9                                         # %-end SoC assumed, e.g. 0.9 means we assume all charges charge to 90%
-    global Sampling = 4
+    global Sampling = 5
     global q_epilon = 0.0001
     global start_1 = time_ns()
 
@@ -118,5 +118,5 @@ function Main_stochastic_CC_OSS_folded(CB_Is, model_res)
 
 
     clock = round((time_ns() - start_1) / 1e9, digits = 3)
-    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer_per[1,:,:,:], missing_capacity_storer[1,:,4], Up_bids_A[:,1:NF*2], Do_bids_A[:,1:NF*2]
+    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer[1,:,4], Up_bids_A[:,1:NF*2], Do_bids_A[:,1:NF*2]
 end

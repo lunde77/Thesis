@@ -128,9 +128,10 @@ function load_sampling_data(Day,sampled_numbers,d_in)
     else  # if not sampling methods is sated, it is assmumed the K-folded OOS, with minut to minute correalted sampling
         for t=1:24
             for m=1:60
-                total_flex_do_s[t,m,:] = dis[1,sampled_numbers,t,m]
-                total_flex_up_s[t,m,:] = dis[2,sampled_numbers,t,m]
-                res_20_s[t,m,:] = dis[3,sampled_numbers,t,m]
+                shuffled_numbers = shuffle(sampled_numbers)
+                total_flex_do_s[t,m,:] = dis[1,shuffled_numbers[1:202],t,m]
+                total_flex_up_s[t,m,:] = dis[2,shuffled_numbers[1:202],t,m]
+                res_20_s[t,m,:] = dis[3,shuffled_numbers[1:202],t,m]
             end
         end
         OOS_numbers = 0

@@ -32,7 +32,7 @@ function Stochastic_chancer_model_hourly_CVAR(total_flex_do, total_flex_up, tota
    # Static Parameters
    M = 60 # minutes in an hour
    T = 24
-   Pi = 1/S
+   Pi = 1/(S*M)
    epsilon = 0.001                 # helper, so demominator won't become zero
    alpha = 0.1
 
@@ -58,17 +58,17 @@ function Stochastic_chancer_model_hourly_CVAR(total_flex_do, total_flex_up, tota
    # summerizing constraints
    @constraint(Mo, Capacity == C_do+C_up )
    ## CVaR
-   @constraint(Mo, [m=1:M, s=1:S],  C_do-total_flex_do[m,s]   <=  zeta[m,s] )
-   @constraint(Mo, [m=1:M, s=1:S],  C_do*0.2+C_up-total_flex_up[m,s]  <=  zeta[m,s] )
-   @constraint(Mo, [m=1:M, s=1:S],  C_do-total_res_20[m,s]   <=  zeta[m,s] )
-   @constraint(Mo, [m=1:M], sum(zeta[m,s] for s=1:S)*Pi-(1-alpha)*beta[m] <= 0 )
-   @constraint(Mo, [m=1:M, s=1:S], zeta[m,s]  >= beta[m] )
-
    #@constraint(Mo, [m=1:M, s=1:S],  C_do-total_flex_do[m,s]   <=  zeta[m,s] )
    #@constraint(Mo, [m=1:M, s=1:S],  C_do*0.2+C_up-total_flex_up[m,s]  <=  zeta[m,s] )
    #@constraint(Mo, [m=1:M, s=1:S],  C_do-total_res_20[m,s]   <=  zeta[m,s] )
-   #@constraint(Mo, sum(zeta[m,s] for s=1:S, m=1:M)*Pi-(1-alpha)*beta <= 0 )
-   #@constraint(Mo, [m=1:M, s=1:S], zeta[m,s]  >= beta )
+   #@constraint(Mo, [m=1:M], sum(zeta[m,s] for s=1:S)*Pi-(1-alpha)*beta[m] <= 0 )
+   #@constraint(Mo, [m=1:M, s=1:S], zeta[m,s]  >= beta[m] )
+
+   @constraint(Mo, [m=1:M, s=1:S],  C_do-total_flex_do[m,s]   <=  zeta[m,s] )
+   @constraint(Mo, [m=1:M, s=1:S],  C_do*0.2+C_up-total_flex_up[m,s]  <=  zeta[m,s] )
+   @constraint(Mo, [m=1:M, s=1:S],  C_do-total_res_20[m,s]   <=  zeta[m,s] )
+   @constraint(Mo, sum(zeta[m,s] for s=1:S, m=1:M)*Pi-(1-alpha)*beta <= 0 )
+   @constraint(Mo, [m=1:M, s=1:S], zeta[m,s]  >= beta )
 
    #************************************************************************
    # Solve

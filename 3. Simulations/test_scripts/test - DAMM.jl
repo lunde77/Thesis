@@ -45,14 +45,14 @@ for i=1:1
 
     global results[i,1], results[i,2], results[i,3:6], results[i,7:9], results[i,10:11], results[i,12], results[i,13], results[i,14], results[i,15], Overbid_distribution_out[:,i], Upwards_bids[:,1:5], Downwards_bids[:,1:5] = Main_stochastic_CVAR_OSS_folded(CB_Is, "hourly")  # actually minute to minute
 
-    global results[i+1,1], results[i+1,2], results[i+1,3:6], results[i+1,7:9], results[i+1,10:11], results[i+1,12], results[i+1,13], results[i+1,14], results[i+1,15], Overbid_distribution_out[:,i+1], Upwards_bids[:,6:10], Downwards_bids[:,6:10] = Main_stochastic_CVAR_OSS_folded(CB_Is, "daily")  # actually minute to minute
+    #global results[i+1,1], results[i+1,2], results[i+1,3:6], results[i+1,7:9], results[i+1,10:11], results[i+1,12], results[i+1,13], results[i+1,14], results[i+1,15], Overbid_distribution_out[:,i+1], Upwards_bids[:,6:10], Downwards_bids[:,6:10] = Main_stochastic_CVAR_OSS_folded(CB_Is, "daily")  # actually minute to minute
 
     results_df = DataFrame(results, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Results_CVaR.csv", results_df)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Results_CVaR_h2.csv", results_df)
 
     results_df = DataFrame(Upwards_bids, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Upwards_bids_CVaR.csv", results_df)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Upwards_bids_CVaR_h2.csv", results_df)
 
     results_df = DataFrame(Downwards_bids, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Downwards_bids_CVaR.csv", results_df)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Downwards_bids_CVaR_h2.csv", results_df)
 end
