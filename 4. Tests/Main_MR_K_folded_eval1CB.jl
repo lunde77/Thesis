@@ -24,7 +24,7 @@ function Main_stochastic_CC_OSS_folded_one(CB_Is, model_res)
     global Days = 365
     global I = size(CB_Is)[1]
     global RM = 0.9                                         # %-end SoC assumed, e.g. 0.9 means we assume all charges charge to 90%
-    global Sampling = 4
+    global Sampling = 5
     global q_epilon = 0.0001
     global start_1 = time_ns()
 
@@ -89,8 +89,8 @@ function Main_stochastic_CC_OSS_folded_one(CB_Is, model_res)
 
             for t=1:24
                 for m=1:60
-                    CB_flex_bid[1, 60*(t-1)+m, Day] =  Up_bids_A[60*(t-1)+m, w]/total_flex_do_r[60*(t-1)+m]*Upwards_flex_CB1[(Day-1)*1440)+60*(t-1)+m]/total_flex_up_r[60*(t-1)+m]
-                    CB_flex_bid[2, 60*(t-1)+m, Day] =  Do_bids_A[60*(t-1)+m, w]/total_flex_do_r[60*(t-1)+m]*Downwards_flex_CB1[(Day-1)*1440)+60*(t-1)+m]/total_flex_do_r[60*(t-1)+m]
+                    CB_flex_bid[1, 60*(t-1)+m, Day] =  Up_bids_A[60*(t-1)+m, w]/total_flex_do_r[60*(t-1)+m]*Upwards_flex_CB1[(Day-1)*1440+60*(t-1)+m]/total_flex_up_r[60*(t-1)+m]
+                    CB_flex_bid[2, 60*(t-1)+m, Day] =  Do_bids_A[60*(t-1)+m, w]/total_flex_do_r[60*(t-1)+m]*Downwards_flex_CB1[(Day-1)*1440+60*(t-1)+m]/total_flex_do_r[60*(t-1)+m]
                 end
             end
 
@@ -127,5 +127,5 @@ function Main_stochastic_CC_OSS_folded_one(CB_Is, model_res)
 
 
     clock = round((time_ns() - start_1) / 1e9, digits = 3)
-    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer_per[1,:,:,:], missing_capacity_storer[1,:,4], Up_bids_A[:,1:NF*2], Do_bids_A[:,1:NF*2]
+    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer_per[1,:,:,:], missing_capacity_storer[1,:,4], Up_bids_A[:,1:NF*2], Do_bids_A[:,1:NF*2], mean(CB_flex_bid[1,:,:]), mean(CB_flex_bid[2,:,:])
 end

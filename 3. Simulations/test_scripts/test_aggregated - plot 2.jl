@@ -34,31 +34,35 @@ end
 global N_size = [1400, 700, 350, 200, 140, 100, 56, 35, 20, 10]
 global N_bundles   = [1, 2, 4, 6, 10, 14, 25, 40, 70, 140]
 
-for x=1:10
-    TE = N_bundles[x]
-
-    results = zeros(TE,15)
-    Overbid_distribution = zeros(365,TE)
-    Upwards_bids = zeros(1440,TE*5)
-    Downwards_bids = zeros(1440,TE*5)
-
-    for q=1:TE
-        CB_Is = collect((q-1)*N_size[x]+1:q*N_size[x])
+TE = 1
+results = zeros(TE,15)
+results_CB_1 = zeros(TE,2)
+Overbid_distribution = zeros(365,TE)
+Upwards_bids = zeros(1440,TE*5)
+Downwards_bids = zeros(1440,TE*5)
 
 
-        global results[q,1], results[q,2], results[q,3:6], results[q,7:9], results[q,10:11], results[q,12], results[q,13], results[q,14], results[q,15], Overbid_distribution[:,q], Upwards_bids[:,(q-1)*5+1:q*5], Downwards_bids[:,(q-1)*5+1:q*5] = Main_stochastic_CC_OSS_folded(CB_Is, "hourly")
+for q=1:TE
+    CB_Is = collect(1:500)
 
-        results_df = DataFrame(results, :auto)
-        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\results_N_bundles_$(N_bundles[x]).csv", results_df)
 
-        results_df = DataFrame(Overbid_distribution, :auto)
-        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Overbid_distribution_N_bundles_$(N_bundles[x]).csv", results_df)
+    global results[q,1], results[q,2], results[q,3:6], results[q,7:9], results[q,10:11], results[q,12], results[q,13], results[q,14], results[q,15], Overbid_distribution[:,q], Upwards_bids[:,(q-1)*5+1:q*5], Downwards_bids[:,(q-1)*5+1:q*5], results_CB_1[q,1], results_CB_1[q,2]  = Main_stochastic_CC_OSS_folded_one(CB_Is, "hourly")
 
-        results_df = DataFrame(Upwards_bids, :auto)
-        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Upwards_bids_N_bundles_$(Upwards_bids[x]).csv", results_df)
+    results_df = DataFrame(results, :auto)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\results_tester_1BC.csv", results_df)
 
-        results_df = DataFrame(Downwards_bids, :auto)
-        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Downwards_bids_N_bundles_$(Upwards_bids[x]).csv", results_df)
+    results_df = DataFrame(Overbid_distribution, :auto)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Overbid_distribution_tester_1BC.csv", results_df)
 
-    end
+    results_df = DataFrame(Upwards_bids, :auto)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Upwards_bids_tester_1BC.csv", results_df)
+
+    results_df = DataFrame(Downwards_bids, :auto)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Downwards_bids_tester_1BC.csv", results_df)
+
+
+    results_df = DataFrame(results_CB_1, :auto)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\1BSresultss_tester_1BC.csv", results_df)
+
+
 end
