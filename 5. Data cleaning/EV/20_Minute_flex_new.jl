@@ -16,13 +16,16 @@ dataframe_names = file_names
 # Create a dictionary to store the loaded DataFrames
 global EV_dataframes = Dict{String, DataFrame}()
 
-global large_matrix_total = zeros(1440*365,20)
-global aggregated = collect(10:10:500)
-global num_files_to_load = 1420
-global M_d = 1440
-global Days = 365
 
-for i=1:10
+
+for i=1:1420
+    if i==1
+        global large_matrix_total = zeros(1440*365,20)
+        global aggregated = collect(10:10:1420)
+    end
+    global num_files_to_load = 1420
+    global M_d = 1440
+    global Days = 365
     if i > num_files_to_load
         break
     end
@@ -75,6 +78,6 @@ for i=1:10
 
         results_df = DataFrame(minute_flex_20, :auto)
         base_path = "C:\\Users\\Gustav\\Documents\\Thesis\\data\\EV\\20_minute data\\"
-        CSV.write(base_path*"$i_test.csv", results_df)
+        CSV.write(base_path*"$i.csv", results_df)
     end
 end

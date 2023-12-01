@@ -70,7 +70,12 @@ for m=1:Mi
 end
 
 WF = true
+Total_WF = true
 
+if Total_WF == true
+    global Downwards_flex_excel = CSV.File("$base_path"*"EV\\Flexibility\\Downwards_flexibilities.csv") |> DataFrame
+    global Upwards_flex_excel = CSV.File("$base_path"*"EV\\Flexibility\\Upwards_flexibilities.csv") |> DataFrame
+end
 if WF == true
 
     ####### LOAD DATA FOR EV CHARGE box ########
@@ -83,7 +88,7 @@ if WF == true
 
     # Set the number of files to load - defount is all
     #num_files_to_load = size(dataframe_names)[1] # outcomment this (not delete), if other option than all is selceted
-    num_files_to_load = 500
+    num_files_to_load = 1
 
 
     # Load only CSV files and store them in the dictionary
@@ -162,10 +167,11 @@ if WE == true
             if Emil
                 dataframe_name = filename[63:65]
             else
-                dataframe_name = filename[57:59]  # Remove the first 3 characters
+                dataframe_name = filename[57:60]  # Remove the first 3 characters
             end
             dataframe_names_20[i] = dataframe_name
             dataframe_names_20[i] = replace.(dataframe_names_20[i], "." => "")
+            dataframe_names_20[i] = replace.(dataframe_names_20[i], "c" => "")
             dataframe_names_20[i] = replace.(dataframe_names_20[i], "\\" => "")
             println("File Path: $file_path")
             println("Dataframe Name: $(dataframe_names_20[i])")

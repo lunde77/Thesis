@@ -43,7 +43,7 @@ function Main_stochastic_CC_admm(CB_Is, S_method, samples_in)
 
     ###### derrive bids based on stochastic model ######
 
-    global count_to = 7 # do coun_to minues 1 itteration
+    global count_to = 2 # do coun_to minues 1 itteration
     Y_input = zeros(T)
     C_up = zeros(T)
     C_do = zeros(T)
