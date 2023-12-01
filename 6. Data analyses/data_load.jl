@@ -165,7 +165,7 @@ if WE == true
             #_, filename, _ = splitpath(file_path)  # Extract the file name without extension
             filename = file_path
             if Emil
-                dataframe_name = filename[63:65]
+                dataframe_name = filename[63:66]
             else
                 dataframe_name = filename[57:60]  # Remove the first 3 characters
             end
