@@ -43,7 +43,7 @@ function Main_stochastic_CC_OSS_folded_one(CB_Is, model_res)
     for w=1:NF
         i = 1
 
-        for i=1:2
+        for i=1:1
             ###### intialize sampling data, so it's loaded ######
             if i==1 # load samples for weekdays if specefied, if xxx just sample across all smaples
                 total_flex_do_s, total_flex_up_s, res_20_s, xxxx, xxxx = load_sampling_data(1, sampled_numbers[w,:], "xxx") # XX imples that the output/input is not used
@@ -69,11 +69,11 @@ function Main_stochastic_CC_OSS_folded_one(CB_Is, model_res)
         Threads.@threads for j=1:n_days
             Day = OOS_days[w,j]
             println("day is $Day")
-            if Day ∈ D_w
-                b =  w
-            else
-                b = w+NF
-            end
+            #if Day ∈ D_w
+            #    b =  w
+            #else
+            #    b = w+NF
+            #end
 
 
             start_2 = time_ns()
@@ -84,7 +84,16 @@ function Main_stochastic_CC_OSS_folded_one(CB_Is, model_res)
             println(round((time_ns() - start_2) / 1e9, digits = 3))
 
             ###### Simulate day of operation on realized data ######
-            obj, pen, missing_delivery_storer[1,Day,:], missing_capacity_storer[1,Day,:], missing_capacity_storer_per[1,Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,b], Up_bids_A[:,b], La_do_r, La_up_r)
+            obj, pen, missing_delivery_storer[1,Day,:], missing_capacity_storer[1,Day,:], missing_capacity_storer_per[1,Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,w], Up_bids_A[:,w], La_do_r, La_up_r)
+
+
+            for t=1:24
+                for m=1:60
+                    CB_flex_bid[1, 60*(t-1)+m, Day] =  Up_bids_A[60*(t-1)+m, w]/total_flex_do_r[60*(t-1)+m]*Upwards_flex_CB1[(Day-1)*1440)+60*(t-1)+m]/total_flex_up_r[60*(t-1)+m]
+                    CB_flex_bid[2, 60*(t-1)+m, Day] =  Do_bids_A[60*(t-1)+m, w]/total_flex_do_r[60*(t-1)+m]*Downwards_flex_CB1[(Day-1)*1440)+60*(t-1)+m]/total_flex_do_r[60*(t-1)+m]
+                end
+            end
+
 
             # update results:
             Total_flex_up[1,:, Day]   = total_flex_up_r
