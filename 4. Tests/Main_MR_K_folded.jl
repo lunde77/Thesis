@@ -45,7 +45,7 @@ function Main_stochastic_CC_OSS_folded(CB_Is, model_res)
 
         for i=1:1
             ###### intialize sampling data, so it's loaded ######
-            if i==1 # load samples for weekdays if specefied, if xxx just sample across all smaples 
+            if i==1 # load samples for weekdays if specefied, if xxx just sample across all smaples
                 total_flex_do_s, total_flex_up_s, res_20_s, xxxx, xxxx = load_sampling_data(1, sampled_numbers[w,:], "xxx") # XX imples that the output/input is not used
             else    # load samples for weekendays
                 total_flex_do_s, total_flex_up_s, res_20_s, xxxx, xxxx = load_sampling_data(1, sampled_numbers[w,:], "S") # XX imples that the output is not used
@@ -69,12 +69,6 @@ function Main_stochastic_CC_OSS_folded(CB_Is, model_res)
         Threads.@threads for j=1:n_days
             Day = OOS_days[w,j]
             println("day is $Day")
-            if Day ∈ D_w
-                b =  w
-            else
-                b = w+NF
-            end
-
 
             start_2 = time_ns()
 
@@ -84,7 +78,7 @@ function Main_stochastic_CC_OSS_folded(CB_Is, model_res)
             println(round((time_ns() - start_2) / 1e9, digits = 3))
 
             ###### Simulate day of operation on realized data ######
-            obj, pen, missing_delivery_storer[1,Day,:], missing_capacity_storer[1,Day,:], missing_capacity_storer_per[1,Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,b], Up_bids_A[:,b], La_do_r, La_up_r)
+            obj, pen, missing_delivery_storer[1,Day,:], missing_capacity_storer[1,Day,:], missing_capacity_storer_per[1,Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,w], Up_bids_A[:,w], La_do_r, La_up_r)
 
             # update results:
             Total_flex_up[1,:, Day]   = total_flex_up_r
