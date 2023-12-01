@@ -27,7 +27,7 @@ function load_results_storer()
     global missing_capacity_storer_per = zeros(2,Days, M_d, 3)
     global pr_flex_used_up = zeros(2)                                                                           # percante of upwarrds flexibity used
     global pr_flex_used_do = zeros(2)                                                                           # percante of downwards flexibity used
-
+    global CB_flex_bid = zeros(2,M_d, Days)                                                                           # amount of up and downwards flexibility bid in
 
     #### in sample result storer
     global revenue_in =  zeros(1)                                                                              # DKK of revenue during Simulation periode

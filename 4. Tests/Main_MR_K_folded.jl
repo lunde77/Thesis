@@ -43,10 +43,10 @@ function Main_stochastic_CC_OSS_folded(CB_Is, model_res)
     for w=1:NF
         i = 1
 
-        for i=1:2
+        for i=1:1
             ###### intialize sampling data, so it's loaded ######
-            if i==1 # load samples for weekdays
-                total_flex_do_s, total_flex_up_s, res_20_s, xxxx, xxxx = load_sampling_data(1, sampled_numbers[w,:], "W") # XX imples that the output is not used
+            if i==1 # load samples for weekdays if specefied, if xxx just sample across all smaples 
+                total_flex_do_s, total_flex_up_s, res_20_s, xxxx, xxxx = load_sampling_data(1, sampled_numbers[w,:], "xxx") # XX imples that the output/input is not used
             else    # load samples for weekendays
                 total_flex_do_s, total_flex_up_s, res_20_s, xxxx, xxxx = load_sampling_data(1, sampled_numbers[w,:], "S") # XX imples that the output is not used
             end

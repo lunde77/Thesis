@@ -18,7 +18,7 @@ function Main_stochastic_CC_OSS_folded_one(CB_Is, model_res)
     global test_type = "T2"
     global T = 24                                           # hours on a day
     global M = 60                                           # minutes in an hour
-    global S = Int32(floor(365/NF) )*4                      # number of samples in IS
+    global S = 202                                          # number of samples in IS
     global M_d = T*M                                        # minutes per model, i.e. per day
     global Pen_e_coef = 3                                   # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
     global Days = 365
