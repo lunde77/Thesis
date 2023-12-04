@@ -2,7 +2,7 @@ using CSV
 using DataFrames
 using Random
 
-global Emil = false
+global Emil = true
 
 if Emil
     base_path = "C:\\Users\\ASUS\\Documents\\11. sem - kand\\github\\Thesis\\"
@@ -32,21 +32,21 @@ end
 # 18: downwards bid for each hour
 
 global N_size = [1400, 700, 350, 200, 140, 100, 56, 35, 20, 10]
-global N_bundles   = [1, 2, 4, 6, 10, 14, 25, 40, 70, 140]
+global N_bundles   = [1, 2, 4, 7, 10, 14, 25, 40, 70, 140]
 
 for x=1:10
     TE = N_bundles[x]
 
     results = zeros(TE,15)
     Overbid_distribution = zeros(365,TE)
-    Upwards_bids = zeros(1440,TE*5)
-    Downwards_bids = zeros(1440,TE*5)
+    Upwards_bids = zeros(1440,TE*10)
+    Downwards_bids = zeros(1440,TE*10)
 
     for q=1:TE
         CB_Is = collect((q-1)*N_size[x]+1:q*N_size[x])
 
 
-        global results[q,1], results[q,2], results[q,3:6], results[q,7:9], results[q,10:11], results[q,12], results[q,13], results[q,14], results[q,15], Overbid_distribution[:,q], Upwards_bids[:,(q-1)*5+1:q*5], Downwards_bids[:,(q-1)*5+1:q*5] = Main_stochastic_CC_OSS_folded(CB_Is, "hourly")
+        global results[q,1], results[q,2], results[q,3:6], results[q,7:9], results[q,10:11], results[q,12], results[q,13], results[q,14], results[q,15], Overbid_distribution[:,q], Upwards_bids[:,(q-1)*10+1:q*10], Downwards_bids[:,(q-1)*10+1:q*10] = Main_stochastic_CC_OSS_folded(CB_Is, "hourly")
 
         results_df = DataFrame(results, :auto)
         CSV.write("$base_path"*"3. Simulations\\Stochastic results\\results_N_bundles_$(N_bundles[x]).csv", results_df)

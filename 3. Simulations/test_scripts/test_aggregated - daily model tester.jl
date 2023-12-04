@@ -2,7 +2,7 @@ using CSV
 using DataFrames
 using Random
 
-global Emil = false
+global Emil = true
 
 if Emil
     base_path = "C:\\Users\\ASUS\\Documents\\11. sem - kand\\github\\Thesis\\"
@@ -32,7 +32,7 @@ end
 # 18: downwards bid for each hour
 
 global N_size = [1400, 700, 350, 200, 140, 100, 56, 35, 20, 10]
-global N_bundles   = [1, 2, 4, 6, 10, 14, 25, 40, 70, 140]
+global N_bundles   = [1, 2, 4, 7, 10, 14, 25, 40, 70, 140]
 
 for x=1:10
     TE = N_bundles[x]
