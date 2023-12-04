@@ -71,11 +71,11 @@ function Main_stochastic_CC_OSS_folded(CB_Is, model_res)
         Threads.@threads for j=1:n_days
             Day = OOS_days[w,j]
             println("day is $Day")
-            #if Day ∈ D_w
-            #    b =  w
-            #else
-            #    b = w+NF
-            #end
+            if Day ∈ D_w
+                b =  w
+            else
+                b = w+NF
+            end
 
 
             start_2 = time_ns()
