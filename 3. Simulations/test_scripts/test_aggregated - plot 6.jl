@@ -34,7 +34,7 @@ end
 global N_size = [1400, 700, 350, 200, 140, 100, 56, 35, 20, 10]
 global N_bundles   = [1, 2, 4, 6, 10, 14, 25, 40, 70, 140]
 
-for x=1:10
+for x=10:10
     TE = N_bundles[x]
 
     results = zeros(TE,15)

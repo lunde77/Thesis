@@ -129,9 +129,9 @@ function load_sampling_data(Day,sampled_numbers,d_in)
         for t=1:24
             for m=1:60
                 shuffled_numbers = shuffle(sampled_numbers)
-                total_flex_do_s[t,m,:] = dis[1,shuffled_numbers[1:202],t,m]
-                total_flex_up_s[t,m,:] = dis[2,shuffled_numbers[1:202],t,m]
-                res_20_s[t,m,:] = dis[3,shuffled_numbers[1:202],t,m]
+                total_flex_do_s[t,m,:] = dis[1,shuffled_numbers[1:S],t,m]
+                total_flex_up_s[t,m,:] = dis[2,shuffled_numbers[1:S],t,m]
+                res_20_s[t,m,:] = dis[3,shuffled_numbers[1:S],t,m]
             end
         end
         OOS_numbers = 0

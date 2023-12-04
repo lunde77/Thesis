@@ -43,26 +43,25 @@ Downwards_bids = zeros(1440,TE*5)
 
 
 for q=1:TE
-    CB_Is = collect(1:500)
-
+    CB_Is = collect(1:1)
 
     global results[q,1], results[q,2], results[q,3:6], results[q,7:9], results[q,10:11], results[q,12], results[q,13], results[q,14], results[q,15], Overbid_distribution[:,q], Upwards_bids[:,(q-1)*5+1:q*5], Downwards_bids[:,(q-1)*5+1:q*5], results_CB_1[q,1], results_CB_1[q,2]  = Main_stochastic_CC_OSS_folded_one(CB_Is, "hourly")
 
     results_df = DataFrame(results, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\results_tester_1BC.csv", results_df)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\results_tester_1BC_1.csv", results_df)
 
     results_df = DataFrame(Overbid_distribution, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Overbid_distribution_tester_1BC.csv", results_df)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Overbid_distribution_tester_1BC_1.csv", results_df)
 
     results_df = DataFrame(Upwards_bids, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Upwards_bids_tester_1BC.csv", results_df)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Upwards_bids_tester_1BC_1.csv", results_df)
 
     results_df = DataFrame(Downwards_bids, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Downwards_bids_tester_1BC.csv", results_df)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Downwards_bids_tester_1BC_1.csv", results_df)
 
 
     results_df = DataFrame(results_CB_1, :auto)
-    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\1BSresultss_tester_1BC.csv", results_df)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\1BSresultss_tester_1BC_1.csv", results_df)
 
 
 end

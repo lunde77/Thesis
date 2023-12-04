@@ -40,6 +40,7 @@ function Main_stochastic_CC_OSS_folded_one(CB_Is, model_res)
     sampled_numbers, OOS_days =  make_folds(NF)
 
     ### run test on the sample days
+    global CB_flex_bid = zeros(2, M_d, Days)                                                                           # amount of up and downwards flexibility bid in, 1=upwards, 2=downwards
     for w=1:NF
         i = 1
 
@@ -89,8 +90,8 @@ function Main_stochastic_CC_OSS_folded_one(CB_Is, model_res)
 
             for t=1:24
                 for m=1:60
-                    CB_flex_bid[1, 60*(t-1)+m, Day] =  Up_bids_A[60*(t-1)+m, w]/total_flex_do_r[60*(t-1)+m]*Upwards_flex_CB1[(Day-1)*1440+60*(t-1)+m]/total_flex_up_r[60*(t-1)+m]
-                    CB_flex_bid[2, 60*(t-1)+m, Day] =  Do_bids_A[60*(t-1)+m, w]/total_flex_do_r[60*(t-1)+m]*Downwards_flex_CB1[(Day-1)*1440+60*(t-1)+m]/total_flex_do_r[60*(t-1)+m]
+                    CB_flex_bid[1, 60*(t-1)+m, Day] =  Up_bids_A[60*(t-1)+m, w]/total_flex_do_r[60*(t-1)+m]*Upwards_flex_CB1[(Day-1)*1440+60*(t-1)+m]
+                    CB_flex_bid[2, 60*(t-1)+m, Day] =  Do_bids_A[60*(t-1)+m, w]/total_flex_do_r[60*(t-1)+m]*Downwards_flex_CB1[(Day-1)*1440+60*(t-1)+m]
                 end
             end
 
@@ -125,7 +126,10 @@ function Main_stochastic_CC_OSS_folded_one(CB_Is, model_res)
     println("The revenue for the entery perioed was $(revenue[1])")
     println("The Penalty would be $(penalty[1])")
 
+    CB_flex_bid = replace!(x -> isnan(x) ? 0.0 : x, CB_flex_bid)
+    CB1_pr_flex_used_up = sum(CB_flex_bid[1, :, :])/sum(Upwards_flex_CB1)
+    CB1_pr_flex_used_do = sum(CB_flex_bid[2, :, :])/sum(Downwards_flex_CB1)
 
     clock = round((time_ns() - start_1) / 1e9, digits = 3)
-    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer_per[1,:,:,:], missing_capacity_storer[1,:,4], Up_bids_A[:,1:NF*2], Do_bids_A[:,1:NF*2], mean(CB_flex_bid[1,:,:]), mean(CB_flex_bid[2,:,:])
+    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer[1,:,4], Up_bids_A[:,1:NF], Do_bids_A[:,1:NF], CB1_pr_flex_used_up, CB1_pr_flex_used_do
 end

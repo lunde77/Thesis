@@ -25,7 +25,7 @@ using XLSX
 
 
 ####### Paths ########
-Emil = true
+Emil = false
 if Emil
     base_path = "C:\\Users\\ASUS\\Documents\\11. sem - kand\\data\\"
 else
@@ -37,11 +37,11 @@ end
 
 Freq_data =  XLSX.readxlsx("$base_path"*"Frequency\\Activation.xlsx")
 global Ac_dowards =  Freq_data["Sheet1!A2:A525601"]  # in %
-global Ac_upwards =  Freq_data["Sheet1!B2:B525601"]  # in #
+global Ac_upwards =  Freq_data["Sheet1!B2:B525601"]  # in %
 
 Freq_data_max =  XLSX.readxlsx("$base_path"*"Frequency\\Max_Activation.xlsx")
 global Ac_dowards_M =  Freq_data_max["Sheet1!A2:A525601"]  # in %
-global Ac_upwards_M =  Freq_data_max["Sheet1!B2:B525601"]  # in #
+global Ac_upwards_M =  Freq_data_max["Sheet1!B2:B525601"]  # in %
 
 
 
@@ -171,6 +171,7 @@ if WE == true
             end
             dataframe_names_20[i] = dataframe_name
             dataframe_names_20[i] = replace.(dataframe_names_20[i], "." => "")
+            dataframe_names_20[i] = replace.(dataframe_names_20[i], "s" => "")
             dataframe_names_20[i] = replace.(dataframe_names_20[i], "c" => "")
             dataframe_names_20[i] = replace.(dataframe_names_20[i], "\\" => "")
             println("File Path: $file_path")

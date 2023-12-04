@@ -86,7 +86,7 @@ function Main_stochastic_CC_OSS_folded(CB_Is, model_res)
             println(round((time_ns() - start_2) / 1e9, digits = 3))
 
             ###### Simulate day of operation on realized data ######
-            obj, pen, missing_delivery_storer[1,Day,:], missing_capacity_storer[1,Day,:], missing_capacity_storer_per[1,Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,b], Up_bids_A[:,b], La_do_r, La_up_r)
+            obj, pen, missing_delivery_storer[1,Day,:], missing_capacity_storer[1,Day,:], missing_capacity_storer_per[1,Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,w], Up_bids_A[:,w], La_do_r, La_up_r)
 
             # update results:
             Total_flex_up[1,:, Day]   = total_flex_up_r
