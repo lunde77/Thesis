@@ -40,7 +40,7 @@ function operation(Total_flex_up, Total_flex_do, res_20_r, ac_do_m, ac_up_m, C_d
             Missing_capacity_storer[m,3] = 1
             Missing_capacity_storer_per[m,3] = ((C_do[m])-res_20_r[m])/(C_do[m])
         end
-        if sum(Missing_capacity_storer[m,:]) > 0.01 # if any capacity is violated
+        if sum(Missing_capacity_storer[m,:]) > 0.0000001 # if any capacity is violated
             Missing_capacity_storer[m,4] = 1
         end
 
@@ -70,9 +70,15 @@ function operation(Total_flex_up, Total_flex_do, res_20_r, ac_do_m, ac_up_m, C_d
 
 
     # calculate the actual penalty
-    penalty = sum( (Pen_activation_up[t]*La_up[t]*Pen_e_coef + Pen_activation_do[t]*La_do[t]*Pen_e_coef) for t=1:T)
+    pen = zeros(24)
+    for t=1:24
+        pen[t] = (Pen_activation_up[t]*La_up[t]*Pen_e_coef + Pen_activation_do[t]*La_do[t]*Pen_e_coef)
+    end
     # calculate the actual revenue
-    revenue = sum( (C_up[(t-1)*60+1]*La_up[t] + C_do[(t-1)*60+1]*La_do[t]) for t=1:T)
+    rev = zeros(24)
+    for t=1:24
+        rev[t] = (C_up[t]*La_up[t] + C_do[t]*La_do[t])
+    end
 
     # calculate the % where the capacity where over bid
     M_C = zeros(4)
@@ -99,5 +105,5 @@ function operation(Total_flex_up, Total_flex_do, res_20_r, ac_do_m, ac_up_m, C_d
         M_A[1] = 0
     end
 
-    return revenue, penalty, M_A, M_C, Missing_capacity_storer_per, M_C_B
+    return rev, pen, M_A, M_C, Missing_capacity_storer_per, M_C_B
 end

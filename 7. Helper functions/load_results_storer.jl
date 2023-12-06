@@ -1,6 +1,6 @@
 function load_results_storer()
-    global revenue =  zeros(2)                                                                              # DKK of revenue during Simulation periode
-    global penalty =  zeros(2)                                                                              # DKK of penalty during Simulation periode
+    global revenue =  zeros(8760,2)                                                                              # DKK of revenue during Simulation periode
+    global penalty =  zeros(8760,2)                                                                              # DKK of penalty during Simulation periode
     global missing_delivery = zeros(2,1)                                                                      # kWh of missed delivery during Simulations
     global Up_bids_A = zeros(M_d,Days)                                                                      # total up bid i kW for each day and minute                                                    # not used
     global Do_bids_A = zeros(M_d,Days)                                                                      # total down bid i kW for each day and minute                                                  # not used
@@ -25,7 +25,7 @@ function load_results_storer()
     global average_cap_missed = zeros(2,3)                                                                            # our aveage overbid when overbidbing
     global total_delivery_missed = zeros(2,2)                                                                  # how large a proption of the activation we missed
     global missing_capacity_storer_per = zeros(2,Days, M_d, 3)
-    global missing_capacity_storer_per_max = zeros(Days*M_d)                                                    # the max overbid for each minute 
+    global missing_capacity_storer_per_max = zeros(Days*M_d)                                                    # the max overbid for each minute
     global pr_flex_used_up = zeros(2)                                                                           # percante of upwarrds flexibity used
     global pr_flex_used_do = zeros(2)                                                                           # percante of downwards flexibity used
     global CB_flex_bid = zeros(2, M_d, Days)                                                                           # amount of up and downwards flexibility bid in, 1=upwards, 2=downwards
