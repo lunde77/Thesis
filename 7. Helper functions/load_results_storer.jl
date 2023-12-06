@@ -25,6 +25,7 @@ function load_results_storer()
     global average_cap_missed = zeros(2,3)                                                                            # our aveage overbid when overbidbing
     global total_delivery_missed = zeros(2,2)                                                                  # how large a proption of the activation we missed
     global missing_capacity_storer_per = zeros(2,Days, M_d, 3)
+    global missing_capacity_storer_per_max = zeros(Days*M_d)                                                    # the max overbid for each minute 
     global pr_flex_used_up = zeros(2)                                                                           # percante of upwarrds flexibity used
     global pr_flex_used_do = zeros(2)                                                                           # percante of downwards flexibity used
     global CB_flex_bid = zeros(2, M_d, Days)                                                                           # amount of up and downwards flexibility bid in, 1=upwards, 2=downwards
@@ -42,6 +43,7 @@ function load_results_storer()
     global after_Activation_in = zeros(M_d,Days, S)                                                            # sum of activated energy for each day to each minute for each charger
     global missing_delivery_storer_in = zeros(Days,2)                                                          # % of bid that could not be meet
     global missing_capacity_storer_in = zeros(Days,4)                                                          # % of all time minutes where capacity were not availeble
+    global Freq_overbid_h = zeros(Days,24)                                                                       # % the frequecy of overbids on bid resolution
     #global Power_A = zeros(M_d,Days,S)                                                                      # The aggregated power for each scenario without activation                                    # not used
     #global SoC_A = zeros(M_d,Days,S)                                                                        # The aggregated SoC for each scenario without activation                                      # not used
     #global MA_A = zeros(M_d,Days,S)                                                                         # The aggregated Ma effect for each scenario without activation                                # not used

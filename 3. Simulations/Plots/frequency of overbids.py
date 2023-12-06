@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 
 # Load the first CSV file
-df1 = pd.read_csv( r"C:\Users\Gustav\Documents\Thesis\Git\3. Simulations\Stochastic results\tester_2.overbids.csv")
+df1 = pd.read_csv(r"C:\Users\Gustav\Documents\Thesis\Git\3. Simulations\Stochastic results\tester_2.overbids.csv")
 data = df1.iloc[:, 0]
 non_zero_elements = data[data != 0]
 

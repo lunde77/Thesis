@@ -18,7 +18,7 @@ function Main_stochastic_CVAR_OSS_folded(CB_Is, model_res)
     global test_type = "T2"
     global T = 24                                           # hours on a day
     global M = 60                                           # minutes in an hour
-    global S = Int32(floor(365/NF) )*4                      # number of samples in IS
+    global S = 202                                          # number of samples in IS
     global M_d = T*M                                        # minutes per model, i.e. per day
     global Pen_e_coef = 6                                   # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
     global Days = 365
@@ -87,7 +87,7 @@ function Main_stochastic_CVAR_OSS_folded(CB_Is, model_res)
             println(round((time_ns() - start_2) / 1e9, digits = 3))
 
             ###### Simulate day of operation on realized data ######
-            obj, pen, missing_delivery_storer[1,Day,:], missing_capacity_storer[1,Day,:], missing_capacity_storer_per[1,Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,w], Up_bids_A[:,w], La_do_r, La_up_r)
+            obj, pen, missing_delivery_storer[1,Day,:], missing_capacity_storer[1,Day,:], missing_capacity_storer_per[1,Day,:, :], Freq_overbid_h[Day,:]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,w], Up_bids_A[:,w], La_do_r, La_up_r)
 
             # update results:
             Total_flex_up[1,:, Day]   = total_flex_up_r
@@ -119,7 +119,20 @@ function Main_stochastic_CVAR_OSS_folded(CB_Is, model_res)
     println("The revenue for the entery perioed was $(revenue[1])")
     println("The Penalty would be $(penalty[1])")
 
+    for d=1:365
+        for m=1:M_d
+            if missing_capacity_storer_per[1,d,m,1] >= missing_capacity_storer_per[1,d,m,2] &&  missing_capacity_storer_per[1,d,m,1] >=  missing_capacity_storer_per[1,d,m,3]
+                missing_capacity_storer_per_max[(d-1)*M_d+m] = missing_capacity_storer_per[1,d,m,1]
+            elseif missing_capacity_storer_per[1,d,m,2] >= missing_capacity_storer_per[1,d,m,3]
+                missing_capacity_storer_per_max[(d-1)*M_d+m] = missing_capacity_storer_per[1,d,m,2]
+            else
+                missing_capacity_storer_per_max[(d-1)*M_d+m] = missing_capacity_storer_per[1,d,m,3]
+            end
+        end
+    end
+
 
     clock = round((time_ns() - start_1) / 1e9, digits = 3)
-    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer[1,:,4], Up_bids_A[:,1:NF], Do_bids_A[:,1:NF]
+
+    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock,  missing_capacity_storer[1,:,4], Up_bids_A[:,1:NF], Do_bids_A[:,1:NF], Freq_overbid_h, missing_capacity_storer_per_max
 end

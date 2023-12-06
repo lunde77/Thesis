@@ -81,6 +81,11 @@ function operation(Total_flex_up, Total_flex_do, res_20_r, ac_do_m, ac_up_m, C_d
     M_C[2] = sum(Missing_capacity_storer[:,2])/M_d                 # % of time capacity were missed up
     M_C[1] = sum(Missing_capacity_storer[:,1])/M_d                 # % of time capacity were missed down
 
+    M_C_B = zeros(T)
+    for t=1:T # find frequency of overbid for each hour
+        M_C_B[t] = sum(Missing_capacity_storer[(t-1)*60+1:60*t,4])/60                 # % of time capacity were missed in any of the catergories
+    end
+
     # calculate the % of bids where we did not meet the activation
     M_A = zeros(2)
     if sum(C_up[m]*ac_up_m[m] for m=1:M_d) > 0
@@ -94,5 +99,5 @@ function operation(Total_flex_up, Total_flex_do, res_20_r, ac_do_m, ac_up_m, C_d
         M_A[1] = 0
     end
 
-    return revenue, penalty, M_A, M_C, Missing_capacity_storer_per
+    return revenue, penalty, M_A, M_C, Missing_capacity_storer_per, M_C_B
 end

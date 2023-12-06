@@ -25,8 +25,8 @@ function Load_aggregated(CB_Is)
     end
     global energy_20_all = energy_20_all*60
 
-    global Upwards_flex_CB1 = EV_dataframes[dataframe_names[CB_Is[1]]][:,8]
-    global Downwards_flex_CB1 = EV_dataframes[dataframe_names[CB_Is[1]]][:,7]
+    #global Upwards_flex_CB1 = EV_dataframes[dataframe_names[CB_Is[1]]][:,8]
+    #global Downwards_flex_CB1 = EV_dataframes[dataframe_names[CB_Is[1]]][:,7]
     # Loop through each vector and add it to the matrix
     #counter = 0 # count numbers of charge boxes loaded to keep user updated
     #Threads.@threads for i=CB_Is[1]:CB_Is[end]
