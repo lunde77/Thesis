@@ -1,9 +1,10 @@
 using Random
 function make_folds(NF)
-    Fold_size = Int32(floor(365/NF) )
+    Fold_size = Int32(floor(363/NF) )
     Random.seed!(3) # set this to a number if we want to have same in sample and out sample across samples
 
-    sampled_numbers_tester = randperm(length(collect(1:365)))
+    sampled_numbers_tester = randperm(length(collect(1:363)))
+    sampled_numbers_tester = sampled_numbers_tester .+ 1 # add one, as we don't want day 1
     sampled_numbers = zeros(NF, (NF-1)*Fold_size)
     OOS_numbers = zeros(NF, Fold_size)
     folds = zeros(NF, Fold_size)
@@ -27,5 +28,5 @@ function make_folds(NF)
     end
     sampled_numbers = Int.(sampled_numbers)
     OOS_numbers = Int.(OOS_numbers)
-    sampled_numbers, OOS_numbers
+    return sampled_numbers, OOS_numbers
 end

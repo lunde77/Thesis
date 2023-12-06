@@ -1,6 +1,6 @@
 using Random
 # all data is made gloabl, so It can be used in the mail
-function load_sampling_data(Day,sampled_numbers,d_in)
+function load_sampling_data(Day, sampled_numbers, d_in)
 
     ###### Initialize the samples for the given bid ######
 
