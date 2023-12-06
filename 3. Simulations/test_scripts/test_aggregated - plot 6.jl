@@ -2,7 +2,7 @@ using CSV
 using DataFrames
 using Random
 
-global Emil = false
+global Emil = true
 
 if Emil
     base_path = "C:\\Users\\ASUS\\Documents\\11. sem - kand\\github\\Thesis\\"
@@ -31,10 +31,12 @@ end
 # 18: Upwards bid for each hour
 # 18: downwards bid for each hour
 
-global N_size = [1400, 700, 350, 200, 140, 100, 56, 35, 20, 10]
-global N_bundles   = [1, 2, 4, 7, 10, 14, 25, 40, 70, 140]
+global N_size = [1400, 700, 350, 200,    140,  100, 50, 20]
+global N_bundles   = [1, 2, 4,    7,     10,   14,  28, 70]
 
-for x=9:9
+z = [1,2,3,5,6,7]
+
+for x in z
     TE = N_bundles[x]
 
     global results = zeros(TE,15)
@@ -42,7 +44,7 @@ for x=9:9
     global Upwards_bids = zeros(1440,TE*10)
     global Downwards_bids = zeros(1440,TE*10)
 
-    for q=3:TE
+    for q=1:TE
         CB_Is = collect((q-1)*N_size[x]+1:q*N_size[x])
 
 
