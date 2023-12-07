@@ -31,19 +31,10 @@ end
 # 18: Upwards bid for each hour
 # 18: downwards bid for each hour
 
-<<<<<<< HEAD
-global N_size = [1400, 700, 350, 200,    140,  100, 50, 20]
-global N_bundles   = [1, 2, 4,    7,     10,   14,  28, 70]
-
-z = [1,2,3,5,6,7]
-
-for x in z
-=======
 global N_size = [1400, 700, 350, 200, 140, 100, 50, 20, 10]
 global N_bundles   = [1, 2, 4, 7, 10, 14, 28, 70, 140]
 
 for x=1:9
->>>>>>> d63eb87bfa1e00f3d6c96c6bb04d0c71c54707a9
     TE = N_bundles[x]
 
     global results = zeros(TE,15)
