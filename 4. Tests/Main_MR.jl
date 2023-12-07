@@ -24,7 +24,7 @@ function Main_stochastic_CC_OSS(CB_Is, S_method, samples_in, model_res)
     global RM = 0.9 # %-end SoC assumed, e.g. 0.9 means we assume all charges charge to 90%
     global Sampling = S_method
     global S = samples_in
-    global q_epilon = 0.0001
+    global q_epilon = 0.000001
     global start_1 = time_ns()
 
 
@@ -55,7 +55,7 @@ function Main_stochastic_CC_OSS(CB_Is, S_method, samples_in, model_res)
     ### run test on the sample days
     println(sampled_numbers)
     println(OOS_numbers)
-    for i=1:1 # set to only loop to one, as we only want OOS results for now
+    for i=1:2 # set to only loop to one, as we only want OOS results for now
         if i == 1
             test_days = OOS_numbers
         else # we test in sample days
@@ -76,14 +76,12 @@ function Main_stochastic_CC_OSS(CB_Is, S_method, samples_in, model_res)
             println("the 20 minutes average is $(mean(res_20_r[1:10]))")
 
             ###### Simulate day of operation on realized data ######
-            obj, pen, missing_delivery_storer[i,Day,:], missing_capacity_storer[i,Day,:], missing_capacity_storer_per[i,Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,1], Up_bids_A[:,1], La_do_r, La_up_r)
+            revenue[1+(Day-1)*24:Day*24,i], penalty[1+(Day-1)*24:Day*24,i], missing_delivery_storer[i,Day,:], missing_capacity_storer[i,Day,:], missing_capacity_storer_per[i,Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,1], Up_bids_A[:,1], La_do_r, La_up_r)
 
             # update results:
             Total_flex_up[i,:, Day]   = total_flex_up_r
             Total_flex_do[i,:, Day]   = total_flex_do_r
 
-            revenue[i] = revenue[i] + obj
-            penalty[i] = penalty[i] + pen
 
         end
 
@@ -102,13 +100,13 @@ function Main_stochastic_CC_OSS(CB_Is, S_method, samples_in, model_res)
         total_delivery_missed[i,1] =  round( sum(missing_delivery_storer[i,:,1])/(n_days) ,  digits= 3 )   # % of of down bids that could not be delivered
         total_delivery_missed[i,2] =  round( sum(missing_delivery_storer[i,:,2])/(n_days) ,  digits= 3 )   # % of of up bids that could not be delivered
 
-        revenue[i] = revenue[i]/n_days       # normlize it so it on a daily scale
-        penalty[i] = penalty[i]/n_days       # normlize it so it on a daily scale
+        rev_mean_MR[i] = sum(revenue[:,i])/(n_days)       # normlize it so it on a daily scale
+        pen_mean_MR[i] = sum(penalty[:,i])/(n_days)       # normlize it so it on a daily scale
 
-        println("The revenue for the entery perioed was $(revenue[i])")
-        println("The Penalty would be $(penalty[i])")
+        println("The revenue for the entery perioed was $(sum(revenue[:,i]))")
+        println("The Penalty would be $(sum(penalty[:,i]))")
     end
 
     clock = round((time_ns() - start_1) / 1e9, digits = 3)
-    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer[1,:,4], Up_bids_A[:,1], Do_bids_A[:,1], total_flex_up_s, total_flex_do_s, res_20_s, revenue[2], penalty[2], total_cap_missed[2,:], average_cap_missed[2,:], total_delivery_missed[2,:], pr_flex_used_up[2], pr_flex_used_do[2], model_runtime, clock, missing_capacity_storer[2,:,4]
+    return rev_mean_MR[1], pen_mean_MR[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer[1,:,4], Up_bids_A[:,1], Do_bids_A[:,1], rev_mean_MR[2], pen_mean_MR[2], total_cap_missed[2,:], average_cap_missed[2,:], total_delivery_missed[2,:], pr_flex_used_up[2], pr_flex_used_do[2], model_runtime, clock, missing_capacity_storer[2,:,4]
 end

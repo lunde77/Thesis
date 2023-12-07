@@ -77,7 +77,7 @@ function operation(Total_flex_up, Total_flex_do, res_20_r, ac_do_m, ac_up_m, C_d
     # calculate the actual revenue
     rev = zeros(24)
     for t=1:24
-        rev[t] = (C_up[t]*La_up[t] + C_do[t]*La_do[t])
+        rev[t] = (C_up[(t-1)*60+1]*La_up[t] + C_do[(t-1)*60+1]*La_do[t])
     end
 
     # calculate the % where the capacity where over bid
@@ -104,6 +104,8 @@ function operation(Total_flex_up, Total_flex_do, res_20_r, ac_do_m, ac_up_m, C_d
     else
         M_A[1] = 0
     end
+
+
 
     return rev, pen, M_A, M_C, Missing_capacity_storer_per, M_C_B
 end
