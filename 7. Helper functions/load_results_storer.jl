@@ -29,6 +29,8 @@ function load_results_storer()
     global pr_flex_used_up = zeros(2)                                                                           # percante of upwarrds flexibity used
     global pr_flex_used_do = zeros(2)                                                                           # percante of downwards flexibity used
     global CB_flex_bid = zeros(2, M_d, Days)                                                                           # amount of up and downwards flexibility bid in, 1=upwards, 2=downwards
+    global CB_flex_pr = zeros(2, M_d, Days)                                                                           # amount of up and downwards flexibility bid in, 1=upwards, 2=downwards
+
 
     #### in sample result storer
     global revenue_in =  zeros(1)                                                                              # DKK of revenue during Simulation periode
@@ -56,5 +58,8 @@ function load_results_storer()
     global average_cap_missed_in = zeros(3)                                                                            # our aveage overbid when overbidbing
     global total_delivery_missed_in = zeros(2)                                                                  # how large a proption of the activation we missed
     global missing_capacity_storer_per_in = zeros(Days, M_d, 3)
+
+    global rev_mean_MR = zeros(2)                                                                                  # the mean revenue for an in an out of smaple
+    global pen_mean_MR = zeros(2)                                                                                  # the mean penality for an in an out of smaple
 
 end

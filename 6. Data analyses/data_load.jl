@@ -43,6 +43,12 @@ Freq_data_max =  XLSX.readxlsx("$base_path"*"Frequency\\Max_Activation.xlsx")
 global Ac_dowards_M =  Freq_data_max["Sheet1!A2:A525601"]  # in %
 global Ac_upwards_M =  Freq_data_max["Sheet1!B2:B525601"]  # in %
 
+# convert from Any matrix to float vector
+Ac_dowards_M = vec(Ac_dowards_M)
+Ac_dowards_M = [parse(Float64, string(x)) for x in Ac_dowards_M]
+Ac_upwards_M = vec(Ac_upwards_M)
+Ac_upwards_M = [parse(Float64, string(x)) for x in Ac_upwards_M]
+
 
 
 ####### Load FCR-D prices ########

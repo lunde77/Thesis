@@ -39,6 +39,7 @@ function Stochastic_chancer_model_hourly_CVAR(total_flex_do, total_flex_up, tota
    #************************************************************************
    # Model
    Mo  = Model(Gurobi.Optimizer)
+   set_optimizer_attribute(Mo, "OutputFlag", 0)
 
    # Bid Varibles
    @variable(Mo, 0 <= C_do)                    # Chosen downwards bid

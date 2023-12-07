@@ -32,7 +32,6 @@ function Stochastic_chancer_model_hourly(total_flex_do, total_flex_up, total_res
    # Static Parameters
    M = 60 # minutes in an hour
    Pi = 1/S
-   epsilon = 0.001                 # helper, so demominator won't become zero
 
 
    M_do = findmax(total_flex_do)[1]+100000
@@ -43,6 +42,7 @@ function Stochastic_chancer_model_hourly(total_flex_do, total_flex_up, total_res
    #************************************************************************
    # Model
    Mo  = Model(Gurobi.Optimizer)
+   set_optimizer_attribute(Mo, "OutputFlag", 0)
 
    # Bid Varibles
    @variable(Mo, 0 <= C_do)                    # Chosen downwards bid

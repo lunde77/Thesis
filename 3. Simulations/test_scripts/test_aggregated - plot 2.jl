@@ -34,18 +34,23 @@ end
 global N_size = [1400, 700, 350, 200, 140, 100, 56, 35, 20, 10]
 global N_bundles   = [1, 2, 4, 6, 10, 14, 25, 40, 70, 140]
 
-TE = 1
+TE = 28
+NF = 3
 results = zeros(TE,15)
 results_CB_1 = zeros(TE,2)
 Overbid_distribution = zeros(365,TE)
 Upwards_bids = zeros(1440,TE*5)
 Downwards_bids = zeros(1440,TE*5)
+global flex_used_down_m = zeros(1440*365,TE)
+global flex_used_up_m = zeros(1440*365,TE)
+hourly_revenue = zeros(8760,TE)
+hourly_penalty = zeros(8760,TE)
 
 
-for q=1:TE
-    CB_Is = collect(1:1)
+for q=1:28
+    CB_Is = collect(1:50*q)
 
-    global results[q,1], results[q,2], results[q,3:6], results[q,7:9], results[q,10:11], results[q,12], results[q,13], results[q,14], results[q,15], Overbid_distribution[:,q], Upwards_bids[:,(q-1)*5+1:q*5], Downwards_bids[:,(q-1)*5+1:q*5], results_CB_1[q,1], results_CB_1[q,2]  = Main_stochastic_CC_OSS_folded_one(CB_Is, "hourly")
+    global results[q,1], results[q,2], results[q,3:6], results[q,7:9], results[q,10:11], results[q,12], results[q,13], results[q,14], results[q,15], Overbid_distribution[:,q], Upwards_bids[:,(q-1)*NF+1:q*NF], Downwards_bids[:,(q-1)*NF+1:q*NF], results_CB_1[q,1], results_CB_1[q,2], flex_used_up_m[:,q], flex_used_down_m[:,q], hourly_revenue[:,q], hourly_penalty[:,q]  = Main_stochastic_CC_OSS_folded_one(CB_Is, "hourly")
 
     results_df = DataFrame(results, :auto)
     CSV.write("$base_path"*"3. Simulations\\Stochastic results\\results_tester_1BC_1.csv", results_df)
@@ -59,9 +64,13 @@ for q=1:TE
     results_df = DataFrame(Downwards_bids, :auto)
     CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Downwards_bids_tester_1BC_1.csv", results_df)
 
-
     results_df = DataFrame(results_CB_1, :auto)
     CSV.write("$base_path"*"3. Simulations\\Stochastic results\\1BSresultss_tester_1BC_1.csv", results_df)
 
+    results_df = DataFrame(flex_used_up_m, :auto)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\flex_used_up_m_tester_1BC_1.csv", results_df)
+
+    results_df = DataFrame(flex_used_down_m, :auto)
+    CSV.write("$base_path"*"3. Simulations\\Stochastic results\\flex_used_down_m_tester_1BC_1.csv", results_df)
 
 end

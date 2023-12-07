@@ -14,13 +14,13 @@
 function Main_stochastic_CC_OSS_folded_one(CB_Is, model_res)
 
     # Static Parameters
-    global NF = 5                                           # Number of folds
+    global NF = 3                                           # Number of folds
     global test_type = "T2"
     global T = 24                                           # hours on a day
     global M = 60                                           # minutes in an hour
-    global S = 202                                          # number of samples in IS
+    global S = 11                                          # number of samples in IS
     global M_d = T*M                                        # minutes per model, i.e. per day
-    global Pen_e_coef = 3                                   # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
+    global Pen_e_coef = 6                                   # multiplier on energy for not delivering the activation -> 6, implies we have to pay the capacity back and that it 5 times as expensive tp buy the capacity back
     global Days = 365
     global I = size(CB_Is)[1]
     global RM = 0.9                                         # %-end SoC assumed, e.g. 0.9 means we assume all charges charge to 90%
@@ -85,23 +85,31 @@ function Main_stochastic_CC_OSS_folded_one(CB_Is, model_res)
             println(round((time_ns() - start_2) / 1e9, digits = 3))
 
             ###### Simulate day of operation on realized data ######
-            obj, pen, missing_delivery_storer[1,Day,:], missing_capacity_storer[1,Day,:], missing_capacity_storer_per[1,Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,w], Up_bids_A[:,w], La_do_r, La_up_r)
+            revenue[1+(Day-1)*24:Day*24,1], penalty[1+(Day-1)*24:Day*24,1], missing_delivery_storer[1,Day,:], missing_capacity_storer[1,Day,:], missing_capacity_storer_per[1,Day,:, :]  = operation(total_flex_up_r, total_flex_do_r, res_20_r, Ac_do_M_r, Ac_up_M_r, Do_bids_A[:,w], Up_bids_A[:,w], La_do_r, La_up_r)
 
 
             for t=1:24
                 for m=1:60
                     CB_flex_bid[1, 60*(t-1)+m, Day] =  Up_bids_A[60*(t-1)+m, w]/total_flex_do_r[60*(t-1)+m]*Upwards_flex_CB1[(Day-1)*1440+60*(t-1)+m]
                     CB_flex_bid[2, 60*(t-1)+m, Day] =  Do_bids_A[60*(t-1)+m, w]/total_flex_do_r[60*(t-1)+m]*Downwards_flex_CB1[(Day-1)*1440+60*(t-1)+m]
+
+
+                    if Upwards_flex_CB1[(Day-1)*1440+60*(t-1)+m] > 0
+                        CB_flex_pr[1, 60*(t-1)+m, Day] =  (Up_bids_A[60*(t-1)+m, w]/total_flex_do_r[60*(t-1)+m]*Upwards_flex_CB1[(Day-1)*1440+60*(t-1)+m])/Upwards_flex_CB1[(Day-1)*1440+60*(t-1)+m]
+                    else
+                        CB_flex_pr[1, 60*(t-1)+m, Day] = -1
+                    end
+                    if Downwards_flex_CB1[(Day-1)*1440+60*(t-1)+m] > 0
+                        CB_flex_pr[2, 60*(t-1)+m, Day] =  (Do_bids_A[60*(t-1)+m, w]/total_flex_do_r[60*(t-1)+m]*Downwards_flex_CB1[(Day-1)*1440+60*(t-1)+m])/Downwards_flex_CB1[(Day-1)*1440+60*(t-1)+m]
+                    else
+                        CB_flex_pr[2, 60*(t-1)+m, Day] = -1
+                    end
+
                 end
             end
-
-
             # update results:
             Total_flex_up[1,:, Day]   = total_flex_up_r
             Total_flex_do[1,:, Day]   = total_flex_do_r
-
-            revenue[1] = revenue[1] + obj
-            penalty[1] = penalty[1] + pen
 
         end
     end
@@ -120,16 +128,29 @@ function Main_stochastic_CC_OSS_folded_one(CB_Is, model_res)
     total_delivery_missed[1,1] =  round( sum(missing_delivery_storer[1,:,1])/(n_days*NF) ,  digits= 3 )   # % of of down bids that could not be delivered
     total_delivery_missed[1,2] =  round( sum(missing_delivery_storer[1,:,2])/(n_days*NF) ,  digits= 3 )   # % of of up bids that could not be delivered
 
-    revenue[1] = revenue[1]/(n_days*NF)       # normlize it so it on a daily scale
-    penalty[1] = penalty[1]/(n_days*NF)       # normlize it so it on a daily scale
+    rev_mean = sum(revenue[:,1])/(n_days*NF)       # normlize it so it on a daily scale
+    pen_mean = sum(penalty[:,1])/(n_days*NF)       # normlize it so it on a daily scale
 
-    println("The revenue for the entery perioed was $(revenue[1])")
-    println("The Penalty would be $(penalty[1])")
+    println("The revenue for the entery perioed was $(sum(revenue))")
+    println("The Penalty would be $(sum(penalty))")
 
+    for d=2:364
+        for m=1:M_d
+            if missing_capacity_storer_per[1,d,m,1] >  missing_capacity_storer_per[1,d,m,2] &&   missing_capacity_storer_per[1,d,m,1] >  missing_capacity_storer_per[1,d,m,3]
+                missing_capacity_storer_per_max[(d-1)*M_d+m] = missing_capacity_storer_per[1,d,m,1]
+            elseif missing_capacity_storer_per[1,d,m,2] > missing_capacity_storer_per[1,d,m,3]
+                missing_capacity_storer_per_max[(d-1)*M_d+m] = missing_capacity_storer_per[1,d,m,2]
+            else
+                missing_capacity_storer_per_max[(d-1)*M_d+m] = missing_capacity_storer_per[1,d,m,3]
+            end
+        end
+    end
     CB_flex_bid = replace!(x -> isnan(x) ? 0.0 : x, CB_flex_bid)
     CB1_pr_flex_used_up = sum(CB_flex_bid[1, :, :])/sum(Upwards_flex_CB1)
     CB1_pr_flex_used_do = sum(CB_flex_bid[2, :, :])/sum(Downwards_flex_CB1)
+    CB_minute_do_flex = vec(CB_flex_pr[2, :, :])
+    CB_minute_up_flex = vec(CB_flex_pr[2, :, :])
 
     clock = round((time_ns() - start_1) / 1e9, digits = 3)
-    return revenue[1], penalty[1], total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer[1,:,4], Up_bids_A[:,1:NF], Do_bids_A[:,1:NF], CB1_pr_flex_used_up, CB1_pr_flex_used_do
+    return rev_mean, pen_mean, total_cap_missed[1,:], average_cap_missed[1,:], total_delivery_missed[1,:], pr_flex_used_up[1], pr_flex_used_do[1], model_runtime, clock, missing_capacity_storer[1,:,4], Up_bids_A[:,1:NF], Do_bids_A[:,1:NF], CB1_pr_flex_used_up, CB1_pr_flex_used_do, CB_minute_up_flex, CB_minute_do_flex,  revenue[:,1], penalty[:,1]
 end
