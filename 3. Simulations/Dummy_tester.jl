@@ -3,7 +3,7 @@ using DataFrames
 using Random
 
 # input what to test
-global model = "CVaR"#  or "CVaR"
+global model = "ALSO"#  or "CVaR"
 global Sampling = 4 # 1-4
 global N_CB = 500 # nuber of CBs to test
 global model_res = "hourly" # or "daily"

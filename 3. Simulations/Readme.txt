@@ -4,7 +4,7 @@ Folder mainly used to align work between team
 
 overview of files/folders:
 
-Stochastic results: where all results are stored
+Stochastic results: where all results are stored -> not included in push, as files are to large
 
 Plots: where plots are stored and where plot scripts are placed
 
