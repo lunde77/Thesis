@@ -121,7 +121,7 @@ function resoivior_avaible_excel(Connected, po_cap, kWh_cap, RM)
       # compute how much power we acutlly can charge with if not to violate capacity
       if m_connect != 0
          addional_resovior =  (kWh_cap[m_dis-1]/po_cap[m_dis-1]/RM-kWh_cap[m_dis-1])/(m_dis-m_connect)
-         if addional_resovior > -0-1
+         if addional_resovior > -1
 
          else
             println(addional_resovior)

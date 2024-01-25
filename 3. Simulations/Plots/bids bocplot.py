@@ -3,21 +3,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Replace these file paths with your actual CSV file paths
-csv_file_path1 = r"C:\Users\Gustav\Documents\Thesis\Git\3. Simulations\Stochastic results\old results\CVaR VS ALSO-X downwards bids.csv"
-csv_file_path2 = r"C:\Users\Gustav\Documents\Thesis\Git\3. Simulations\Stochastic results\Downwards_bids day dependent distributions.csv"
+csv_file_path1 = r"C:\Users\Gustav\Documents\Thesis\Git\3. Simulations\Stochastic results\plot 9 (conditinal bud)\Downwards_bids_ALSO_3).csv"
+csv_file_path2 = r"C:\Users\Gustav\Documents\Thesis\Git\3. Simulations\Stochastic results\plot 9 (conditinal bud)\Downwards_bids_ALSO_condtional).csv"
 
 # Specify the columns you want to use (e.g., ['A', 'B', 'C', 'D', 'E'])
-columns_to_use = ['column1', 'column2', 'column3', 'column4', 'column5']
+# columns_to_use = ['column1', 'column2', 'column3', 'column4', 'column5']
 
 # Load the CSV files
-file2 = pd.read_csv(csv_file_path1, usecols=['x6', 'x9', 'x7', 'x8', 'x10'])
-file1 = pd.read_csv(csv_file_path2, usecols=['x6', 'x9', 'x7', 'x8', 'x10'])
-file3 = pd.read_csv(csv_file_path2, usecols=['x1', 'x2', 'x3', 'x4', 'x5'])
+file2 = pd.read_csv(csv_file_path1, usecols=['x1', 'x2', 'x3'])
+file1 = pd.read_csv(csv_file_path2, usecols=['x4', 'x5', 'x6'])
+file3 = pd.read_csv(csv_file_path2, usecols=['x1', 'x2', 'x3'])
 
 # Reshape the data into 24x5 matrices
-matrix1 = file1.iloc[::60, :].values.reshape(24, 5)
-matrix2 = file2.iloc[::60, :].values.reshape(24, 5)
-matrix3 = file3.iloc[::60, :].values.reshape(24, 5)
+matrix1 = file1.iloc[::60, :].values.reshape(24, 3)
+matrix2 = file2.iloc[::60, :].values.reshape(24, 3)
+matrix3 = file3.iloc[::60, :].values.reshape(24, 3)
 # Function to plot a single boxplot for all rows
 
 import matplotlib.pyplot as plt

@@ -8,14 +8,14 @@ using XLSX
 
 ##################
 
-if false # plot flexibility of sample sapce vs bids
+if true # plot flexibility of sample sapce vs bids
 
     # Sample data (replace this with your actual data)
     x = 1:1440  # Replace with your x-values
 
     # Sample bid values (replace this with your actual bid values)
-    bid_values = Downwards_bids[:,2]  # Replace with your bid values
-    S = 365
+    bid_values = ones(1440)*2 #Downwards_bids[:,2]  # Replace with your bid values
+    S = 216
     total_flex_do_s_pl = zeros(1440,S)
     total_flex_up_s_5_pl = zeros(1440,S)
     total_flex_up_s_pl = zeros(1440,S)
@@ -33,20 +33,39 @@ if false # plot flexibility of sample sapce vs bids
     plot_sample_start = 1
     plot_sample_end = 1440
 
-    q10_values = [quantile(total_flex_up_s_5_pl[i, :], 0.10) for i in 1:1440]
-    q00_values = [findmin(total_flex_up_s_5_pl[i,:])[1] for i in 1:1440]
-    q100_values = [findmax(total_flex_up_s_5_pl[i,:])[1] for i in 1:1440]
+    q10_values = [quantile(total_flex_do_s_pl[i, :], 0.10) for i in 1:1440]
+    q00_values = [findmin(total_flex_do_s_pl[i,:])[1] for i in 1:1440]
+    q100_values = [findmax(total_flex_do_s_pl[i,:])[1] for i in 1:1440]
 
-    plot(x[plot_sample_start:plot_sample_end], bid_values[plot_sample_start:plot_sample_end], ribbon = (-q00_values[plot_sample_start:plot_sample_end]+bid_values[plot_sample_start:plot_sample_end], q100_values[plot_sample_start:plot_sample_end]-bid_values[plot_sample_start:plot_sample_end]), label = "Sample space (energy flexibility)", fillalpha = 0.2, legend = true)
+    lower_bound = bid_values[plot_sample_start:plot_sample_end] - q00_values[plot_sample_start:plot_sample_end]
+    upper_bound = q100_values[plot_sample_start:plot_sample_end] - bid_values[plot_sample_start:plot_sample_end]
 
-    # Label the ribbon and the line components individually
-    #plot(x[plot_sample_start:plot_sample_end], bid_values[plot_sample_start:plot_sample_end], alpha = 1.0, label = "Bid")
-    plot!(x[plot_sample_start:plot_sample_end], q10_values[plot_sample_start:plot_sample_end], line = :dash, color = :blue, alpha = 0.3, label = "10th Quantile")
+
+
+    plot(x[plot_sample_start:plot_sample_end],
+         bid_values[plot_sample_start:plot_sample_end],
+         ribbon = (-q00_values[plot_sample_start:plot_sample_end] + bid_values[plot_sample_start:plot_sample_end],
+                   q100_values[plot_sample_start:plot_sample_end] - bid_values[plot_sample_start:plot_sample_end]),
+         label = "",
+         color = :orchid,
+         fillalpha = 0.2,
+         legend = :top,
+         linecolor = :transparent, # Make the line transparent
+         ylim = (0, 2000), # Set the limits for the y-axis here
+         xguidefontsize = 13, # X-axis label font size
+         yguidefontsize = 13, # Y-axis label font size
+         xtickfontsize = 11, # X-axis tick font size
+         ytickfontsize = 11, # Y-axis tick font size
+         legendfontsize = 11,
+         grid = false) # Legend font size
+
+    plot!([NaN], [NaN], label="Sample set range", color = :orchid, fillalpha = 0.2)
+    plot!(x[plot_sample_start:plot_sample_end], q10_values[plot_sample_start:plot_sample_end], line = :dash, color = :royalblue4, alpha = 0.3, label = "10th Quantile")
 
     xlabel!("Time (Minutes)")
-    ylabel!("downwards flexibility (kW)")
-    title!("Sample space for hourly sampling")
-    savefig(raw"C:\Users\Gustav\Documents\Thesis\Git\3. Simulations\Plots\sample space sampling 1 500 CBS.png")
+    ylabel!("Downwards flexibility (kW)")
+    title!("Dependent Sampling")
+    savefig(raw"C:\Users\Gustav\Documents\Thesis\Git\3. Simulations\Plots\sample space sampling 1 500 CBS new.png")
 
 end
 
@@ -110,7 +129,7 @@ if false
     savefig(raw"C:\Users\Gustav\Documents\Thesis\Git\3. Simulations\Plots\overbid_p vs bid.png")
 end
 
-if true
+if false
 
     bid_values = zeros(25)
     data = [randn(S*M) for _ in 1:24]

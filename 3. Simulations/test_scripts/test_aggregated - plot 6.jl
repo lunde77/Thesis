@@ -2,7 +2,7 @@ using CSV
 using DataFrames
 using Random
 
-global Emil = true
+global Emil = false
 
 if Emil
     base_path = "C:\\Users\\ASUS\\Documents\\11. sem - kand\\github\\Thesis\\"
@@ -31,14 +31,16 @@ end
 # 18: Upwards bid for each hour
 # 18: downwards bid for each hour
 
-#global N_size = [1400, 700, 350, 200, 140, 100, 50, 20]
-#global N_bundles   = [1, 2, 4, 7, 10, 14, 28, 70]
-global N_size = [20]
-global N_bundles = [70]
+global N_size = [1400, 700, 350, 200, 140, 100, 50, 20]
+global N_bundles   = [1, 2, 4, 7, 10, 14, 28, 70]
+#global N_size = [20]
+#global N_bundles = [70]
 
-for x=1:1
+z = [2,3,5,6]
+for x in z
+
     TE = N_bundles[x]
-    NF = 3 
+    NF = 3
     global results = zeros(TE,15)
     global Overbid_distribution = zeros(365,TE)
     global Upwards_bids = zeros(1440,TE*5)
@@ -46,28 +48,30 @@ for x=1:1
     global hourly_revenue = zeros(8760,TE)
     global hourly_penalty = zeros(8760,TE)
 
-    for q=19:TE
+    for q=1:TE
         CB_Is = collect((q-1)*N_size[x]+1:q*N_size[x])
 
-        global results[q,1], results[q,2], results[q,3:6], results[q,7:9], results[q,10:11], results[q,12], results[q,13], results[q,14], results[q,15], Overbid_distribution[:,q], Upwards_bids[:,(q-1)*NF+1:q*NF], Downwards_bids[:,(q-1)*NF+1:q*NF], xxx, xxx, hourly_revenue[:,q], hourly_penalty[:,q] = Main_stochastic_CC_OSS_folded(CB_Is, "hourly")
+
+        global results[q,1], results[q,2], results[q,3:6], results[q,7:9], results[q,10:11], results[q,12], results[q,13], results[q,14], results[q,15], Overbid_distribution[:,q], Upwards_bids[:,(q-1)*NF+1:q*NF], Downwards_bids[:,(q-1)*NF+1:q*NF], xxx, xxx, hourly_revenue[:,q], hourly_penalty[:,q] = Main_stochastic_CC_OSS_folded(CB_Is, "hourly" , 0.1)
+
 
         results_df = DataFrame(results, :auto)
-        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\results_N_bundles_2_$(N_bundles[x]).csv", results_df)
+        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\results_N_bundles_4_$(N_bundles[x]).csv", results_df)
 
         results_df = DataFrame(Overbid_distribution, :auto)
-        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Overbid_distribution_N_bundles_2_$(N_bundles[x]).csv", results_df)
+        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Overbid_distribution_N_bundles_4_$(N_bundles[x]).csv", results_df)
 
         results_df = DataFrame(Upwards_bids, :auto)
-        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Upwards_bids_N_bundles_2_$(N_bundles[x]).csv", results_df)
+        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Upwards_bids_N_bundles_4_$(N_bundles[x]).csv", results_df)
 
         results_df = DataFrame(Downwards_bids, :auto)
-        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Downwards_bids_N_bundles_2_$(N_bundles[x]).csv", results_df)
+        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Downwards_bids_N_bundles_4_$(N_bundles[x]).csv", results_df)
 
         results_df = DataFrame(hourly_penalty, :auto)
-        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Hourly_penalty_N_bundles_2_$(N_bundles[x]).csv", results_df)
+        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Hourly_penalty_N_bundles_4_$(N_bundles[x]).csv", results_df)
 
         results_df = DataFrame(hourly_revenue, :auto)
-        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Hourly_revenue_N_bundles_2_$(N_bundles[x]).csv", results_df)
+        CSV.write("$base_path"*"3. Simulations\\Stochastic results\\Hourly_revenue_N_bundles_4_$(N_bundles[x]).csv", results_df)
 
     end
 end

@@ -1,12 +1,12 @@
 function load_results_storer()
     global revenue =  zeros(8760,2)                                                                              # DKK of revenue during Simulation periode
     global penalty =  zeros(8760,2)                                                                              # DKK of penalty during Simulation periode
-    global missing_delivery = zeros(2,1)                                                                      # kWh of missed delivery during Simulations
-    global Up_bids_A = zeros(M_d,Days)                                                                      # total up bid i kW for each day and minute                                                    # not used
-    global Do_bids_A = zeros(M_d,Days)                                                                      # total down bid i kW for each day and minute                                                  # not used
-    #global Up_bids_I = zeros(M_d,Days,I,S)                                                                  # total up bid distribued amongst charges for each scenario in kW for each day and minute      # not used
+    global missing_delivery = zeros(2,1)                                                                         # kWh of missed delivery during Simulations
+    global Up_bids_A = zeros(M_d,Days)                                                                           # total up bid i kW for each day and minute                                                    #
+    global Do_bids_A = zeros(M_d,Days)                                                                           # total down bid i kW for each day and minute
+    #global Up_bids_I = zeros(M_d,Days,I,S)                                                                      # total up bid distribued amongst charges for each scenario in kW for each day and minute      # not used
     #global Do_bids_I = zeros(M_d,Days,I,S)                                                                  # total down bid distribued amongst charges for each scenario in kW for each day and minute    # not used
-    global ex_p_do = zeros(2,M_d,Days,S)                                                                      # expected penalty cost for down bid
+    global ex_p_do = zeros(2,M_d,Days,S)                                                                      # expected penalty cost for down bid                                                              not used
     global ex_p_up = zeros(2,M_d,Days,S)                                                                      # expected penalty cost for up bid
     global ex_p_total = zeros(2,Days)                                                                         # total expected pentalty
     #global Activation_energy = zeros(M_d,Days,I)                                                            # sum of activated energy for each day to each minute for each charger                         # not used
@@ -61,5 +61,6 @@ function load_results_storer()
 
     global rev_mean_MR = zeros(2)                                                                                  # the mean revenue for an in an out of smaple
     global pen_mean_MR = zeros(2)                                                                                  # the mean penality for an in an out of smaple
+    global model_runtime = 0
 
 end

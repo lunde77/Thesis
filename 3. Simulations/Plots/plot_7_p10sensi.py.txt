@@ -1,0 +1,132 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Dec 11 17:53:20 2023
+
+@author: Gustav
+"""
+import matplotlib.pyplot as plt
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+#from brokenaxes import brokenaxes
+import seaborn as sns
+import matplotlib.pyplot as plt
+from scipy.stats import gaussian_kde
+
+plt.rcParams.update({'font.size': 8.5})  # You can adjust the size as needed
+
+# Define the "rocket" color palette from Seaborn
+palette = sns.color_palette("rocket", 5)
+
+
+
+df1 = pd.read_csv( r"C:\Users\gustav.lunde\OneDrive - Viasol\Dokumenter\DTU\results_N_CBS_50.csv")
+line1_y_values = df1.iloc[0:17,12]*100
+
+df1 = pd.read_csv( r"C:\Users\gustav.lunde\OneDrive - Viasol\Dokumenter\DTU\results_N_CBS_100.csv")
+line2_y_values = df1.iloc[0:17,12]*100
+
+df1 = pd.read_csv( r"C:\Users\gustav.lunde\OneDrive - Viasol\Dokumenter\DTU\results_N_CBS_250.csv")
+line3_y_values = df1.iloc[0:17,12]*100
+
+df1 = pd.read_csv( r"C:\Users\gustav.lunde\OneDrive - Viasol\Dokumenter\DTU\results_N_CBS_500.csv")
+line4_y_values = df1.iloc[0:17,12]*100
+
+df1 = pd.read_csv( r"C:\Users\gustav.lunde\OneDrive - Viasol\Dokumenter\DTU\results_N_CBS_1400.csv")
+line5_y_values = df1.iloc[0:17,12]*100
+
+# Create a figure and an axes
+fig, ax = plt.subplots()
+
+# Setting up the X-axis from 0 to 20 in steps of 2
+x_values = list(np.arange(0, 2, 0.5))
+x_values_1 = list(np.arange(2, 21, 2))
+
+# Append 50 and 100 to the x_values list
+# Append 50 and 100 to the x_values list
+x_values.extend(x_values_1)
+x_values.extend([30,40,50])
+
+
+# Define a color palette
+colors = ['deepskyblue', 'limegreen', 'fuchsia', 'gold', 'darkorange']
+
+
+# Adding lines to the plot with semi-transparency using the color palette
+# The color order is matched to the line order
+
+ax.plot(x_values, line1_y_values, label='50', color=palette[4], alpha=0.3)
+ax.plot(x_values, line2_y_values, label='100', color=palette[3], alpha=0.3)
+ax.plot(x_values, line3_y_values, label='250', color=palette[2], alpha=0.3)
+ax.plot(x_values, line4_y_values, label='500', color=palette[1], alpha=0.3)
+ax.plot(x_values, line5_y_values, label='1400', color=palette[0], alpha=0.3)
+
+# Calculate the mean line
+mean_y_values = np.mean([line1_y_values, line2_y_values, line3_y_values, line4_y_values, line5_y_values], axis=0)
+
+# Add the mean line as a dotted line
+ax.plot(x_values, mean_y_values, label='Mean', color='black', linestyle='dotted')
+
+# Finding the minimum and maximum y-values at each x-value
+min_y_values = np.minimum.reduce([line1_y_values, line2_y_values, line3_y_values, line4_y_values, line5_y_values])
+max_y_values = np.maximum.reduce([line1_y_values, line2_y_values, line3_y_values, line4_y_values, line5_y_values])
+
+# Shading the area between the minimum and maximum lines with semi-transparency
+ax.fill_between(x_values, min_y_values, max_y_values, color='grey', alpha=0.3)
+
+# Adding labels and title
+ax.set_xlabel('Frequency of Overbids Allowed (%)')
+ax.set_ylabel('% of total flexibility bid')
+ax.legend()
+ax.grid(axis='y', alpha=0.7)
+ax.grid(axis='x', alpha=0.7)
+
+# Show the plot
+plt.show()
+
+
+#########################
+
+line1_y_values_1_gr = np.zeros(17-1)
+
+line2_y_values_2_gr = np.zeros(17-1)
+
+line3_y_values_3_gr = np.zeros(17-1)
+
+line4_y_values_4_gr = np.zeros(17-1)
+
+line5_y_values_5_gr = np.zeros(17-1)
+
+for j in range(16):
+    line1_y_values_1_gr[j] = (line1_y_values[j+1]-line1_y_values[j])/(x_values[j+1]-x_values[j])
+    line2_y_values_2_gr[j] = (line2_y_values[j+1]-line2_y_values[j])/(x_values[j+1]-x_values[j])
+    line3_y_values_3_gr[j] = (line3_y_values[j+1]-line3_y_values[j])/(x_values[j+1]-x_values[j])
+    line4_y_values_4_gr[j] = (line4_y_values[j+1]-line4_y_values[j])/(x_values[j+1]-x_values[j])
+    line5_y_values_5_gr[j] = (line5_y_values[j+1]-line5_y_values[j])/(x_values[j+1]-x_values[j])
+
+
+
+ax.plot(x_values[1:17], line1_y_values_1_gr, label='50', color=palette[4], alpha=0.6)
+ax.plot(x_values[1:17], line2_y_values_2_gr, label='100', color=palette[3], alpha=0.6)
+ax.plot(x_values[1:17], line3_y_values_3_gr, label='250', color=palette[2], alpha=0.6)
+ax.plot(x_values[1:17], line4_y_values_4_gr, label='500', color=palette[1], alpha=0.6)
+ax.plot(x_values[1:17], line5_y_values_5_gr, label='1400', color=palette[0], alpha=0.6)
+
+
+
+# Adding labels and title
+ax.set_xlabel('Frequency of Overbids Allowed (%)')
+ax.set_ylabel('% of total flexibility bid')
+ax.legend()
+ax.grid(axis='y', alpha=0.7)
+ax.grid(axis='x', alpha=0.7)
+ax.set_ylim(0, 3)
+
+# Show the plot
+plt.show()
+
+

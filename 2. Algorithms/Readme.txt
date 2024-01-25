@@ -1,9 +1,9 @@
-overview of files/folders:s
+overview of files/folders
 
-ALSO_X_hourly: The also-X algorithm, which solves given hour 
+ALSO_X_hourly: The also-X algorithm, which solves given hour
 
-Day_simulater_without_energy: The realixation algorithm
+Day_simulater_without_energy: The realization algorithm
 
-Chance with ADMM: Work in pogress files
+sensitivity: Algorithms used in the sensitivity analyses
 
 reference algorithms: old models that are still used for references

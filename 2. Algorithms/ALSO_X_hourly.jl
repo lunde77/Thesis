@@ -7,7 +7,7 @@ function ALSO_X_hourly(total_flex_up_s, total_flex_do_s, res_20_s)
     Threads.@threads for t=1:24
         println("hour is $t")
         ###### run model - make the bids ######
-        fail_rate = 0.1
+        #fail_rate = 0.1
         q_L = 0
         q_H = fail_rate*M*S
         # store the itteration

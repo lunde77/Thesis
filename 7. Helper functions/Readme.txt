@@ -2,7 +2,7 @@ Overwiev of folders\files:
 
 Non main function: a lot for small extra function stored here - not all are sill in use
 
-Load_aggregated_data: all data for the given potefolio are stored and the distribution created
+Load_aggregated_data: all data for the given portefolio are stored and the distribution created
 
 Load_daily_data: for each day one realizes, the daily data is loaded
 
